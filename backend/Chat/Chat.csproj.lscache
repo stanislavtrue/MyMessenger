@@ -374,6 +374,10 @@ Program.cs
  System.Xml.XPath.dll
  System.Xml.XPath.XDocument.dll
  WindowsBase.dll
+<NUGET>/
+ microsoft.extensions.caching.stackexchangeredis/10.0.8/lib/net10.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll
+ pipelines.sockets.unofficial/2.2.8/lib/net5.0/Pipelines.Sockets.Unofficial.dll
+ stackexchange.redis/2.7.27/lib/net6.0/StackExchange.Redis.dll
 
 [analyzerReferences]
 <DOTNET>/packs/Microsoft.AspNetCore.App.Ref/10.0.4/analyzers/dotnet/cs/

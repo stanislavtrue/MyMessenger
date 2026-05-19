@@ -32,15 +32,31 @@ function App(){
     }
   };
 
+  const sendMessage = (message) => {
+    if(connection) {
+      connection.invoke("SendMessage", message);
+    }
+  };
+
+  const closeChat = async () => {
+    await connection.stop();
+    setConnection(null);
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-[#242424]">
       {connection ? ( 
-        <Chat messages={messages} chatRoom={chatRoom} /> 
+        <Chat 
+          messages={messages} 
+          chatRoom={chatRoom} 
+          sendMessage={sendMessage}
+          closeChat={closeChat}
+        /> 
       ) : ( 
         <WaitingRoom joinChat={joinChat}/> 
       )}
     </div>
   );
-}
+};
 
 export default App;

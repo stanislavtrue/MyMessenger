@@ -33,16 +33,40 @@ public class ChatHub : Hub<IChatClient>
 
     public async Task SendMessage(string message)
     {
-        var stringConnection = await _cache.GetAsync(Context.ConnectionId);
+        var stringConnection = await _cache.GetStringAsync(Context.ConnectionId);
 
-        var connection=JsonSerializer.Deserialize<UserConnection>(stringConnection);
+        if (stringConnection is null)
+            return;
+
+        var connection = JsonSerializer.Deserialize<UserConnection>(stringConnection);
         
+        if (connection is not null)
+        {
+            await Clients
+                .Group(connection.ChatRoom)
+                .ReceiveMessage(connection.UserName, message);
+        }
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var stringConnection = await _cache.GetStringAsync(Context.ConnectionId);
+
+        if (stringConnection is null)
+            return;
+
+        var connection = JsonSerializer.Deserialize<UserConnection>(stringConnection);
+
         if(connection is not null)
         {
-        await Clients
-            .Group(connection.ChatRoom)
-            .ReceiveMessage(connection.UserName, message);
+            await _cache.RemoveAsync(Context.ConnectionId);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, connection.ChatRoom);
+            
+            await Clients
+                .Group(connection.ChatRoom)
+                .ReceiveMessage("Admin", $"{connection.UserName} leave chat");
         }
 
+        await base.OnDisconnectedAsync(exception);
     }
 }
