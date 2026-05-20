@@ -4,8 +4,8 @@ export const MessageInput = () => {
             w-[90%] h-14
             bg-[#1F1F28]    
             rounded-4xl
-            !mb-4 !mx-auto
-            !px-8
+            mb-4! mx-auto!
+            px-8!
             flex items-center
             focus-within:ring-2
             focus-within:ring-[#957AAA]
@@ -16,7 +16,7 @@ export const MessageInput = () => {
                     w-full
                     h-full
                     bg-transparent
-                    !outline-none
+                    outline-none!
                     text-xl
                 "
                 type="text"
