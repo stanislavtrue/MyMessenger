@@ -5,22 +5,37 @@ export const Sidebar = ({ selectedChat, setSelectedChat }) => {
         {
             id: 1,
             name: "John Sina",
-            lastMessage: "Goodbuy!"
+            lastMessage: "Goodbuy!",
+            messages: [
+                {
+                    id: 1,
+                    text: "Hello my friend!",
+                    isOwnMessage: false
+                },
+                {
+                    id: 2,
+                    text: "Hi)",
+                    isOwnMessage: true
+                }
+            ]
         },
         {
             id: 2,
             name: "Elon Musk",
-            lastMessage: "Hi, how r u?"
+            lastMessage: "Hi, how r u?",
+            messages: []
         },
         {
             id: 3,
             name: "Cristiano Ronaldo",
-            lastMessage: "Go football!?"
+            lastMessage: "Go football!?",
+            messages: []
         },
         {
             id: 4,
             name: "Noname",
-            lastMessage: "Есть работа курьером, зп-300000к"
+            lastMessage: "Есть работа курьером, зп-300000к",
+            messages: []
         }
     ];
 

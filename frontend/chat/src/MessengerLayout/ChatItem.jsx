@@ -9,8 +9,8 @@ export const ChatItem = ( {chat, selectedChat, setSelectedChat} ) => {
                 flex 
                 items-center 
                 gap-4 
-                !px-4 
-                !py-2
+                px-4!
+                py-2!
                 cursor-pointer
 
                 ${isSelected
