@@ -11,12 +11,27 @@ export const MessageList = ({ messages }) => {
 
             <div className="mt-auto!">
 
-                {messages.map((message) => (
-                    <MessageBubble
-                        key={message.id}
-                        message={message}
-                    />
-                ))}
+                {messages.map((message, index) => {
+                    const previousMessage = messages[index - 1];
+                    const nextMessage = messages[index + 1];
+
+                    const isFirstMessage = 
+                        !previousMessage ||
+                        previousMessage.isOwnMessage !== message.isOwnMessage;
+
+                    const isLastMessage =
+                        !nextMessage ||
+                        nextMessage.isOwnMessage !== message.isOwnMessage;
+
+                    return (
+                        <MessageBubble
+                            key={message.id}
+                            message={message}
+                            isFirstMessage={isFirstMessage}
+                            isLastMessage={isLastMessage}
+                        />
+                    );
+                })}
 
             </div>
 

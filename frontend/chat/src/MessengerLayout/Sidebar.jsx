@@ -16,7 +16,37 @@ export const Sidebar = ({ selectedChat, setSelectedChat }) => {
                     id: 2,
                     text: "Hi)",
                     isOwnMessage: true
-                }
+                },
+                {
+                    id: 3,
+                    text: "Hello my friend!",
+                    isOwnMessage: false
+                },
+                {
+                    id: 4,
+                    text: "Hello my friend!",
+                    isOwnMessage: true
+                },
+                {
+                    id: 5,
+                    text: "Lalala",
+                    isOwnMessage: true
+                },
+                {
+                    id: 6,
+                    text: "Hello my friend!",
+                    isOwnMessage: false
+                },
+                {
+                    id: 7,
+                    text: "Hello my friend!",
+                    isOwnMessage: false
+                },
+                {
+                    id: 8,
+                    text: "Hello my friend!",
+                    isOwnMessage: false
+                },
             ]
         },
         {
