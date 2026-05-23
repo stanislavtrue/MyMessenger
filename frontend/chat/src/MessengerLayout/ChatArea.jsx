@@ -3,7 +3,7 @@ import { ChatHeader } from "./ChatHeader";
 import { MessageInput } from "./MessageInput";
 import { MessageList } from "./MessageList";
 
-export const ChatArea = ({ selectedChat }) => {
+export const ChatArea = ({ selectedChat, onSendMessage}) => {
     if(!selectedChat) {
         return (
             <div className="w-2/3 h-screen bg-[#16161D] flex justify-center items-center">
@@ -19,12 +19,16 @@ export const ChatArea = ({ selectedChat }) => {
 
             <ChatHeader chat={selectedChat} />
 
-            <div className="flex-1 overflow-y-auto min-h-0">
-                <MessageList messages={selectedChat.messages} />
+            <div className="flex-1 overflow-y-auto messages-scroll">
+                <div className="w-full h-full max-w-180 mx-auto!">
+                    <MessageList messages={selectedChat.messages} />
+                </div>
             </div>
 
             <div className="pb-4!">
-                <MessageInput />
+                <div className="w-full max-w-180 mx-auto!">
+                    <MessageInput onSendMessage={onSendMessage} />
+                </div>
             </div>
 
         </div>

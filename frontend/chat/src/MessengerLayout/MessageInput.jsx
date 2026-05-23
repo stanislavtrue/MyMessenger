@@ -1,10 +1,22 @@
-export const MessageInput = () => {
+import { useState } from "react";
+
+export const MessageInput = ({ onSendMessage }) => {
+    const [message, setMessage] = useState("");
+
+    const handleSend = () => {
+        if(message.trim() === "") return;
+
+        onSendMessage(message);
+
+        setMessage("");
+    };
+
     return (
         <div className="
-            w-[90%] h-14
+            h-12
             bg-[#1F1F28]    
-            rounded-4xl
-            mb-4! mx-auto!
+            rounded-2xl
+            my-2!  
             px-8!
             flex items-center
             focus-within:ring-2
@@ -12,6 +24,13 @@ export const MessageInput = () => {
             transition-all duration-300
         ">
             <input
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => {
+                    if(e.key == "Enter") {
+                        handleSend();
+                    }
+                }}
                 className="
                     w-full
                     h-full

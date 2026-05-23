@@ -8,3 +8,10 @@ input::placeholder {
 body {
     font-family: 'B612', sans-serif;
 }
+.messages-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.messages-scroll {
+    scrollbar-width: none;
+}

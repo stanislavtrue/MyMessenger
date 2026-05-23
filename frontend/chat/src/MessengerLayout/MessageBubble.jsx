@@ -1,45 +1,79 @@
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
+
+    let radiusClass = "";
+    let spacingClass = "";
+
+    if (isFirstMessage && isLastMessage)
+    {
+        spacingClass="mb-3!"
+    }
+
+    if (!isFirstMessage && !isLastMessage) 
+    {
+        if (message.isOwnMessage)
+        {
+            radiusClass="rounded-br-sm rounded-tr-sm"
+        }
+        else
+        {
+            radiusClass="rounded-bl-sm rounded-tl-sm"
+        }
+    }
+    else if (isFirstMessage && !isLastMessage)
+    {
+        if (message.isOwnMessage)
+        {
+            radiusClass="rounded-br-sm"
+        }
+        else 
+        {
+            radiusClass="rounded-bl-sm"
+        }
+    }
+    else if (!isFirstMessage && isLastMessage)
+    {
+        spacingClass="mb-3!"
+        if (message.isOwnMessage)
+        {
+            radiusClass="rounded-tr-sm"
+        }
+        else
+        {
+            radiusClass="rounded-tl-sm"
+        }
+    }
+
     return (
         <div className={`
                 relative
                 w-fit
                 max-w-[70%]
-                rounded-xl
+                rounded-2xl
                 
-                py-1! px-4! mx-16! mb-1!
+                py-1! px-3! mb-1!
                 wrap-break-word
+
+                ${radiusClass}
+
+                ${spacingClass}
                 
                 ${message.isOwnMessage
-                    ? "ml-auto! bg-[#363646]"
-                    : "mr-auto! bg-[#957AAA]"
+                    ? "ml-auto! mr-4! bg-[#363646]"
+                    : "mr-auto! ml-4! bg-[#5A4282]"
                 }
-
-                ${isFirstMessage && isLastMessage 
-                    ? "rounded-xl! mb-3!"
-                    : ""
-                }
-
-                ${!isFirstMessage && !isLastMessage && message.isOwnMessage
-                    ? "rounded-tr-xs rounded-br-xs"
-                    : "rounded-tl-xs rounded-bl-xs"
-                }
-
-                ${isFirstMessage && message.isOwnMessage
-                    ? "rounded-br-xs"
-                    : "rounded-bl-xs"
-                }
-
-                ${isLastMessage && message.isOwnMessage
-                    ? "rounded-tr-xs"
-                    : "rounded-tl-xs"
-                }
-
-
             `}
         >
             
-            <div className="text-white text-lg!">
-                {message.text}
+            <div className="flex items-end gap-2">
+
+                <span className="text-white">
+                    {message.text}
+                </span>
+
+                <span className="text-xs! opacity-50 leading-none whitespace-nowrap!">
+                    {message.time}
+                </span>
+
             </div>
 
             {isLastMessage && (
@@ -52,7 +86,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
 
                             ${message.isOwnMessage
                                 ? "right-[-6px] rounded-full bg-[#363646]" 
-                                : "left-[-6px] rounded-full bg-[#957AAA]"
+                                : "left-[-6px] rounded-full bg-[#5A4282]"
                             }
                         `}
                     />
@@ -65,7 +99,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
 
                             ${message.isOwnMessage
                                 ? "right-[-12px] rounded-full bg-[#363646]"
-                                : "left-[-12px] rounded-full bg-[#957AAA]"
+                                : "left-[-12px] rounded-full bg-[#5A4282]"
                             }
                         `} 
                     />

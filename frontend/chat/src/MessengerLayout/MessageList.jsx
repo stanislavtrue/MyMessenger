@@ -1,12 +1,20 @@
+import { useEffect, useRef } from "react";
 import { MessageBubble } from "./MessageBubble";
 
 export const MessageList = ({ messages }) => {
+
+    const bottomRef = useRef(null);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({
+            behavior: "smooth"
+        });
+    }, [messages]);
 
     return (
         <div className="
             flex flex-col 
             h-full py-10!
-            overflow-y-auto
         ">
 
             <div className="mt-auto!">
@@ -32,8 +40,11 @@ export const MessageList = ({ messages }) => {
                         />
                     );
                 })}
+            
+                <div ref={bottomRef} />
 
             </div>
+
 
         </div>
     );
