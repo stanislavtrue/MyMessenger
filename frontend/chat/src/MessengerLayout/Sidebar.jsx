@@ -1,11 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { ChatItem } from "./ChatItem"
-import { Search, Menu, User, Settings } from "lucide-react";
+import { Search, Menu, User, Settings, ArrowLeft } from "lucide-react";
 
 export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
+    const [searchText, setSearchText] = useState("");
+
+    const filteredChats = chats.filter(chat => 
+        chat.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -34,8 +41,15 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
 
                     <div 
                         ref={buttonRef} 
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className={`
+                        onClick={() => {
+                            if (isSearchFocused) {
+                                setIsSearchFocused(false)
+                            } else {
+                                setIsMenuOpen(!isMenuOpen);
+                            }
+                        }}
+                        className="
+                            relative
                             flex items-center justify-center 
                             h-10 w-12
                             rounded-full 
@@ -43,16 +57,33 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                             active:scale-90
                             active:bg-[#52526B]
                             transition-all duration-300
-                             
-                            ${isMenuOpen
-                                ? "bg-[#282836]"
-                                : ""
-                            }
-                        `}
+                            overflow-hidden
+                        "
                     >
                         <Menu 
-                            size={22} 
-                            className="cursor-pointer" 
+                            size={22}
+                            className={`
+                                absolute
+                                transition-all duration-300
+                                
+                                ${isSearchFocused
+                                    ? "opacity-0 rotate-180 scale-50"
+                                    : "opacity-100 rotate-0 scale-100"
+                                }
+                            `}
+                        />
+
+                        <ArrowLeft
+                            size={22}
+                            className={`
+                                absolute
+                                trasition-all duration-300    
+
+                                ${isSearchFocused
+                                    ? "opacity-100 rotate-0 scale-100"
+                                    : "opacity-0 -rotate-180 scale-50"
+                                }
+                            `}
                         />
                     </div>
 
@@ -115,6 +146,9 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                         <Search size={22} className="text-[#52526B] transition-colors group-focus-within:text-[#957AAA]" />
 
                         <input
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onFocus={() => setIsSearchFocused(true)}
                             className="
                                 w-full h-11!
                                 rounded-3xl 
@@ -136,18 +170,18 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
 
             </div>
 
-            <div className="flex flex-col overflow-y-auto">
-                {chats.map((chat) => (
-                    <ChatItem 
-                        key={chat.id} 
-                        chat={chat} 
-                        setSelectedChatId={setSelectedChatId}
-                        selectedChatId={selectedChatId}
-                    />
-                        
-                ))}
-            </div>
-
+            {!isSearchFocused && (
+                <div className="flex flex-col overflow-y-auto">
+                    {chats.map((chat) => (
+                        <ChatItem 
+                            key={chat.id} 
+                            chat={chat} 
+                            setSelectedChatId={setSelectedChatId}
+                            selectedChatId={selectedChatId}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
