@@ -7,7 +7,7 @@ export const ChatArea = ({ selectedChat, onSendMessage}) => {
     if(!selectedChat) {
         return (
             <div className="w-2/3 h-screen bg-[#16161D] flex justify-center items-center">
-                <div className="w-fit !px-3 !py-1 bg-[#1F1F28] rounded-3xl">
+                <div className="w-fit px-3! py-1! bg-[#1F1F28] rounded-3xl">
                     <Heading size="sm" fontFamily="B612" fontWeight="medium" className="text-center">Select a chat to start messaging</Heading>
                 </div>
             </div>

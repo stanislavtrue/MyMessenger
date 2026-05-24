@@ -1,3 +1,4 @@
+import { Mic, Paperclip, Smile } from "lucide-react";
 import { useState } from "react";
 
 export const MessageInput = ({ onSendMessage }) => {
@@ -17,12 +18,15 @@ export const MessageInput = ({ onSendMessage }) => {
             bg-[#1F1F28]    
             rounded-2xl
             my-2!  
-            px-8!
+            px-4!
             flex items-center
             focus-within:ring-2
             focus-within:ring-[#957AAA]
             transition-all duration-300
         ">
+
+            <Smile className="cursor-pointer text-[#5F5F7C]"/>
+
             <input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -32,6 +36,7 @@ export const MessageInput = ({ onSendMessage }) => {
                     }
                 }}
                 className="
+                    pl-3!
                     w-full
                     h-full
                     bg-transparent
@@ -43,9 +48,12 @@ export const MessageInput = ({ onSendMessage }) => {
                 color="white"
                 border="none"
                 _placeholder={{
-                    color: "#52526B"
+                    color: "#5F5F7C"
                 }}
             />
+            <Paperclip size={50} className="cursor-pointer text-[#5F5F7C] px-3!"/>
+
+            <Mic size={42} className="cursor-pointer text-[#5F5F7C] pr-3!" />
 
         </div>
     );

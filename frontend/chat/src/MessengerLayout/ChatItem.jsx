@@ -22,16 +22,16 @@ export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
             `}
         >
 
-            <div className="w-12 h-12 rounded-full bg-[#5A4282] flex items-center justify-center text-white !text-2xl">
+            <div className="w-12 h-12 rounded-full bg-[#5A4282] flex items-center justify-center text-white text-2xl!">
                 {chat.name[0]}
             </div>
 
-            <div className="flex flex-col ">
-                <span className="text-white font-medium !text-lg">
+            <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-white font-medium text-lg! truncate">
                     {chat.name}
                 </span>
         
-                <span className="text-[#52526B] !text-sm">
+                <span className="text-[#52526B] text-sm! truncate">
                     {chat.lastMessage}
                 </span>
             </div>

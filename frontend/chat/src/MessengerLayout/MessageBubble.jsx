@@ -51,8 +51,6 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 rounded-2xl
                 
                 py-1! px-3! mb-1!
-                wrap-break-word
-
                 ${radiusClass}
 
                 ${spacingClass}
@@ -66,11 +64,11 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             
             <div className="flex items-end gap-2">
 
-                <span className="text-white">
+                <span className="text-white whitespace-pre-wrap! overflow-hidden">
                     {message.text}
                 </span>
 
-                <span className="text-xs! opacity-50 leading-none whitespace-nowrap!">
+                <span className="text-xs! opacity-50 leading-none">
                     {message.time}
                 </span>
 
