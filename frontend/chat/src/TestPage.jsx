@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChatArea } from "./MessengerLayout/ChatArea";
 import { Sidebar } from "./MessengerLayout/Sidebar";
 
@@ -75,6 +75,18 @@ function TestPage() {
                         time: "12.41",
                         isOwnMessage: false
                     },
+                    {
+                        id: 12,
+                        text: "John Felix Anthony Cena is an American actor, retired professional wrestler, and former rapper. In professional wrestling, he is signed to WWE as a brand ambassador. He is best known for his in-ring career from 2001 to 2025, where he is recognized by WWE as a record 17-time world champion. ",
+                        time: "12.41",
+                        isOwnMessage: false
+                    },
+                    {
+                        id: 13,
+                        text: "John Felix Anthony Cena is an American actor, retired professional wrestler, and former rapper. In professional wrestling, he is signed to WWE as a brand ambassador. He is best known for his in-ring career from 2001 to 2025, where he is recognized by WWE as a record 17-time world champion. ",
+                        time: "12.41",
+                        isOwnMessage: false
+                    },
                 ],
             },
             {
@@ -94,10 +106,89 @@ function TestPage() {
                 name: "Noname",
                 lastMessage: "Есть работа курьером, зп-300000к",
                 messages: []
-            }         
+            },
+            {
+                id: 5,
+                name: "Linus Torwalds",
+                lastMessage: "",
+                messages: []
+            },
+            {
+                id: 6,
+                name: "Martin",
+                lastMessage: "",
+                messages: []
+            },
+            {
+                id: 7,
+                name: "Alex",
+                lastMessage: "",
+                messages: []
+            },
+            {
+                id: 8,
+                name: "Steve Jobs",
+                lastMessage: "",
+                messages: []
+            },
+            {
+                id: 9,
+                name: "Scammers",
+                lastMessage: "",
+                messages: []
+            },       
+            {
+                id: 10,
+                name: "Scammers",
+                lastMessage: "",
+                messages: []
+            },       
+            {
+                id: 11,
+                name: "Scammers",
+                lastMessage: "",
+                messages: []
+            },       
+            {
+                id: 12,
+                name: "Scammers",
+                lastMessage: "",
+                messages: []
+            },       
+            {
+                id: 13,
+                name: "Scammers",
+                lastMessage: "",
+                messages: []
+            },       
+            {
+                id: 14,
+                name: "Scamme",
+                lastMessage: "",
+                messages: []
+            },       
+            {
+                id: 15,
+                name: "Scammer",
+                lastMessage: "",
+                messages: []
+            },       
     ]);
     
     const [selectedChatId, setSelectedChatId] = useState(null);
+
+    useEffect(() => {
+        const handleEscape = (event) => {
+            if (event.key == "Escape" && document.activeElement.tagName !== "INPUT") {
+                setSelectedChatId(null);
+            }
+        };
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, []);
     
     const selectedChat=chats.find(
         chat => chat.id === selectedChatId
@@ -131,7 +222,7 @@ function TestPage() {
     };
 
     return (
-        <div className="h-screen flex">
+        <div className="h-screen flex overflow-hidden">
             <Sidebar chats={chats} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />
             <ChatArea selectedChat={selectedChat} onSendMessage={handleSendMessage} />
         </div>

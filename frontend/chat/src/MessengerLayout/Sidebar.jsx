@@ -30,12 +30,11 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
     }, []);
 
     return (
-        <div className="w-1/3 h-screen border-r! border-[#282836]! bg-[#1F1F28]">
+        <div className="relative w-1/3 h-screen flex flex-col border-r! border-[#282836]! bg-[#1F1F28] select-none">
 
             <div className="
                 pl-4! pr-2! pt-1! pb-3! 
                 text-center 
-                select-none
             ">
                 <div className="flex items-center relative">
 
@@ -44,6 +43,7 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                         onClick={() => {
                             if (isSearchFocused) {
                                 setIsSearchFocused(false)
+                                setSearchText("")
                             } else {
                                 setIsMenuOpen(!isMenuOpen);
                             }
@@ -65,6 +65,7 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                             className={`
                                 absolute
                                 transition-all duration-300
+                                text-[#707099]
                                 
                                 ${isSearchFocused
                                     ? "opacity-0 rotate-180 scale-50"
@@ -77,7 +78,8 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                             size={22}
                             className={`
                                 absolute
-                                trasition-all duration-300    
+                                transition-all duration-300    
+                                text-[#707099]
 
                                 ${isSearchFocused
                                     ? "opacity-100 rotate-0 scale-100"
@@ -90,7 +92,7 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                     <div
                         ref={menuRef}
                         className={`
-                            absolute
+                            absolute z-50
                             top-13 left-2
                             w-50 h-60
                             rounded-2xl
@@ -134,7 +136,7 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                                 transition-colors
                             "
                         >
-                            <Settings size={20} />
+                            <Settings size={20} className="text-[#707099]" />
                             <span className="text-sm!">Settings</span>
 
                         </div>
@@ -170,8 +172,21 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
 
             </div>
 
-            {!isSearchFocused && (
-                <div className="flex flex-col overflow-y-auto">
+            <div className="relative flex-1 overflow-hidden">
+            
+                <div className={`
+                        absolute inset-0 z-0
+                        overflow-y-auto 
+                        chats-scroll
+                        transition-all duration-50 ease-out
+
+                        ${isSearchFocused
+                            ? "scale-95 opacity-0 pointer-events-none"
+                            : "scale-100 opacity-100"
+                        }
+                    `}
+                >
+
                     {chats.map((chat) => (
                         <ChatItem 
                             key={chat.id} 
@@ -180,8 +195,36 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                             selectedChatId={selectedChatId}
                         />
                     ))}
+
                 </div>
-            )}
+
+                <div className={`
+                        absolute inset-0
+                        overflow-y-auto chats-scroll
+                        transition-all duration-50 ease-out
+
+                        ${isSearchFocused
+                            ? "opacity-100 scale-100"
+                            : "opacity-0 scale-105 pointer-events-none"
+                        }
+                    `}
+                >
+
+                    {searchText.length > 0 && (
+                        filteredChats.map((chat) => (
+                            <ChatItem 
+                                key={chat.id} 
+                                chat={chat} 
+                                setSelectedChatId={setSelectedChatId}
+                                selectedChatId={selectedChatId}
+                            />
+                        ))
+                    )}
+            
+                </div>
+            
+            </div>
+        
         </div>
     );
 }

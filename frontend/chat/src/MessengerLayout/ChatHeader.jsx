@@ -8,6 +8,7 @@ export const ChatHeader = ({ chat }) => {
             bg-[#1F1F28] 
             flex items-center
             m-auto!
+            select-none
         ">
 
 
