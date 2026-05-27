@@ -6,7 +6,7 @@ import { MessageList } from "./MessageList";
 export const ChatArea = ({ selectedChat, onSendMessage}) => {
     if(!selectedChat) {
         return (
-            <div className="w-2/3 h-screen bg-[#16161D] flex justify-center items-center">
+            <div className="w-2/3 h-screen bg-[#111111] flex justify-center items-center">
                 <div className="w-fit px-3! py-1! bg-[#1F1F28] rounded-3xl">
                     <Heading size="sm" fontFamily="B612" fontWeight="medium" className="text-center">Select a chat to start messaging</Heading>
                 </div>
@@ -15,7 +15,7 @@ export const ChatArea = ({ selectedChat, onSendMessage}) => {
     }
 
     return (
-        <div className="w-2/3 h-screen bg-[#16161D] flex flex-col">
+        <div className="w-2/3 h-screen bg-[#111111] flex flex-col">
 
             <ChatHeader chat={selectedChat} />
 

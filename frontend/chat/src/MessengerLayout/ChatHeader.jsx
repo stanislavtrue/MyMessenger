@@ -1,10 +1,9 @@
 import { Heading } from "@chakra-ui/react";
-import { ChatItem } from "./ChatItem"
 
 export const ChatHeader = ({ chat }) => {
     return (
         <div className="
-            w-full h-13
+            w-full h-14
             bg-[#1F1F28] 
             flex items-center
             m-auto!
@@ -16,13 +15,13 @@ export const ChatHeader = ({ chat }) => {
                 {chat.name[0]}
             </div>
 
-            <div className="flex flex-1 flex-col ml-2! min-w-0">
+            <div className="flex flex-col ml-2! min-w-0">
 
                 <span className="text-white text-lg! truncate">
                     {chat.name}
                 </span>
                 
-                <span className="text-[#52526B]">
+                <span className="text-[#52526B] text-sm!">
                     Online
                 </span>
 

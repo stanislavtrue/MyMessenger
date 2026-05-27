@@ -42,18 +42,13 @@ export const MessageInput = ({ onSendMessage }) => {
                     bg-transparent
                     outline-none!
                     text-xl
+                    placeholder-[#5F5F7C]!
                 "
                 type="text"
                 placeholder="Write a message..."
                 color="white"
                 border="none"
-                _placeholder={{
-                    color: "#5F5F7C"
-                }}
             />
-            <Paperclip size={50} className="cursor-pointer text-[#5F5F7C] px-3!"/>
-
-            <Mic size={42} className="cursor-pointer text-[#5F5F7C] pr-3!" />
 
         </div>
     );

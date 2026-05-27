@@ -13,6 +13,12 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
         chat.name.toLowerCase().includes(searchText.toLowerCase())
     );
 
+    const handleSelectChat = (chatId) => {
+        setSelectedChatId(chatId);
+
+        setIsSearchFocused(false);
+        setSearchText("");
+    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -191,7 +197,7 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                         <ChatItem 
                             key={chat.id} 
                             chat={chat} 
-                            setSelectedChatId={setSelectedChatId}
+                            setSelectedChatId={handleSelectChat}
                             selectedChatId={selectedChatId}
                         />
                     ))}
@@ -215,7 +221,7 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                             <ChatItem 
                                 key={chat.id} 
                                 chat={chat} 
-                                setSelectedChatId={setSelectedChatId}
+                                setSelectedChatId={handleSelectChat}
                                 selectedChatId={selectedChatId}
                             />
                         ))

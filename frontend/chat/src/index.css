@@ -33,3 +33,19 @@ body {
     scrollbar-width: thin;
     scrollbar-color: #52526B transparent;
 }
+
+@keyframes ripple-effect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.animate-ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-effect 1500ms ease-out;
+    background-color: rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+}
