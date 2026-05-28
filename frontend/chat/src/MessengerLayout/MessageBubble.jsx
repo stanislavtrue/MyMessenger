@@ -47,7 +47,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
         <div className={`
                 relative
                 w-fit
-                max-w-[70%]
+                max-w-[75%]
                 rounded-2xl
                 
                 py-1! px-3! mb-1!

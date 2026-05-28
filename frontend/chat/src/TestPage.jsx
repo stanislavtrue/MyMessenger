@@ -1,16 +1,36 @@
-import { useEffect, useState } from "react";
 import { ChatArea } from "./MessengerLayout/ChatArea";
 import { Sidebar } from "./MessengerLayout/Sidebar";
-import { mockChats } from "./data/mockChats";
 import { useMessenger } from "./hooks/useMessenger";
 
 function TestPage() {
-    const {chats, selectedChat, selectedChatId, setSelectedChatId, handleSendMessage} = useMessenger();
+    const {chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage} = useMessenger();
+
+    const isMobile = windowWidth < 768;
 
     return (
-        <div className="h-screen flex overflow-hidden">
-            <Sidebar chats={chats} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />
-            <ChatArea selectedChat={selectedChat} onSendMessage={handleSendMessage} />
+        <div className="h-screen flex overflow-hidden bg-[#111111] relative">
+            
+            {(!isMobile || !selectedChatId) && (
+                <Sidebar 
+                    sidebarWidth={sidebarWidth} 
+                    setSidebarWidth={setSidebarWidth} 
+                    chats={chats} 
+                    isMobile={isMobile}
+                    selectedChatId={selectedChatId} 
+                    setSelectedChatId={setSelectedChatId} 
+                />
+            )}
+
+            {(!isMobile || selectedChatId) && (
+                <ChatArea  
+                    selectedChat={selectedChat} 
+                    onSendMessage={handleSendMessage} 
+                    sidebarWidth={sidebarWidth}
+                    isMobile={isMobile}
+                    onBack={() => setSelectedChatId(null)}
+                    isOpen={!!selectedChatId}
+                />
+            )}
         </div>
         
     );

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChatItem } from "./ChatItem"
 import { Search, Menu, User, Settings, ArrowLeft } from "lucide-react";
 
-export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
+export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
@@ -36,10 +36,16 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
     }, []);
 
     return (
-        <div className="relative w-1/3 h-screen flex flex-col border-r! border-[#282836]! bg-[#1F1F28] select-none">
+        <div 
+            style={{
+                width: isMobile ? "100%" : `${sidebarWidth}%`,
+                minWidth: isMobile ? "100%" : "240px",
+                maxWidth: isMobile ? "100%" : "650px"
+            }}
+            className="relative h-screen w-full flex flex-col border-r! border-[#282836]! bg-[#1F1F28] select-none shrink-0">
 
             <div className="
-                pl-4! pr-2! pt-1! pb-3! 
+                pl-4! pr-4! pt-1! pb-3! 
                 text-center 
             ">
                 <div className="flex items-center relative">
@@ -63,6 +69,7 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                             active:scale-90
                             active:bg-[#52526B]
                             transition-all duration-300
+                            cursor-pointer
                             overflow-hidden
                         "
                     >
@@ -230,6 +237,43 @@ export const Sidebar = ({ chats, selectedChatId, setSelectedChatId }) => {
                 </div>
             
             </div>
+            {!isMobile && (
+                <div 
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+
+                        const startX = e.clientX;
+                        const startWidth = sidebarWidth;
+
+                        const handleMouseMove = (e) => {
+                            const delta = e.clientX - startX;
+
+                            const newWidth = startWidth + (delta / window.innerWidth) * 100;
+
+                            if(newWidth >= 13 && newWidth <= 33) {
+                                setSidebarWidth(newWidth);
+                            }
+                        };
+
+                        const handleMouseUp = () => {
+                            document.removeEventListener("mousemove", handleMouseMove);
+                            document.removeEventListener("mouseup", handleMouseUp);
+                        };
+
+                        document.addEventListener("mousemove", handleMouseMove);
+                        document.addEventListener("mouseup", handleMouseUp);
+                    }}
+                    className="
+                        absolute
+                        top-0
+                        right-0
+                        w-1
+                        h-full
+                        cursor-col-resize
+                        transition-colors
+                    "
+                />
+            )}
         
         </div>
     );

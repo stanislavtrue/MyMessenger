@@ -1,6 +1,7 @@
 import { Heading } from "@chakra-ui/react";
+import { ArrowLeft } from "lucide-react";
 
-export const ChatHeader = ({ chat }) => {
+export const ChatHeader = ({ chat, isMobile, onBack }) => {
     return (
         <div className="
             w-full h-14
@@ -10,8 +11,40 @@ export const ChatHeader = ({ chat }) => {
             select-none
         ">
 
+            {isMobile && (
+                <div 
+                    onClick={onBack}
+                    className="
+                        ml-2!
+                        flex items-center justify-center
+                        h-10 w-10    
+                        rounded-full
+                        text-[#707099]
+                        hover:bg-[#282836]
+                        active:scale-90
+                        active:bg-[#52526B]
+                        transition-all duration-300
+                        cursor-pointer
+                        shrink-0
+                    "
+                >
+                    <ArrowLeft size={22} />
+                </div>
+            )}
 
-            <div className="w-10 h-10 rounded-full bg-[#5A4282] flex items-center justify-center text-white! text-xl! ml-4!">
+            <div className={`
+                w-10 h-10 
+                rounded-full 
+                bg-[#5A4282] 
+                flex items-center justify-center 
+                text-white! text-xl! 
+                shrink-0
+
+                ${isMobile
+                    ? "ml-2!"
+                    : "ml-4!"
+                }
+            `}>
                 {chat.name[0]}
             </div>
 

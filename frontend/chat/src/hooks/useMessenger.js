@@ -5,21 +5,27 @@ import { formatTime } from "../utils/formatTime";
 export const useMessenger = () => {
     const [chats, setChats] = useState(mockChats);
     const [selectedChatId, setSelectedChatId] = useState(null);
+    const [sidebarWidth, setSidebarWidth] = useState(33);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     
-    const selectedChat = chats.find(
-        chat => chat.id === selectedChatId
-    );
+    const selectedChat = chats.find(chat => chat.id === selectedChatId);
 
     useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
         const handleEscape = (event) => {
             if (event.key === "Escape" && document.activeElement.tagName !== "INPUT") {
                 setSelectedChatId(null);
             }
         };
 
+        window.addEventListener("resize", handleResize);
         document.addEventListener("keydown", handleEscape);
 
         return () => {
+            window.removeEventListener("resize", handleResize);
             document.removeEventListener("keydown", handleEscape);
         };
     }, []);
@@ -51,6 +57,9 @@ export const useMessenger = () => {
         chats,
         selectedChat,
         selectedChatId,
+        sidebarWidth,
+        windowWidth,
+        setSidebarWidth,
         setSelectedChatId,
         handleSendMessage
     };
