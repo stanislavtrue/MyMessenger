@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=B612:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import "tailwindcss";
 
@@ -48,4 +49,20 @@ body {
     animation: ripple-effect 1500ms ease-out;
     background-color: rgba(0, 0, 0, 0.1);
     pointer-events: none;
+}
+
+@keyframes typingScale {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.4);
+        opacity: 1;
+    }
+}
+
+.scale-dot {
+    display: inline-block;
+    animation: typingScale 0.9s infinite ease-in-out;
 }

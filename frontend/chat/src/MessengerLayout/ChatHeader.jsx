@@ -2,6 +2,49 @@ import { Heading } from "@chakra-ui/react";
 import { ArrowLeft } from "lucide-react";
 
 export const ChatHeader = ({ chat, isMobile, onBack }) => {
+    const renderStatus = () => {
+        if (chat.status === "typing") {
+            return (
+                <div className="flex items-center"> 
+                    <div 
+                        className="scale-dot mr-1! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
+                    />
+
+                    <div 
+                        style={{
+                            animationDelay: "0.3s"
+                        }}
+                        className="scale-dot mr-1! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
+                    />
+
+                    <div 
+                        style={{
+                            animationDelay: "0.6s"
+                        }}
+                        className="scale-dot mr-2! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
+                    />
+
+                    <span className="text-[#AA8DD2] text-sm!">
+                        typing
+                    </span>
+
+                </div>
+            );
+        }
+        if (chat.status === "online") {
+            return (
+                <span className="text-[#AA8DD2] text-sm!">
+                    online
+                </span>
+            );
+        }
+        return (
+            <span className="text-[#52526B] text-sm!">
+                last seen recently
+            </span>
+        )
+    }
+
     return (
         <div className="
             w-full h-14
@@ -54,9 +97,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                     {chat.name}
                 </span>
                 
-                <span className="text-[#52526B] text-sm!">
-                    Online
-                </span>
+                {renderStatus()}
 
             </div>
         </div>

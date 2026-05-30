@@ -3,6 +3,9 @@ export const mockChats = [
         id: 1,
         name: "John Cena",
         lastMessage: "Goodbuy!",
+        time: "18:37",
+        unreadCount: 1,
+        status: "typing",
         messages: [
             {
                 id: 1,
@@ -94,85 +97,73 @@ export const mockChats = [
         id: 2,
         name: "Elon Musk",
         lastMessage: "Hi, how r u?",
+        time: "15:34",
+        unreadCount: 115,
+        status: "offline",
         messages: []
     },
     {
         id: 3,
         name: "Cristiano Ronaldo",
         lastMessage: "Go football!?",
+        time: "Fri",
+        unreadCount: 2,
+        status: "offline",
         messages: []
     },
     {
         id: 4,
         name: "Noname",
         lastMessage: "Есть работа курьером, зп-300000к",
+        time: "Tue",
+        unreadCount: 0,
+        status: "online",
         messages: []
     },
     {
         id: 5,
         name: "Linus Torwalds",
         lastMessage: "",
+        time: "",
+        unreadCount: 1,
+        status: "online",
         messages: []
     },
     {
         id: 6,
         name: "Martin",
         lastMessage: "",
+        time: "Wed",
+        unreadCount: 0,
+        status: "online",
         messages: []
     },
     {
         id: 7,
         name: "Alex",
         lastMessage: "",
+        time: "Mon",
+        unreadCount: 0,
+        status: "offline",
         messages: []
     },
     {
         id: 8,
         name: "Steve Jobs",
         lastMessage: "",
+        time: "Mon",
+        unreadCount: 0,
+        status: "offline",
         messages: []
     },
     {
         id: 9,
         name: "Scammers",
         lastMessage: "",
+        time: "Mon",
+        unreadCount: 0,
+        status: "offline",
         messages: []
-    },       
-    {
-        id: 10,
-        name: "Scammers",
-        lastMessage: "",
-        messages: []
-    },       
-    {
-        id: 11,
-        name: "Scammers",
-        lastMessage: "",
-        messages: []
-    },       
-    {
-        id: 12,
-        name: "Scammers",
-        lastMessage: "",
-        messages: []
-    },       
-    {
-        id: 13,
-        name: "Scammers",
-        lastMessage: "",
-        messages: []
-    },       
-    {
-        id: 14,
-        name: "Scamme",
-        lastMessage: "",
-        messages: []
-    },       
-    {
-        id: 15,
-        name: "Scammer",
-        lastMessage: "",
-        messages: []
-    },           
+    },                
 ]
 
