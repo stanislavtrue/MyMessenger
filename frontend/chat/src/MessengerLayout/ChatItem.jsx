@@ -52,7 +52,18 @@ export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
                 />
             ))}
 
-            <div className="w-14 h-14 rounded-full bg-[#5A4282] flex items-center justify-center text-white text-2xl! z-10 shrink-0">
+            <div className="relative w-14 h-14 rounded-full bg-[#5A4282] flex items-center justify-center text-white text-2xl! z-10 shrink-0">
+                {(chat.status === "online" || chat.status === "typing") && (
+                    <div className={`
+                        absolute
+                        w-3.5 h-3.5
+                        rounded-full
+                        bottom-0 right-1
+                        bg-[#0AC630]
+                        border!
+                    `}  />
+                )}
+
                 {chat.name[0]}
             </div>
 
@@ -64,23 +75,23 @@ export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
                     <div className="flex items-center"> 
 
                         <div 
-                            className="scale-dot mr-1! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
+                            className={`scale-dot mr-1! h-[4px] w-[4px] rounded-full ${isSelected ? "bg-[#FFFFFF]" : "bg-[#52526B]"}`} 
                         />
 
                         <div 
                             style={{
                                 animationDelay: "0.3s"
                             }}
-                            className="scale-dot mr-1! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
+                            className={`scale-dot mr-1! h-[4px] w-[4px] rounded-full ${isSelected ? "bg-[#FFFFFF]" : "bg-[#52526B]"}`}
                         />
 
                         <div 
                             style={{
                                 animationDelay: "0.6s"
                             }}
-                            className="scale-dot mr-2! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
+                            className={`scale-dot mr-1! h-[4px] w-[4px] rounded-full ${isSelected ? "bg-[#FFFFFF]" : "bg-[#52526B]"}`}
                         />
-                        <span className="text-[#AA8DD2] text-sm!">
+                        <span className={`text-sm! ${isSelected ? "text-[#FFFFFF]" : "text-[#52526B]"}`}>
                             typing
                         </span>
                     </div>

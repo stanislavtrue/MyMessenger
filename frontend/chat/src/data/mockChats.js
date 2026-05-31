@@ -17,7 +17,8 @@ export const mockChats = [
                 id: 2,
                 text: "Hi)",
                 time: "12.23",
-                isOwnMessage: true
+                isOwnMessage: true,
+                status: "read"
             },
             {
                 id: 3,
@@ -29,13 +30,15 @@ export const mockChats = [
                 id: 4,
                 text: "Hello my friend!",
                 time: "12.24",
-                isOwnMessage: true
+                isOwnMessage: true,
+                status: "read"
             },
             {
                 id: 5,
                 text: "Lalala",
                 time: "12.24",
-                isOwnMessage: true
+                isOwnMessage: true,
+                status: "read",
             },
             {
                 id: 6,
@@ -65,7 +68,8 @@ export const mockChats = [
                 id: 10,
                 text: "Elon Reeve Musk is a businessman and public official known for his leadership of Tesla and SpaceX. Musk has been the wealthiest person in the world since 2025; as of May 2026, Forbes estimates his net worth to be US$788 billion. ",
                 time: "12.30",
-                isOwnMessage: true
+                isOwnMessage: true,
+                status: "sent"
             },
             {
                 id: 11,

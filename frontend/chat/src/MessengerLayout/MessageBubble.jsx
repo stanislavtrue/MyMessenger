@@ -1,3 +1,5 @@
+import { Check } from "lucide-react";
+
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
 
     let radiusClass = "";
@@ -62,15 +64,35 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             `}
         >
             
-            <div className="flex items-end gap-2">
+            <div className="flex items-end">
 
                 <span className="text-white whitespace-pre-wrap! overflow-hidden">
                     {message.text}
                 </span>
 
-                <span className="text-xs! opacity-50 leading-none">
+                <span className="text-xs! opacity-50 leading-none ml-3! shrink-0">
                     {message.time}
                 </span>
+
+                {message.isOwnMessage && (
+                    <div className="flex items-center relative w-4.5 h-3 ml-0.5! shrink-0">
+                        <Check
+                            size={14}
+                            className={`
+                                absolute right-0 -bottom-0.5 transition-colors duration-200
+                                ${message.status === "read" ? "text-[#E2D9F3]" : "text-[#FFFFFF]/60"}
+                            `}
+                        />
+
+                        {message.status === "read" && (
+                            <Check 
+                                size={14}                           
+                                className="absolute text-[#E2D9F3] right-1.5 -bottom-0.5"
+                            />
+                        )}
+
+                    </div>
+                )}
 
             </div>
 
