@@ -1,34 +1,15 @@
 import { Heading } from "@chakra-ui/react";
 import { ArrowLeft } from "lucide-react";
+import { TypingIndicator } from "../components/indicators/TypingIndicator";
 
 export const ChatHeader = ({ chat, isMobile, onBack }) => {
     const renderStatus = () => {
         if (chat.status === "typing") {
             return (
-                <div className="flex items-center"> 
-                    <div 
-                        className="scale-dot mr-1! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
-                    />
-
-                    <div 
-                        style={{
-                            animationDelay: "0.3s"
-                        }}
-                        className="scale-dot mr-1! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
-                    />
-
-                    <div 
-                        style={{
-                            animationDelay: "0.6s"
-                        }}
-                        className="scale-dot mr-2! h-[4px] w-[4px] rounded-full bg-[#AA8DD2]" 
-                    />
-
-                    <span className="text-[#AA8DD2] text-sm!">
-                        typing
-                    </span>
-
-                </div>
+                <TypingIndicator
+                    activeColor="#AA8DD2"
+                    textClassName="text-[#AA8DD2] text-sm!"
+                />
             );
         }
         if (chat.status === "online") {

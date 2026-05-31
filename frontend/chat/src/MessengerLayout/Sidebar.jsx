@@ -1,3 +1,4 @@
+import { sortChats} from "../utils/sortChats";
 import { useEffect, useRef, useState } from "react";
 import { ChatItem } from "./ChatItem"
 import { Search, Menu, User, Settings, ArrowLeft } from "lucide-react";
@@ -9,8 +10,10 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
     const buttonRef = useRef(null);
     const [searchText, setSearchText] = useState("");
 
-    const filteredChats = chats.filter(chat => 
-        chat.name.toLowerCase().includes(searchText.toLowerCase())
+    const sortedChats = useMemo (() => sortChats(chats), [chats]);
+
+    const filteredChats = useMemo(() => sortedChats.filter(chat => 
+        chat.name.toLowerCase().includes(searchText.toLowerCase())), [sortedChats, searchText]
     );
 
     const handleSelectChat = (chatId) => {
@@ -200,10 +203,13 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                     `}
                 >
 
-                    {chats.map((chat) => (
+                    {sortedChats.map((chat) => (
                         <ChatItem 
                             key={chat.id} 
                             chat={chat} 
+                            lastMessageText={chat.messages[chat.messages.length - 1]?.text}
+                            lastMessageTime={chat.messages[chat.messages.length - 1]?.time}
+                            lastMessageDate={chat.messages[chat.messages.length - 1]?.date}
                             setSelectedChatId={handleSelectChat}
                             selectedChatId={selectedChatId}
                         />
@@ -228,6 +234,9 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                             <ChatItem 
                                 key={chat.id} 
                                 chat={chat} 
+                                lastMessageText={chat.messages[chat.messages.length - 1]?.text}
+                                lastMessageTime={chat.messages[chat.messages.length - 1]?.time}
+                                lastMessageDate={chat.messages[chat.messages.length - 1]?.date}
                                 setSelectedChatId={handleSelectChat}
                                 selectedChatId={selectedChatId}
                             />

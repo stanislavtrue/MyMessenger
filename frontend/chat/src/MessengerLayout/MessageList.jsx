@@ -1,3 +1,4 @@
+import { formatDividerDate } from "../utils/formatDividerDate";
 import { useEffect, useRef } from "react";
 import { MessageBubble } from "./MessageBubble";
 
@@ -23,28 +24,43 @@ export const MessageList = ({ messages }) => {
                     const previousMessage = messages[index - 1];
                     const nextMessage = messages[index + 1];
 
+                    const showDivider = !previousMessage || previousMessage.date !== message.date;
+
                     const isFirstMessage = 
                         !previousMessage ||
-                        previousMessage.isOwnMessage !== message.isOwnMessage;
+                        previousMessage.isOwnMessage !== message.isOwnMessage ||
+                        showDivider;
 
                     const isLastMessage =
                         !nextMessage ||
-                        nextMessage.isOwnMessage !== message.isOwnMessage;
+                        nextMessage.isOwnMessage !== message.isOwnMessage ||
+                        nextMessage.date !== message.date;
 
                     return (
-                        <MessageBubble
-                            key={message.id}
-                            message={message}
-                            isFirstMessage={isFirstMessage}
-                            isLastMessage={isLastMessage}
-                        />
+                        <div key={message.id || index} className="w-full flex flex-col">
+
+                            {showDivider && (
+                                <div className="flex justify-center my-4! select-none pointer-events-none">
+                                    <div style={{fontFamily: "Roboto"}} className="px-2! py-1! bg-[#1F1F28] text-sm! font-semibold! rounded-2xl">
+                                        {formatDividerDate(message.date)}
+                                    </div>
+                                </div>
+                            )}
+
+                            <MessageBubble
+                                key={message.id}
+                                message={message}
+                                isFirstMessage={isFirstMessage}
+                                isLastMessage={isLastMessage}
+                            />
+
+                        </div>
                     );
                 })}
             
                 <div ref={bottomRef} />
 
             </div>
-
 
         </div>
     );

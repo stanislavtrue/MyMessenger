@@ -1,6 +1,8 @@
+import { formatSidebarDate } from "../utils/formatSidebarDate"
 import { useRipple } from "../hooks/useRipple";
+import { TypingIndicator } from "../components/indicators/TypingIndicator";
 
-export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
+export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDate, selectedChatId, setSelectedChatId} ) => {
     const isSelected = selectedChatId === chat.id;
     const { ripples, createRipple } = useRipple();
 
@@ -13,7 +15,6 @@ export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
     };
 
     const unreadCount = chat.unreadCount || 0;
-    const chatTime = chat.time || "12:54";
 
     return (
         <div 
@@ -72,29 +73,13 @@ export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
                     {chat.name}
                 </span>
                 {chat.status === "typing" ? (
-                    <div className="flex items-center"> 
-
-                        <div 
-                            className={`scale-dot mr-1! h-[4px] w-[4px] rounded-full ${isSelected ? "bg-[#FFFFFF]" : "bg-[#52526B]"}`} 
-                        />
-
-                        <div 
-                            style={{
-                                animationDelay: "0.3s"
-                            }}
-                            className={`scale-dot mr-1! h-[4px] w-[4px] rounded-full ${isSelected ? "bg-[#FFFFFF]" : "bg-[#52526B]"}`}
-                        />
-
-                        <div 
-                            style={{
-                                animationDelay: "0.6s"
-                            }}
-                            className={`scale-dot mr-1! h-[4px] w-[4px] rounded-full ${isSelected ? "bg-[#FFFFFF]" : "bg-[#52526B]"}`}
-                        />
-                        <span className={`text-sm! ${isSelected ? "text-[#FFFFFF]" : "text-[#52526B]"}`}>
-                            typing
-                        </span>
-                    </div>
+                    <TypingIndicator 
+                        activeColor={isSelected ? "#FFFFFF" : "#52526B"}
+                        textClassName={`
+                            text-sm!
+                            ${isSelected ? "text-[#FFFFFF]" : "text-[#52526B]"}    
+                        `}
+                    />
                 ) : (
                     <span className={`
                             text-[#52526B] 
@@ -108,7 +93,7 @@ export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
                         `}
                     >
                 
-                        {chat.lastMessage || "No messages yet"}
+                        {lastMessageText}
                     </span>
                 )}
             </div>
@@ -130,7 +115,7 @@ export const ChatItem = ( {chat, selectedChatId, setSelectedChatId} ) => {
                     }
                     
                 `}>
-                    {chat.time}
+                    {formatSidebarDate(lastMessageDate, lastMessageTime)}
                 </span>
 
                 {unreadCount > 0 ? (

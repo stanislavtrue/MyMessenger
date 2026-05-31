@@ -71,7 +71,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 </span>
 
                 <span className="text-xs! opacity-50 leading-none ml-3! shrink-0">
-                    {message.time}
+                    {message.time?.slice(0, 5)}
                 </span>
 
                 {message.isOwnMessage && (
