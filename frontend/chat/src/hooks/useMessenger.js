@@ -8,26 +8,49 @@ export const useMessenger = () => {
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [sidebarWidth, setSidebarWidth] = useState(33);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    const [contextMenu, setContextMenu] = useState({
+        visible: false,
+        x: 0,
+        y: 0,
+        messageData: null,
+    });
     
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
+
+    useEffect(() => {
+        const handleEscape = (event) => {
+            if (event.key !== "Escape") return;
+
+            if (contextMenu.visible) {
+                setContextMenu(prev => ({
+                    ...prev,
+                    visible: false,
+                }));
+                return;
+            }
+
+            if (selectedChatId) {
+                setSelectedChatId(null);
+            }
+        };
+
+        document.addEventListener("keydown", handleEscape);
+
+        return () => {
+            document.removeEventListener("keydown", handleEscape);
+        }
+    }, [contextMenu.visible, selectedChatId])
 
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
         };
 
-        const handleEscape = (event) => {
-            if (event.key === "Escape" && document.activeElement.tagName !== "INPUT") {
-                setSelectedChatId(null);
-            }
-        };
-
         window.addEventListener("resize", handleResize);
-        document.addEventListener("keydown", handleEscape);
 
         return () => {
             window.removeEventListener("resize", handleResize);
-            document.removeEventListener("keydown", handleEscape);
         };
     }, []);
 
@@ -61,7 +84,7 @@ export const useMessenger = () => {
                     return chat;
                 });
             });
-        }, 10000);
+        }, 30000);
 
         return () => clearInterval(interval);
     }, [selectedChatId, chats]);
@@ -144,6 +167,10 @@ export const useMessenger = () => {
         selectedChatId,
         sidebarWidth,
         windowWidth,
+
+        contextMenu,
+        setContextMenu,
+
         setSidebarWidth,
         setSelectedChatId: handleSelectChat,
         handleSendMessage

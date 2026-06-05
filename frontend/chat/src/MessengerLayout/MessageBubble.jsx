@@ -14,22 +14,22 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
     {
         if (message.isOwnMessage)
         {
-            radiusClass="rounded-br-sm rounded-tr-sm"
+            radiusClass="rounded-br-md rounded-tr-md"
         }
         else
         {
-            radiusClass="rounded-bl-sm rounded-tl-sm"
+            radiusClass="rounded-bl-md rounded-tl-md"
         }
     }
     else if (isFirstMessage && !isLastMessage)
     {
         if (message.isOwnMessage)
         {
-            radiusClass="rounded-br-sm"
+            radiusClass="rounded-br-md"
         }
         else 
         {
-            radiusClass="rounded-bl-sm"
+            radiusClass="rounded-bl-md"
         }
     }
     else if (!isFirstMessage && isLastMessage)
@@ -37,11 +37,11 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
         spacingClass="mb-3!"
         if (message.isOwnMessage)
         {
-            radiusClass="rounded-tr-sm"
+            radiusClass="rounded-tr-md"
         }
         else
         {
-            radiusClass="rounded-tl-sm"
+            radiusClass="rounded-tl-md"
         }
     }
 
@@ -66,11 +66,11 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             
             <div className="flex items-end">
 
-                <span className="text-white whitespace-pre-wrap! overflow-hidden">
+                <span className="text-white text-sm! whitespace-pre-wrap! overflow-hidden">
                     {message.text}
                 </span>
 
-                <span className="text-xs! opacity-50 leading-none ml-3! shrink-0">
+                <span style={{fontFamily: "Roboto"}} className="text-xs! opacity-50 leading-none ml-3! shrink-0">
                     {message.time?.slice(0, 5)}
                 </span>
 
@@ -100,26 +100,26 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 <>
                     <div className={`
                             absolute
-                            -bottom-1
+                            -bottom-0
                             w-2 h-2
                             opacity-85
 
                             ${message.isOwnMessage
-                                ? "right-[-6px] rounded-full bg-[#363646]" 
-                                : "left-[-6px] rounded-full bg-[#5A4282]"
+                                ? "right-[-8px] rounded-full bg-[#363646]" 
+                                : "left-[-8px] rounded-full bg-[#5A4282]"
                             }
                         `}
                     />
                 
                     <div className={`
                             absolute
-                            -bottom-1.5
+                            -bottom-0
                             w-1 h-1
                             opacity-70
 
                             ${message.isOwnMessage
-                                ? "right-[-12px] rounded-full bg-[#363646]"
-                                : "left-[-12px] rounded-full bg-[#5A4282]"
+                                ? "right-[-14px] rounded-full bg-[#363646]"
+                                : "left-[-14px] rounded-full bg-[#5A4282]"
                             }
                         `} 
                     />

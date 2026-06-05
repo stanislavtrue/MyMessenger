@@ -3,7 +3,7 @@ import { Sidebar } from "./MessengerLayout/Sidebar";
 import { useMessenger } from "./hooks/useMessenger";
 
 function TestPage() {
-    const {chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage} = useMessenger();
+    const {chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, contextMenu, setContextMenu, setSidebarWidth, setSelectedChatId, handleSendMessage} = useMessenger();
 
     const isMobile = windowWidth < 768;
 
@@ -27,6 +27,8 @@ function TestPage() {
                     onSendMessage={handleSendMessage} 
                     sidebarWidth={sidebarWidth}
                     isMobile={isMobile}
+                    contextMenu={contextMenu}
+                    setContextMenu={setContextMenu}
                     onBack={() => setSelectedChatId(null)}
                     isOpen={!!selectedChatId}
                 />
