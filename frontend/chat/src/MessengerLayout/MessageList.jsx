@@ -3,9 +3,10 @@ import { useEffect, useRef } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { useContextMenu } from "../hooks/useContextMenu";
 import { Copy, Forward, Pin, Reply, Trash } from "lucide-react";
+import { useMessengerContext } from "../context/MessengerContext";
 
-export const MessageList = ({ messages, contextMenu, setContextMenu}) => {
-
+export const MessageList = ({ messages }) => {
+    const { contextMenu, setContextMenu } = useMessengerContext();
     const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
 
     const handleAction = (actionType, message) => {

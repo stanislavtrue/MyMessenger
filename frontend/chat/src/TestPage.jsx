@@ -1,9 +1,9 @@
 import { ChatArea } from "./MessengerLayout/ChatArea";
 import { Sidebar } from "./MessengerLayout/Sidebar";
-import { useMessenger } from "./hooks/useMessenger";
+import { MessengerProvider, useMessengerContext } from "./context/MessengerContext";
 
-function TestPage() {
-    const {chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, contextMenu, setContextMenu, setSidebarWidth, setSelectedChatId, handleSendMessage} = useMessenger();
+export const MessengerContent = () => {
+    const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage } = useMessengerContext();
 
     const isMobile = windowWidth < 768;
 
@@ -27,14 +27,19 @@ function TestPage() {
                     onSendMessage={handleSendMessage} 
                     sidebarWidth={sidebarWidth}
                     isMobile={isMobile}
-                    contextMenu={contextMenu}
-                    setContextMenu={setContextMenu}
                     onBack={() => setSelectedChatId(null)}
-                    isOpen={!!selectedChatId}
                 />
             )}
         </div>
-        
+    );
+
+}
+
+function TestPage() {
+    return (
+        <MessengerProvider>
+            <MessengerContent />
+        </MessengerProvider>
     );
 };
 

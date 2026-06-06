@@ -8,6 +8,8 @@ export const useMessenger = () => {
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [sidebarWidth, setSidebarWidth] = useState(33);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     const [contextMenu, setContextMenu] = useState({
         visible: false,
@@ -30,6 +32,16 @@ export const useMessenger = () => {
                 return;
             }
 
+            if (isSidebarMenuOpen) {
+                setIsSidebarMenuOpen(false);
+                return;
+            }
+
+            if (isSearchFocused) {
+                setIsSearchFocused(false);
+                return;
+            }
+
             if (selectedChatId) {
                 setSelectedChatId(null);
             }
@@ -40,7 +52,7 @@ export const useMessenger = () => {
         return () => {
             document.removeEventListener("keydown", handleEscape);
         }
-    }, [contextMenu.visible, selectedChatId])
+    }, [contextMenu.visible, isSidebarMenuOpen, isSearchFocused, selectedChatId])
 
     useEffect(() => {
         const handleResize = () => {
@@ -167,6 +179,11 @@ export const useMessenger = () => {
         selectedChatId,
         sidebarWidth,
         windowWidth,
+
+        isSidebarMenuOpen,
+        setIsSidebarMenuOpen,
+        isSearchFocused,
+        setIsSearchFocused,
 
         contextMenu,
         setContextMenu,

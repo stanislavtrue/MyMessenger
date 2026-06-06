@@ -3,7 +3,7 @@ import { ChatHeader } from "./ChatHeader";
 import { MessageInput } from "./MessageInput";
 import { MessageList } from "./MessageList";
 
-export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, contextMenu, setContextMenu, onBack, isOpen }) => {
+export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, onBack}) => {
 
     if(!selectedChat) {
         return (
@@ -26,7 +26,7 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
             
             <div className="flex-1 overflow-y-auto messages-scroll px-4!">
                 <div style={contentStyle} className="w-full h-full mx-auto! transition-all duration-75 ease-out">
-                    <MessageList messages={selectedChat.messages} contextMenu={contextMenu} setContextMenu={setContextMenu} />
+                    <MessageList messages={selectedChat.messages} />
                 </div>
             </div>
             

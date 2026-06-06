@@ -1,33 +1,30 @@
-import { sortChats} from "../utils/sortChats";
 import { useEffect, useRef, useState } from "react";
 import { ChatItem } from "./ChatItem"
 import { Search, Menu, User, Settings, ArrowLeft } from "lucide-react";
+import { useSidebarSearch } from "../hooks/useSidebarSearch";
+import { useSidebarResize } from "../hooks/useSidebarResize";
+import { useMessengerContext } from "../context/MessengerContext";
 
 export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
-    const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { searchText, setSearchText, sortedChats, filteredChats } = useSidebarSearch(chats);
+    const { handleMouseDown } = useSidebarResize(sidebarWidth, setSidebarWidth);
+    const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSearchFocused, setIsSearchFocused } = useMessengerContext();
+
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
-    const [searchText, setSearchText] = useState("");
-
-    const sortedChats = useMemo (() => sortChats(chats), [chats]);
-
-    const filteredChats = useMemo(() => sortedChats.filter(chat => 
-        chat.name.toLowerCase().includes(searchText.toLowerCase())), [sortedChats, searchText]
-    );
 
     const handleSelectChat = (chatId) => {
         setSelectedChatId(chatId);
 
         setIsSearchFocused(false);
         setSearchText("");
-    }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target) && !buttonRef.current.contains(event.target))
             {
-                setIsMenuOpen(false);
+                setIsSidebarMenuOpen(false);
             }
         };
 
@@ -60,7 +57,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                                 setIsSearchFocused(false)
                                 setSearchText("")
                             } else {
-                                setIsMenuOpen(!isMenuOpen);
+                                setIsSidebarMenuOpen(!isSidebarMenuOpen);
                             }
                         }}
                         className="
@@ -121,7 +118,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
 
                             transition-all duration-100 ease-out
 
-                            ${isMenuOpen
+                            ${isSidebarMenuOpen
                                 ? "opacity-100 translate-x-1 translate-y-1 scale-100"
                                 : "opacity-0 -translate-x-1 -translate-y-1 pointer-events-none"
                             }
@@ -248,30 +245,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
             </div>
             {!isMobile && (
                 <div 
-                    onMouseDown={(e) => {
-                        e.preventDefault();
-
-                        const startX = e.clientX;
-                        const startWidth = sidebarWidth;
-
-                        const handleMouseMove = (e) => {
-                            const delta = e.clientX - startX;
-
-                            const newWidth = startWidth + (delta / window.innerWidth) * 100;
-
-                            if(newWidth >= 13 && newWidth <= 33) {
-                                setSidebarWidth(newWidth);
-                            }
-                        };
-
-                        const handleMouseUp = () => {
-                            document.removeEventListener("mousemove", handleMouseMove);
-                            document.removeEventListener("mouseup", handleMouseUp);
-                        };
-
-                        document.addEventListener("mousemove", handleMouseMove);
-                        document.addEventListener("mouseup", handleMouseUp);
-                    }}
+                    onMouseDown={handleMouseDown}
                     className="
                         absolute
                         top-0
