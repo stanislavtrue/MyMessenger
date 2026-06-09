@@ -10,12 +10,17 @@ export const useMessenger = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [replyToMessage, setReplyToMessage] = useState(null);
 
     const [contextMenu, setContextMenu] = useState({
         visible: false,
         x: 0,
         y: 0,
+        isUp: false,
+        isLeft: false,
+        type: null,
         messageData: null,
+        isMeasuring: true,
     });
     
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
@@ -131,7 +136,11 @@ export const useMessenger = () => {
             time: formatTime(),
             date: formatDate(),
             isOwnMessage: true,
-            status: "sent"
+            status: "sent",
+            replyTo: replyToMessage ? {
+                id: replyToMessage.id,
+                text: replyToMessage.text,
+            } : null
         };
         
         setChats(prevChats => prevChats.map(chat => {
@@ -147,6 +156,7 @@ export const useMessenger = () => {
                 return chat;
             })
         );
+
         setTimeout(() => {
             const friendMessage = {
                 id: Date.now() + 1,
@@ -171,6 +181,8 @@ export const useMessenger = () => {
                 return chat;
             }));
         }, 3000);
+
+        setReplyToMessage(null);
     };
 
     return {
@@ -190,6 +202,8 @@ export const useMessenger = () => {
 
         setSidebarWidth,
         setSelectedChatId: handleSelectChat,
-        handleSendMessage
+        handleSendMessage,
+        replyToMessage,
+        setReplyToMessage
     };
 };

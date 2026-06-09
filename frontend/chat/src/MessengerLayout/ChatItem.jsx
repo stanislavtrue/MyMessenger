@@ -2,7 +2,7 @@ import { formatSidebarDate } from "../utils/formatSidebarDate"
 import { useRipple } from "../hooks/useRipple";
 import { TypingIndicator } from "../components/indicators/TypingIndicator";
 
-export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDate, selectedChatId, setSelectedChatId} ) => {
+export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDate, selectedChatId, setSelectedChatId, isContextActive, onContextMenu} ) => {
     const isSelected = selectedChatId === chat.id;
     const { ripples, createRipple } = useRipple();
 
@@ -19,6 +19,7 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
     return (
         <div 
             onClick={handleClick}
+            onContextMenu={onContextMenu}
             className={`
                 relative
                 overflow-hidden
@@ -32,10 +33,16 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
                 w-[97%] rounded-2xl
                 m-auto!
                 select-none
+                duration-0
                 
                 ${isSelected
                     ? "bg-[#6F4F9C] hover:bg-[#6F4F9C]"
                     : "hover:bg-[#282836]"
+                }
+
+                ${isContextActive && !isSelected
+                    ? "bg-[#282836]"
+                    : ""
                 }
             `}
         >
@@ -60,8 +67,12 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
                         w-3.5 h-3.5
                         rounded-full
                         bottom-0 right-1
-                        bg-[#0AC630]
-                        border!
+                        border-2! 
+
+                        ${isSelected 
+                            ? "bg-white border-[#6F4F9C]!"
+                            : "bg-[#0AC630] border-[#1F1F28]!"
+                        }
                     `}  />
                 )}
 

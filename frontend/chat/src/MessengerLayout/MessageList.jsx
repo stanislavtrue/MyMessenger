@@ -3,20 +3,19 @@ import { useEffect, useRef } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { useContextMenu } from "../hooks/useContextMenu";
 import { Copy, Forward, Pin, Reply, Trash } from "lucide-react";
+import { SlActionRedo, SlActionUndo } from "react-icons/sl"
 import { useMessengerContext } from "../context/MessengerContext";
+import { ContextMenuWrapper } from "./ContextMenuWrapper";
 
-export const MessageList = ({ messages }) => {
-    const { contextMenu, setContextMenu } = useMessengerContext();
+export const MessageList = ({ messages, contentStyle }) => {
+    const { contextMenu, setContextMenu, setReplyToMessage } = useMessengerContext();
     const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
 
-    const handleAction = (actionType, message) => {
-        closeMenu();
-
-        if (actionType === "copy") {
-            navigator.clipboard.writeText(message.text);
-        }
+    const handleReplyClick = () => {
+        setReplyToMessage(contextMenu.messageData);
+        setContextMenu(prev => ({ ...prev, visible: false }));
     }
-
+    
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -32,7 +31,7 @@ export const MessageList = ({ messages }) => {
             w-full h-full 
             py-4!
         ">
-            {contextMenu.visible && (
+            {contextMenu.visible && contextMenu.type === "message" && (
                 <div 
                     onClick={closeMenu}
                     className="fixed inset-0 z-40"
@@ -56,6 +55,13 @@ export const MessageList = ({ messages }) => {
                         !nextMessage ||
                         nextMessage.isOwnMessage !== message.isOwnMessage ||
                         nextMessage.date !== message.date;
+                        
+                    const isTargetMessage = contextMenu.visible && contextMenu.type === "message" && contextMenu.messageData?.id === message.id;
+
+                    let spacingClass = "mb-1.5!";
+                    if (isLastMessage) {
+                        spacingClass = "mb-3!";
+                    }
 
                     return (
                         <div key={message.id || index} className="w-full flex flex-col">
@@ -68,16 +74,22 @@ export const MessageList = ({ messages }) => {
                                 </div>
                             )}
 
-                            <div 
-                                onContextMenu={(e) => showMenu(e, message)}
-                                className="w-full flex flex-col"
-                            >
-                                <MessageBubble
-                                    key={message.id}
-                                    message={message}
-                                    isFirstMessage={isFirstMessage}
-                                    isLastMessage={isLastMessage}
-                                />
+                            <div className={`w-full flex items-center message-row-highlight ${spacingClass} ${isTargetMessage ? "active" : ""}`}>
+
+                                <div style={contentStyle} className="mx-auto!">
+
+                                    <div 
+                                        onContextMenu={(e) => showMenu(e, message, "message")}
+                                        className="w-full flex flex-col"
+                                    >
+                                        <MessageBubble
+                                            key={message.id}
+                                            message={message}
+                                            isFirstMessage={isFirstMessage}
+                                            isLastMessage={isLastMessage}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     );
@@ -87,65 +99,43 @@ export const MessageList = ({ messages }) => {
 
             </div>
 
-                <div
-                    style={{
-                        top: contextMenu.y,
-                        left: contextMenu.x,
-                        fontFamily: "Roboto"
-                    }}
-                    className={`
-                        fixed z-50
-                        w-44
-                        rounded-xl
-                        bg-[#272739]/80
-                        backdrop-blur-sm
-                        shadow-black
-                        shadow-lg
-                        p-1!
-                        flex flex-col
-                        duration-300
-                        context-menu
-                        
-                        ${contextMenu.visible ? "open" : "closed"}
-                    `}
-
-                >
+                <ContextMenuWrapper type="message">
                     <button
-                        onClick={() => handleAction("reply", contextMenu.messageData)}
-                        className="flex items-center gap-4 px-2! py-1! text-white rounded-lg hover:bg-[#1F1F27]/70! cursor-pointer transition-colors"
+                        onClick={handleReplyClick}
+                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
                     >
-                        <Reply size={18} className="text-[#707099]" />
+                        <SlActionUndo size={18} strokeWidth={40} className="text-[#8888BA]" />
                         <span>Reply</span>
                     </button>
 
                     <button
-                        className="flex items-center gap-4 px-2! py-1! text-white rounded-lg hover:bg-[#1F1F27]/70! cursor-pointer transition-colors"
+                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
                     >
-                        <Copy size={18} className="text-[#707099]"/>
+                        <Copy size={18} strokeWidth={2.5} className="text-[#8888BA]"/>
                         <span>Copy Text</span>
                     </button>
                             
                     <button
-                        className="flex items-center gap-4 px-2! py-1! text-white rounded-lg hover:bg-[#1F1F27]/70! cursor-pointer transition-colors"
+                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
                     >
-                        <Pin size={18} className="text-[#707099]"/>
+                        <Pin size={18} strokeWidth={2.5} className="text-[#8888BA]"/>
                         <span>Pin</span>
                     </button>
                         
                     <button
-                        className="flex items-center gap-4 px-2! py-1! text-white rounded-lg hover:bg-[#1F1F27]/70! cursor-pointer transition-colors"
+                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
                     >
-                        <Forward size={18} className="text-[#707099]"/>
+                        <SlActionRedo size={18} strokeWidth={40} className="text-[#8888BA]"/>
                         <span>Forward</span>
                     </button>
 
                     <button
-                        className="flex items-center gap-4 px-2! py-1! text-red-500! rounded-lg hover:bg-[#1F1F27]/70! cursor-pointer transition-colors"
+                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-red-500! rounded-lg hover:bg-[#131319]/80! hover:text-white! cursor-pointer transition-colors duration-0"
                     >
-                        <Trash size={18} className="text-red-500"/>
+                        <Trash size={18} strokeWidth={2.5} />
                         <span>Delete</span>
                     </button>
-                </div>
+                </ContextMenuWrapper>
 
         </div>
     );

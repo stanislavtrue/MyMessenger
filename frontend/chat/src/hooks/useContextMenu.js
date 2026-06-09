@@ -1,16 +1,20 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback } from "react"
 
 export const useContextMenu = (contextMenu, setContextMenu) => {
-    const showMenu = useCallback((event, message) => {
+    const showMenu = useCallback((event, message, type = "message") => {
         event.preventDefault();
 
         setContextMenu({
             visible: true,
-            x: event.clientX + 5,
-            y: event.clientY + 5,
+            x: event.clientX,
+            y: event.clientY,
+            isUp: false,
+            isLeft: false,
+            type: type,
             messageData: message,
+            isMeasuring: true,
         });
-    }, [contextMenu.visible, setContextMenu]);
+    }, [setContextMenu]);
 
     const closeMenu = useCallback(() => {
         setContextMenu((prev) => (prev.visible ? { ...prev, visible: false } : prev));

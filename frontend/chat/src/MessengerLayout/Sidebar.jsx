@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { ChatItem } from "./ChatItem"
-import { Search, Menu, User, Settings, ArrowLeft } from "lucide-react";
+import { Search, Menu, User, Settings, ArrowLeft, SquareArrowOutUpRight, Eye, Pin, BellOff, Trash } from "lucide-react";
 import { useSidebarSearch } from "../hooks/useSidebarSearch";
 import { useSidebarResize } from "../hooks/useSidebarResize";
 import { useMessengerContext } from "../context/MessengerContext";
+import { useContextMenu } from "../hooks/useContextMenu";
+import { ContextMenuWrapper } from "./ContextMenuWrapper";
 
 export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
     const { searchText, setSearchText, sortedChats, filteredChats } = useSidebarSearch(chats);
     const { handleMouseDown } = useSidebarResize(sidebarWidth, setSidebarWidth);
-    const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSearchFocused, setIsSearchFocused } = useMessengerContext();
+    const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSearchFocused, setIsSearchFocused, contextMenu, setContextMenu } = useMessengerContext();
+    const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
 
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
@@ -20,29 +23,30 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
         setSearchText("");
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target) && !buttonRef.current.contains(event.target))
-            {
-                setIsSidebarMenuOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-    }, []);
-
     return (
         <div 
+            id="sidebar"
             style={{
                 width: isMobile ? "100%" : `${sidebarWidth}%`,
                 minWidth: isMobile ? "100%" : "240px",
                 maxWidth: isMobile ? "100%" : "650px"
             }}
-            className="relative h-screen w-full flex flex-col border-r! border-[#282836]! bg-[#1F1F28] select-none shrink-0">
+            className="relative h-screen w-full flex flex-col border-r! border-[#282836]! bg-[#1F1F28] select-none shrink-0"
+        >
+
+            {isSidebarMenuOpen && (
+                <div 
+                    onClick={() => setIsSidebarMenuOpen(false)}
+                    className="fixed inset-0 z-40"
+                />
+            )}
+
+            {contextMenu.visible && contextMenu.type === "chat" && (
+                <div
+                    onClick={closeMenu}
+                    className="fixed inset-0 z-40"
+                />
+            )}
 
             <div className="
                 pl-4! pr-4! pt-1! pb-3! 
@@ -102,6 +106,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                         />
                     </div>
 
+
                     <div
                         ref={menuRef}
                         className={`
@@ -128,9 +133,10 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                                 flex items-center gap-4
                                 px-2! py-1!
                                 rounded-lg
-                                hover:bg-[#1F1F27]/70
+                                hover:bg-[#131319]/80
                                 cursor-pointer
                                 transition-colors
+                                duration-0
                             "
                         >
                             <User size={20} />
@@ -144,12 +150,13 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                                 flex items-center gap-4
                                 px-2! py-1!
                                 rounded-lg
-                                hover:bg-[#1F1F27]/70
+                                hover:bg-[#131319]/80
                                 cursor-pointer
                                 transition-colors
+                                duration-0
                             "
                         >
-                            <Settings size={20} className="text-[#707099]" />
+                            <Settings size={20} className="text-[#8888BA]" />
                             <span className="text-sm!">Settings</span>
 
                         </div>
@@ -200,18 +207,23 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                     `}
                 >
 
-                    {sortedChats.map((chat) => (
-                        <ChatItem 
-                            key={chat.id} 
-                            chat={chat} 
-                            lastMessageText={chat.messages[chat.messages.length - 1]?.text}
-                            lastMessageTime={chat.messages[chat.messages.length - 1]?.time}
-                            lastMessageDate={chat.messages[chat.messages.length - 1]?.date}
-                            setSelectedChatId={handleSelectChat}
-                            selectedChatId={selectedChatId}
-                        />
-                    ))}
+                    {sortedChats.map((chat) => {
+                        const isContextActive = contextMenu.visible && contextMenu.type === "chat" && contextMenu.messageData?.id === chat.id;
 
+                        return (
+                            <ChatItem 
+                                key={chat.id} 
+                                chat={chat} 
+                                lastMessageText={chat.messages[chat.messages.length - 1]?.text}
+                                lastMessageTime={chat.messages[chat.messages.length - 1]?.time}
+                                lastMessageDate={chat.messages[chat.messages.length - 1]?.date}
+                                setSelectedChatId={handleSelectChat}
+                                selectedChatId={selectedChatId}
+                                isContextActive={isContextActive}
+                                onContextMenu={(e) => showMenu(e, chat, "chat")}
+                            />
+                        );
+                    })}
                 </div>
 
                 <div className={`
@@ -227,20 +239,63 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                 >
 
                     {searchText.length > 0 && (
-                        filteredChats.map((chat) => (
-                            <ChatItem 
-                                key={chat.id} 
-                                chat={chat} 
-                                lastMessageText={chat.messages[chat.messages.length - 1]?.text}
-                                lastMessageTime={chat.messages[chat.messages.length - 1]?.time}
-                                lastMessageDate={chat.messages[chat.messages.length - 1]?.date}
-                                setSelectedChatId={handleSelectChat}
-                                selectedChatId={selectedChatId}
-                            />
-                        ))
+                        filteredChats.map((chat) => {
+                            const isContextActive = contextMenu.visible && contextMenu.type === "chat" && contextMenu.messageData?.id === chat.id;
+                            
+                            return (
+                                <ChatItem 
+                                    key={chat.id} 
+                                    chat={chat} 
+                                    lastMessageText={chat.messages[chat.messages.length - 1]?.text}
+                                    lastMessageTime={chat.messages[chat.messages.length - 1]?.time}
+                                    lastMessageDate={chat.messages[chat.messages.length - 1]?.date}
+                                    setSelectedChatId={handleSelectChat}
+                                    selectedChatId={selectedChatId}
+                                    isContextActive={isContextActive}
+                                    onContextMenu={(e) => showMenu(e, chat, "chat")}
+                                />
+                            );
+                        })
                     )}
             
                 </div>
+
+                <ContextMenuWrapper type="chat" width="w-52">
+                    <button
+                        className="flex items-center gap-5 px-3! py-2! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
+                    >
+                        <SquareArrowOutUpRight strokeWidth={2.5} size={18} className="text-[#8888BA]" />
+                        <span>Open in New Tab</span>
+                    </button>
+
+                    <button
+                        className="flex items-center gap-5 px-3! py-2! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
+                    >
+                        <Eye strokeWidth={2.5} size={18} className="text-[#8888BA]" />
+                        <span>Quick Preview</span>
+                    </button>
+                    
+                    <button
+                        className="flex items-center gap-5 px-3! py-2! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
+                    >
+                        <Pin strokeWidth={2.5} size={18} className="text-[#8888BA]" />
+                        <span>Pin to Top</span>
+                    </button>
+
+                    <button
+                        className="flex items-center gap-5 px-3! py-2! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
+                    >
+                        <BellOff strokeWidth={2.5} size={18} className="text-[#8888BA]" />
+                        <span>Mute...</span>
+                    </button>
+
+                    <button
+                        className="flex items-center gap-5 px-3! py-2! text-sm! font-semibold! text-red-500! rounded-lg hover:bg-[#131319]/80! hover:text-white! cursor-pointer transition-colors duration-0"
+                    >
+                        <Trash strokeWidth={2.5} size={18} />
+                        <span>Delete Chat</span>
+                    </button>
+                </ContextMenuWrapper>
             
             </div>
             {!isMobile && (

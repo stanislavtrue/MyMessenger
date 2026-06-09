@@ -3,44 +3,25 @@ import { Check } from "lucide-react";
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
 
     let radiusClass = "";
-    let spacingClass = "";
 
-    if (isFirstMessage && isLastMessage)
-    {
-        spacingClass="mb-3!"
-    }
-
-    if (!isFirstMessage && !isLastMessage) 
-    {
-        if (message.isOwnMessage)
-        {
+    if (!isFirstMessage && !isLastMessage) {
+        if (message.isOwnMessage) {
             radiusClass="rounded-br-md rounded-tr-md"
-        }
-        else
-        {
+        } else {
             radiusClass="rounded-bl-md rounded-tl-md"
         }
     }
-    else if (isFirstMessage && !isLastMessage)
-    {
-        if (message.isOwnMessage)
-        {
+    else if (isFirstMessage && !isLastMessage) {
+        if (message.isOwnMessage) {
             radiusClass="rounded-br-md"
-        }
-        else 
-        {
+        } else {
             radiusClass="rounded-bl-md"
         }
     }
-    else if (!isFirstMessage && isLastMessage)
-    {
-        spacingClass="mb-3!"
-        if (message.isOwnMessage)
-        {
+    else if (!isFirstMessage && isLastMessage) {
+        if (message.isOwnMessage) {
             radiusClass="rounded-tr-md"
-        }
-        else
-        {
+        } else {
             radiusClass="rounded-tl-md"
         }
     }
@@ -52,25 +33,41 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 max-w-[75%]
                 rounded-2xl
                 
-                py-1! px-3! mb-1!
+                py-1! px-3!
                 ${radiusClass}
 
-                ${spacingClass}
-                
                 ${message.isOwnMessage
                     ? "ml-auto! mr-4! bg-[#363646]"
                     : "mr-auto! ml-4! bg-[#5A4282]"
                 }
             `}
         >
+            {message.replyTo && (
+                <div className={`
+                        flex flex-col my-1! justify-between h-10 w-full text-sm! rounded-sm cursor-pointer select-none
+                        
+                        ${message.isOwnMessage
+                            ? "bg-white/10 border-white! border-l-4! hover:bg-white/5"
+                            : "bg-[#8F5EB5]/20 border-[#8F5EB5]! border-l-4! hover:bg-[#8F5EB5]/15"
+                        }
+                    `}
+                >
+                    <span className="px-2!">
+                        {message.replyTo.isOwnMessage ? "Main User" : "User"}
+                    </span>
+                    <span className="px-2! truncate max-w-50">
+                        {message.replyTo.text}
+                    </span>
+                </div>
+            )}
             
-            <div className="flex items-end">
+            <div className="flex items-end justify-between w-full gap-2">
 
-                <span className="text-white text-sm! whitespace-pre-wrap! overflow-hidden">
+                <span className="flex-1 text-white text-sm! whitespace-pre-wrap! overflow-hidden">
                     {message.text}
                 </span>
 
-                <span style={{fontFamily: "Roboto"}} className="text-xs! opacity-50 leading-none ml-3! shrink-0">
+                <span style={{fontFamily: "Roboto"}} className="text-xs! opacity-50 leading-none ml-auto! shrink-0 select-none">
                     {message.time?.slice(0, 5)}
                 </span>
 

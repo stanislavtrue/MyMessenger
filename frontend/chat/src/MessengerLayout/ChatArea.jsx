@@ -24,9 +24,9 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
         <div className="flex-1 h-screen bg-[#111111] flex flex-col min-w-0">
             <ChatHeader chat={selectedChat} isMobile={isMobile} onBack={onBack} />
             
-            <div className="flex-1 overflow-y-auto messages-scroll px-4!">
-                <div style={contentStyle} className="w-full h-full mx-auto! transition-all duration-75 ease-out">
-                    <MessageList messages={selectedChat.messages} />
+            <div className="flex-1 overflow-y-auto messages-scroll">
+                <div className="w-full h-full mx-auto! transition-all duration-75 ease-out">
+                    <MessageList messages={selectedChat.messages} contentStyle={contentStyle} />
                 </div>
             </div>
             
