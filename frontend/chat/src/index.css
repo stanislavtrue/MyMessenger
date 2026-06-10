@@ -103,3 +103,25 @@ body {
 .message-row-highlight.active {
     background-color: rgba(0, 0, 0, 0.3);
 }
+
+@keyframes toast {
+    0% {
+        opacity: 0;
+    }
+
+    5% {
+        opacity: 1;
+    }
+
+    95% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.animate-toast {
+    animation: toast 3s ease forwards;
+}

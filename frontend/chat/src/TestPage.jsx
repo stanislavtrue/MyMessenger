@@ -1,14 +1,25 @@
+import { BsExclamationCircleFill } from "react-icons/bs";
 import { ChatArea } from "./MessengerLayout/ChatArea";
 import { Sidebar } from "./MessengerLayout/Sidebar";
 import { MessengerProvider, useMessengerContext } from "./context/MessengerContext";
 
 export const MessengerContent = () => {
-    const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage } = useMessengerContext();
+    const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage, toast } = useMessengerContext();
 
     const isMobile = windowWidth < 768;
 
     return (
         <div className="h-screen flex overflow-hidden bg-[#111111] relative">
+
+            {toast && (
+                <div 
+                    style={{fontFamily: "Roboto"}}
+                    className="fixed flex items-center h-14 w-80 left-1/2 top-16 -translate-x-1/2 px-4! py-2! gap-3 rounded-xl bg-[#000000]/70 backdrop-blur-xl z-999 select-none animate-toast"
+                >
+                    <BsExclamationCircleFill size={30}/>
+                    <span className="font-light!">{toast}</span>
+                </div>
+            )}
             
             {(!isMobile || !selectedChatId) && (
                 <Sidebar 

@@ -55,7 +55,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                     <span className="px-2!">
                         {message.replyTo.isOwnMessage ? "Main User" : "User"}
                     </span>
-                    <span className="px-2! truncate max-w-50">
+                    <span className="px-2! truncate min-w-40">
                         {message.replyTo.text}
                     </span>
                 </div>

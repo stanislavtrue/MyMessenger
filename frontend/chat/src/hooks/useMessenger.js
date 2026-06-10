@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { mockChats } from "../data/mockChats"
 import { formatTime } from "../utils/formatTime";
 import { formatDate } from "../utils/formatDate";
@@ -11,6 +11,8 @@ export const useMessenger = () => {
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [replyToMessage, setReplyToMessage] = useState(null);
+    const [replyPreview, setReplyPreview] = useState(null);
+    const [toast, setToast] = useState(null);
 
     const [contextMenu, setContextMenu] = useState({
         visible: false,
@@ -24,6 +26,39 @@ export const useMessenger = () => {
     });
     
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
+
+    const replyTimeoutRef = useRef(null);
+
+    const showToast = (text) => {
+        setToast(text);
+
+        setTimeout(() => {
+            setToast(null);
+        }, 3000);
+    };
+
+    const openReply = (message) => {
+        clearTimeout(replyTimeoutRef.current)
+        setReplyPreview(message);
+
+        setTimeout(() => {
+            setReplyToMessage(message);
+        }, 0);
+    };
+
+    const closeReply = () => {
+        setReplyToMessage(null);
+
+        replyTimeoutRef.current = setTimeout(() => {
+            setReplyPreview(null);
+        }, 200);
+    };
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(replyTimeoutRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         const handleEscape = (event) => {
@@ -47,6 +82,11 @@ export const useMessenger = () => {
                 return;
             }
 
+            if (replyToMessage) {
+                closeReply();
+                return;
+            }
+
             if (selectedChatId) {
                 setSelectedChatId(null);
             }
@@ -57,7 +97,7 @@ export const useMessenger = () => {
         return () => {
             document.removeEventListener("keydown", handleEscape);
         }
-    }, [contextMenu.visible, isSidebarMenuOpen, isSearchFocused, selectedChatId])
+    }, [contextMenu.visible, isSidebarMenuOpen, isSearchFocused, selectedChatId, replyToMessage])
 
     useEffect(() => {
         const handleResize = () => {
@@ -140,6 +180,7 @@ export const useMessenger = () => {
             replyTo: replyToMessage ? {
                 id: replyToMessage.id,
                 text: replyToMessage.text,
+                isOwnMessage: replyToMessage.isOwnMessage,
             } : null
         };
         
@@ -182,7 +223,7 @@ export const useMessenger = () => {
             }));
         }, 3000);
 
-        setReplyToMessage(null);
+        closeReply();
     };
 
     return {
@@ -204,6 +245,12 @@ export const useMessenger = () => {
         setSelectedChatId: handleSelectChat,
         handleSendMessage,
         replyToMessage,
-        setReplyToMessage
+        setReplyToMessage,
+        replyPreview,
+        openReply,
+        closeReply,
+
+        toast,
+        showToast,
     };
 };

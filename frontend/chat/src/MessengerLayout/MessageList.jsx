@@ -8,12 +8,26 @@ import { useMessengerContext } from "../context/MessengerContext";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
 
 export const MessageList = ({ messages, contentStyle }) => {
-    const { contextMenu, setContextMenu, setReplyToMessage } = useMessengerContext();
+    const { contextMenu, setContextMenu, openReply, showToast } = useMessengerContext();
     const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
 
     const handleReplyClick = () => {
-        setReplyToMessage(contextMenu.messageData);
-        setContextMenu(prev => ({ ...prev, visible: false }));
+        openReply(contextMenu.messageData);
+        closeMenu();
+    }
+
+    const handleCopyClick = async () => {
+        if (!contextMenu.messageData || !contextMenu.messageData.text) return;
+
+        try {
+            await navigator.clipboard.writeText(contextMenu.messageData.text);
+            showToast("Copied to Clipboard")
+            console.log("Text copied to clipboard");
+        } catch (err) {
+            console.error("Text didn't copy to clipboard", err);
+        } finally {
+            closeMenu();
+        }
     }
     
     const bottomRef = useRef(null);
@@ -109,6 +123,7 @@ export const MessageList = ({ messages, contentStyle }) => {
                     </button>
 
                     <button
+                        onClick={handleCopyClick}
                         className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
                     >
                         <Copy size={18} strokeWidth={2.5} className="text-[#8888BA]"/>
