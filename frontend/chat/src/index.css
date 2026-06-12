@@ -125,3 +125,37 @@ body {
 .animate-toast {
     animation: toast 3s ease forwards;
 }
+
+@keyframes pulse-send {
+    0% {
+        transform: scale(0.5);
+    }
+
+    80% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-pulse-send {
+    animation: pulse-send 400ms ease forwards;
+}
+
+aside.EmojiPickerReact {
+    --epr-bg-color: #1F1F28;
+    --epr-text-color: #52526B;
+    --epr-emoji-padding: 7px;
+    --epr-horizontal-padding: 4px;
+    --epr-emoji-size: 32px;
+    --epr-picker-border-radius: 20px;
+    --epr-highlight-color: #FFFFFF;
+    --epr-hover-bg-color: #282836;
+    --epr-focus-bg-color: #282836;
+    --epr-category-navigation-button-size: 30px;
+    --epr-category-label-bg-color: #1F1F28/80;
+    --epr-category-label-height: 25px;
+}
+

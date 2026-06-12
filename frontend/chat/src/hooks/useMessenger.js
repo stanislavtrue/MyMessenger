@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { mockChats } from "../data/mockChats"
 import { formatTime } from "../utils/formatTime";
 import { formatDate } from "../utils/formatDate";
@@ -28,11 +28,17 @@ export const useMessenger = () => {
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
 
     const replyTimeoutRef = useRef(null);
+    const toastTimeoutRef = useRef(null);
 
     const showToast = (text) => {
-        setToast(text);
+        clearTimeout(toastTimeoutRef.current);
 
-        setTimeout(() => {
+        setToast({
+            id: Date.now(),
+            text
+        });
+
+        toastTimeoutRef.current = setTimeout(() => {
             setToast(null);
         }, 3000);
     };
@@ -41,6 +47,7 @@ export const useMessenger = () => {
         clearTimeout(replyTimeoutRef.current)
         setReplyPreview(message);
 
+        // mount 'preview' before launching animation
         setTimeout(() => {
             setReplyToMessage(message);
         }, 0);
@@ -53,6 +60,12 @@ export const useMessenger = () => {
             setReplyPreview(null);
         }, 200);
     };
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(toastTimeoutRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         return () => {
@@ -165,6 +178,30 @@ export const useMessenger = () => {
         }));
     };
 
+    const handleDeleteMessage = (chatId, messageId) => {
+        setChats(prevChats => 
+            prevChats.map(chat => {
+                if (chat.id === chatId) {
+                    const updatedMessages = chat.messages.filter(msg => msg.id !== messageId);
+                    const nextLastMessage = updatedMessages.at(-1);
+
+                    if (replyToMessage?.id === messageId) {
+                        closeReply();
+                    }
+
+                    return {
+                        ...chat,
+                        lastMessage: nextLastMessage ? nextLastMessage.text : "No messages yet",
+                        time: nextLastMessage ? nextLastMessage.time : "",
+                        messages: updatedMessages
+                    };
+                }
+
+                return chat;
+            })
+        );
+    };
+
     const handleSendMessage = (text) => {
         if (!text.trim() || !selectedChatId) return;
 
@@ -244,6 +281,7 @@ export const useMessenger = () => {
         setSidebarWidth,
         setSelectedChatId: handleSelectChat,
         handleSendMessage,
+        handleDeleteMessage,
         replyToMessage,
         setReplyToMessage,
         replyPreview,

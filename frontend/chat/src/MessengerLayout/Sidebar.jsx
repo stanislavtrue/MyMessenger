@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { ChatItem } from "./ChatItem"
-import { Search, Menu, User, Settings, ArrowLeft, SquareArrowOutUpRight, Eye, Pin, BellOff, Trash } from "lucide-react";
+import { Search, User, Settings, ArrowLeft, SquareArrowOutUpRight, Eye, Pin, BellOff, Trash } from "lucide-react";
+import { TfiMenu } from "react-icons/tfi";
 import { useSidebarSearch } from "../hooks/useSidebarSearch";
 import { useSidebarResize } from "../hooks/useSidebarResize";
 import { useMessengerContext } from "../context/MessengerContext";
@@ -67,7 +68,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                         className="
                             relative
                             flex items-center justify-center 
-                            h-10 w-12
+                            h-11 w-11
                             rounded-full 
                             hover:bg-[#282836]
                             active:scale-90
@@ -77,7 +78,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                             overflow-hidden
                         "
                     >
-                        <Menu 
+                        <TfiMenu 
                             size={22}
                             className={`
                                 absolute
@@ -163,7 +164,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                     
                 </div>
 
-                    <div className="w-full! flex items-center group focus-within:ring-2 focus-within:ring-[#957AAA] bg-[#16161D] transition-all duration-300 rounded-3xl ml-4! pl-4!">
+                    <div className="w-full! flex flex-1 items-center group focus-within:ring-2 focus-within:ring-[#957AAA] bg-[#16161D] transition-all duration-300 rounded-3xl ml-4! pl-4!">
 
                         <Search size={22} className="text-[#52526B] transition-colors group-focus-within:text-[#957AAA]" />
 

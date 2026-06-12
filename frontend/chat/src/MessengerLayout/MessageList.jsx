@@ -2,17 +2,31 @@ import { formatDividerDate } from "../utils/formatDividerDate";
 import { useEffect, useRef } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { useContextMenu } from "../hooks/useContextMenu";
-import { Copy, Forward, Pin, Reply, Trash } from "lucide-react";
+import { Copy, Pin, Trash } from "lucide-react";
 import { SlActionRedo, SlActionUndo } from "react-icons/sl"
 import { useMessengerContext } from "../context/MessengerContext";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
 
 export const MessageList = ({ messages, contentStyle }) => {
-    const { contextMenu, setContextMenu, openReply, showToast } = useMessengerContext();
+    const { contextMenu, setContextMenu, openReply, showToast, selectedChatId, handleDeleteMessage } = useMessengerContext();
     const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
 
     const handleReplyClick = () => {
         openReply(contextMenu.messageData);
+        document.getElementById("message-input")?.focus();
+        closeMenu();
+    }
+
+    const handleQuickReply = (message) => {
+        openReply(message);
+        document.getElementById("message-input")?.focus();
+    }
+
+    const handleDeleteClick = () => {
+        if (!contextMenu.messageData || !selectedChatId) return;
+
+        handleDeleteMessage(selectedChatId, contextMenu.messageData.id);
+
         closeMenu();
     }
 
@@ -88,7 +102,10 @@ export const MessageList = ({ messages, contentStyle }) => {
                                 </div>
                             )}
 
-                            <div className={`w-full flex items-center message-row-highlight ${spacingClass} ${isTargetMessage ? "active" : ""}`}>
+                            <div 
+                                onDoubleClick={() => handleQuickReply(message)} 
+                                className={`w-full flex items-center message-row-highlight ${spacingClass} ${isTargetMessage ? "active" : ""}`}
+                            >
 
                                 <div style={contentStyle} className="mx-auto!">
 
@@ -145,6 +162,7 @@ export const MessageList = ({ messages, contentStyle }) => {
                     </button>
 
                     <button
+                        onClick={handleDeleteClick}
                         className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-red-500! rounded-lg hover:bg-[#131319]/80! hover:text-white! cursor-pointer transition-colors duration-0"
                     >
                         <Trash size={18} strokeWidth={2.5} />
