@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { mockChats } from "../data/mockChats"
 import { formatTime } from "../utils/formatTime";
 import { formatDate } from "../utils/formatDate";
+import { useChatSearch } from "./useChatSearch";
 
 export const useMessenger = () => {
     const [chats, setChats] = useState(mockChats);
@@ -9,7 +10,9 @@ export const useMessenger = () => {
     const [sidebarWidth, setSidebarWidth] = useState(33);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
-    const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [isSidebarSearchFocused, setIsSidebarSearchFocused] = useState(false);
+    const [isChatSearchFocused, setIsChatSearchFocused] = useState(false);
+    const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
     const [replyToMessage, setReplyToMessage] = useState(null);
     const [replyPreview, setReplyPreview] = useState(null);
     const [toast, setToast] = useState(null);
@@ -26,6 +29,8 @@ export const useMessenger = () => {
     });
     
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
+
+    const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
 
     const replyTimeoutRef = useRef(null);
     const toastTimeoutRef = useRef(null);
@@ -89,9 +94,19 @@ export const useMessenger = () => {
                 setIsSidebarMenuOpen(false);
                 return;
             }
+            
+            if (isEmojiPickerOpen) {
+                setIsEmojiPickerOpen(false);
+                return;
+            }
 
-            if (isSearchFocused) {
-                setIsSearchFocused(false);
+            if (isSidebarSearchFocused) {
+                setIsSidebarSearchFocused(false);
+                return;
+            }
+
+            if (isChatSearchFocused) {
+                chatSearch.closeChatSearch();
                 return;
             }
 
@@ -110,7 +125,7 @@ export const useMessenger = () => {
         return () => {
             document.removeEventListener("keydown", handleEscape);
         }
-    }, [contextMenu.visible, isSidebarMenuOpen, isSearchFocused, selectedChatId, replyToMessage])
+    }, [contextMenu.visible, isSidebarMenuOpen, isSidebarSearchFocused, isChatSearchFocused, isEmojiPickerOpen, selectedChatId, replyToMessage])
 
     useEffect(() => {
         const handleResize = () => {
@@ -128,7 +143,7 @@ export const useMessenger = () => {
         const interval = setInterval(() => {
 
             setChats(prevChats => {
-                const inactiveChats = chats.filter(c => c.id !== selectedChatId);
+                const inactiveChats = prevChats.filter(c => c.id !== selectedChatId);
                 if (inactiveChats.length === 0) return prevChats;
 
                 const randomChat = inactiveChats[Math.floor(Math.random() * inactiveChats.length)];
@@ -272,8 +287,12 @@ export const useMessenger = () => {
 
         isSidebarMenuOpen,
         setIsSidebarMenuOpen,
-        isSearchFocused,
-        setIsSearchFocused,
+        isSidebarSearchFocused,
+        setIsSidebarSearchFocused,
+
+        isChatSearchFocused,
+        setIsChatSearchFocused,
+        ...chatSearch,
 
         contextMenu,
         setContextMenu,
@@ -287,6 +306,9 @@ export const useMessenger = () => {
         replyPreview,
         openReply,
         closeReply,
+
+        isEmojiPickerOpen,
+        setIsEmojiPickerOpen,
 
         toast,
         showToast,

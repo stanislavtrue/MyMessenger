@@ -1,6 +1,9 @@
 import { Check } from "lucide-react";
+import { useMessengerContext } from "../context/MessengerContext";
+import { highlightText } from "../utils/highlightText";
 
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
+    const { searchText, filteredSearchMessages, currentSearchIndex } = useMessengerContext();
 
     let radiusClass = "";
 
@@ -64,7 +67,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             <div className="flex items-end justify-between w-full gap-2">
 
                 <span className="flex-1 text-white text-sm! whitespace-pre-wrap! overflow-hidden">
-                    {message.text}
+                    {highlightText(message.text, searchText)}
                 </span>
 
                 <span style={{fontFamily: "Roboto"}} className="text-xs! opacity-50 leading-none ml-auto! shrink-0 select-none">

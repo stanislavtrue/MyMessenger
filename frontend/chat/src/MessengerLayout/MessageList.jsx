@@ -1,15 +1,17 @@
 import { formatDividerDate } from "../utils/formatDividerDate";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
 import { useContextMenu } from "../hooks/useContextMenu";
 import { Copy, Pin, Trash } from "lucide-react";
 import { SlActionRedo, SlActionUndo } from "react-icons/sl"
 import { useMessengerContext } from "../context/MessengerContext";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
+import { MdOutlineContentCopy } from "react-icons/md";
 
 export const MessageList = ({ messages, contentStyle }) => {
-    const { contextMenu, setContextMenu, openReply, showToast, selectedChatId, handleDeleteMessage } = useMessengerContext();
+    const { contextMenu, setContextMenu, openReply, showToast, selectedChatId, handleDeleteMessage, searchText, filteredSearchMessages, currentSearchIndex } = useMessengerContext();
     const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
+    const [highlightMsgId, setHighlightMsgId] = useState(null);
 
     const handleReplyClick = () => {
         openReply(contextMenu.messageData);
@@ -45,6 +47,30 @@ export const MessageList = ({ messages, contentStyle }) => {
     }
     
     const bottomRef = useRef(null);
+
+    useEffect(() => {
+        if (searchText && filteredSearchMessages.length > 0) {
+            const targetMessage = filteredSearchMessages[currentSearchIndex];
+
+            if (targetMessage.id) {
+                const element = document.getElementById(`msg-${targetMessage.id}`);
+                if (element) {
+                    element.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                    setHighlightMsgId(targetMessage.id);
+
+                    const timer = setTimeout(() => {
+                        setHighlightMsgId(null);
+                    }, 2000);
+
+                    return () => clearTimeout(timer);
+                }
+            }
+        }
+    }, [searchText, currentSearchIndex, filteredSearchMessages]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({
@@ -86,13 +112,18 @@ export const MessageList = ({ messages, contentStyle }) => {
                         
                     const isTargetMessage = contextMenu.visible && contextMenu.type === "message" && contextMenu.messageData?.id === message.id;
 
+                    const isHighlighed = isTargetMessage || highlightMsgId === message.id;
+
                     let spacingClass = "mb-1.5!";
                     if (isLastMessage) {
                         spacingClass = "mb-3!";
                     }
 
                     return (
-                        <div key={message.id || index} className="w-full flex flex-col">
+                        <div 
+                            key={message.id || index} 
+                            id={`msg-${message.id}`}
+                            className="w-full flex flex-col">
 
                             {showDivider && (
                                 <div className="flex justify-center my-4! select-none pointer-events-none">
@@ -104,7 +135,11 @@ export const MessageList = ({ messages, contentStyle }) => {
 
                             <div 
                                 onDoubleClick={() => handleQuickReply(message)} 
-                                className={`w-full flex items-center message-row-highlight ${spacingClass} ${isTargetMessage ? "active" : ""}`}
+                                className={`
+                                    w-full flex items-center 
+                                    transition-colors duration-300 ease-in-out
+                                    message-row-highlight ${spacingClass} 
+                                    ${isHighlighed ? "active" : ""}`}
                             >
 
                                 <div style={contentStyle} className="mx-auto!">
@@ -143,7 +178,7 @@ export const MessageList = ({ messages, contentStyle }) => {
                         onClick={handleCopyClick}
                         className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
                     >
-                        <Copy size={18} strokeWidth={2.5} className="text-[#8888BA]"/>
+                        <MdOutlineContentCopy size={18} className="text-[#8888BA]"/>
                         <span>Copy Text</span>
                     </button>
                             

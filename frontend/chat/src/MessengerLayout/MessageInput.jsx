@@ -7,27 +7,31 @@ import EmojiPicker from "emoji-picker-react"
 
 export const MessageInput = ({ onSendMessage }) => {
     const [message, setMessage] = useState("");
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const { replyToMessage, replyPreview, closeReply } = useMessengerContext();
+    const { replyToMessage, replyPreview, closeReply, isEmojiPickerOpen, setIsEmojiPickerOpen } = useMessengerContext();
 
     const hidePickerTimeout = useRef(null);
+    const showPickerTimeout = useRef(null);
 
     const handleEmojiMouseEnter = () => {
         clearTimeout(hidePickerTimeout.current);
-        setShowEmojiPicker(true);
+
+        showPickerTimeout.current = setTimeout(() => {
+            setIsEmojiPickerOpen(true);
+        }, 100);
     };
     
     const handleEmojiMouseLeave = () => {
-        clearTimeout(hidePickerTimeout.current);
+        clearTimeout(showPickerTimeout.current);
 
         hidePickerTimeout.current = setTimeout(() => {
-            setShowEmojiPicker(false);
+            setIsEmojiPickerOpen(false);
         }, 300);
     };
 
     useEffect(() => {
         return () => {
             clearTimeout(hidePickerTimeout.current);
+            clearTimeout(showPickerTimeout.current);
         };
     }, []);
 
@@ -46,7 +50,7 @@ export const MessageInput = ({ onSendMessage }) => {
         <div className="flex relative items-end gap-2 my-2!">
             <div className={`
                     flex-1
-                    w-full
+                    min-w-0
                     bg-[#1F1F28]    
                     rounded-2xl
                     rounded-br-none
@@ -89,11 +93,11 @@ export const MessageInput = ({ onSendMessage }) => {
                 <div className="flex items-center my-auto! px-4! h-12">
 
                     <div
-                        className="relative"
+                        className="relative select-none"
                         onMouseEnter={handleEmojiMouseEnter}
                         onMouseLeave={handleEmojiMouseLeave}
                     >
-                        <Smile size={26} className={`cursor-pointer transition-colors ${showEmojiPicker ? "text-[#8F5EB5]" : "text-[#5F5F7C]"}`}/>
+                        <Smile size={26} className={`cursor-pointer transition-colors ${isEmojiPickerOpen ? "text-[#8F5EB5]" : "text-[#5F5F7C]"}`}/>
 
                             <div 
                                 className={`
@@ -101,7 +105,7 @@ export const MessageInput = ({ onSendMessage }) => {
                                     origin-bottom-left
                                     transition-all duration-200 ease-out
 
-                                    ${showEmojiPicker
+                                    ${isEmojiPickerOpen
                                         ? "opacity-100 scale-100 translate-y-0"
                                         : "opacity-0 scale-75 translate-y-2 pointer-events-none"
                                     }
@@ -164,6 +168,7 @@ export const MessageInput = ({ onSendMessage }) => {
                     cursor-pointer
                     hover:bg-[#8F5EB5]
                     group
+                    shrink-0
                     transition-colors
                 `}
             >

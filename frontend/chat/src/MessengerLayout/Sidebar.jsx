@@ -1,17 +1,20 @@
 import { useRef } from "react";
 import { ChatItem } from "./ChatItem"
-import { Search, User, Settings, ArrowLeft, SquareArrowOutUpRight, Eye, Pin, BellOff, Trash } from "lucide-react";
+import { Settings, ArrowLeft, SquareArrowOutUpRight, Eye, Pin, BellOff, Trash, Plus, EllipsisVertical } from "lucide-react";
 import { TfiMenu } from "react-icons/tfi";
+import { BsPeople, BsPerson, BsChevronRight } from "react-icons/bs";
+import { SlMagnifier } from "react-icons/sl";
 import { useSidebarSearch } from "../hooks/useSidebarSearch";
 import { useSidebarResize } from "../hooks/useSidebarResize";
 import { useMessengerContext } from "../context/MessengerContext";
+import { PiBookmarkSimple } from "react-icons/pi";
 import { useContextMenu } from "../hooks/useContextMenu";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
 
 export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
     const { searchText, setSearchText, sortedChats, filteredChats } = useSidebarSearch(chats);
     const { handleMouseDown } = useSidebarResize(sidebarWidth, setSidebarWidth);
-    const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSearchFocused, setIsSearchFocused, contextMenu, setContextMenu } = useMessengerContext();
+    const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSidebarSearchFocused, setIsSidebarSearchFocused, contextMenu, setContextMenu } = useMessengerContext();
     const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
 
     const menuRef = useRef(null);
@@ -20,7 +23,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
     const handleSelectChat = (chatId) => {
         setSelectedChatId(chatId);
 
-        setIsSearchFocused(false);
+        setIsSidebarSearchFocused(false);
         setSearchText("");
     };
 
@@ -50,7 +53,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
             )}
 
             <div className="
-                pl-4! pr-4! pt-1! pb-3! 
+                px-3! pt-1! pb-3! 
                 text-center 
             ">
                 <div className="flex items-center relative">
@@ -58,8 +61,8 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                     <div 
                         ref={buttonRef} 
                         onClick={() => {
-                            if (isSearchFocused) {
-                                setIsSearchFocused(false)
+                            if (isSidebarSearchFocused) {
+                                setIsSidebarSearchFocused(false)
                                 setSearchText("")
                             } else {
                                 setIsSidebarMenuOpen(!isSidebarMenuOpen);
@@ -85,7 +88,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                                 transition-all duration-300
                                 text-[#707099]
                                 
-                                ${isSearchFocused
+                                ${isSidebarSearchFocused
                                     ? "opacity-0 rotate-180 scale-50"
                                     : "opacity-100 rotate-0 scale-100"
                                 }
@@ -99,7 +102,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                                 transition-all duration-300    
                                 text-[#707099]
 
-                                ${isSearchFocused
+                                ${isSidebarSearchFocused
                                     ? "opacity-100 rotate-0 scale-100"
                                     : "opacity-0 -rotate-180 scale-50"
                                 }
@@ -109,38 +112,42 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
 
 
                     <div
+                        style={{
+                            fontFamily: "Roboto"
+                        }}
                         ref={menuRef}
                         className={`
                             absolute z-50
                             top-13 left-2
-                            w-50 h-60
-                            rounded-2xl
+                            w-55 h-fit
+                            rounded-xl
                             bg-[#272739]/80
                             backdrop-blur-xs
-                            shadow-[#000000]
+                            shadow-black/60
                             shadow-lg
-                            p-1!
+                            font-semibold!
+                            text-[#FFFFFF]/90
                             origin-top-left
 
                             transition-all duration-100 ease-out
 
                             ${isSidebarMenuOpen
                                 ? "opacity-100 translate-x-1 translate-y-1 scale-100"
-                                : "opacity-0 -translate-x-1 -translate-y-1 pointer-events-none"
+                                : "opacity-0 -translate-x-1 -translate-y-1 scale-80 pointer-events-none"
                             }
                         `}
                     >
                         <div className="
                                 flex items-center gap-4
-                                px-2! py-1!
-                                rounded-lg
+                                px-3! py-1! mx-1! my-1!
+                                rounded-md
                                 hover:bg-[#131319]/80
                                 cursor-pointer
                                 transition-colors
                                 duration-0
                             "
                         >
-                            <User size={20} />
+                            <div className="size-5.5 bg-white rounded-full" />
                             <span className="text-sm!">User</span>
 
                         </div>
@@ -149,7 +156,69 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
 
                         <div className="
                                 flex items-center gap-4
-                                px-2! py-1!
+                                px-3! py-1! mx-1! my-1!
+                                rounded-lg
+                                hover:bg-[#131319]/80
+                                cursor-pointer
+                                transition-colors
+                                duration-0
+                            "
+                        >
+                            <Plus size={22} className="text-[#8888BA]" />
+                            <span className="text-sm!">Add Account</span>
+
+                        </div>
+
+                        <div className="h-px! w-full bg-[#52526B] my-1!" />
+                        
+                        <div className="
+                                flex items-center gap-4.5
+                                px-3! py-1.5! mx-1! my-1!
+                                rounded-lg
+                                hover:bg-[#131319]/80
+                                cursor-pointer
+                                transition-colors
+                                duration-0
+                            "
+                        >
+                            <BsPerson size={20} className="text-[#8888BA]" />
+                            <span className="text-sm!">My Profile</span>
+
+                        </div>
+
+                        <div className="
+                                flex items-center gap-4.5
+                                px-3! py-1.5! mx-1! my-1!
+                                rounded-lg
+                                hover:bg-[#131319]/80
+                                cursor-pointer
+                                transition-colors
+                                duration-0
+                            "
+                        >
+                            <PiBookmarkSimple size={20} className="text-[#8888BA]" />
+                            <span className="text-sm!">Saved Messages</span>
+
+                        </div>
+
+                        <div className="
+                                flex items-center gap-4.5
+                                px-3! py-1.5! mx-1! my-1!
+                                rounded-lg
+                                hover:bg-[#131319]/80
+                                cursor-pointer
+                                transition-colors
+                                duration-0
+                            "
+                        >
+                            <BsPeople size={20} className="text-[#8888BA]" />
+                            <span className="text-sm!">Contacts</span>
+
+                        </div>
+
+                        <div className="
+                                flex items-center gap-4.5
+                                px-3! py-1.5! mx-1! my-1!
                                 rounded-lg
                                 hover:bg-[#131319]/80
                                 cursor-pointer
@@ -161,21 +230,37 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                             <span className="text-sm!">Settings</span>
 
                         </div>
+                        
+                        <div className="
+                                flex items-center gap-4.5
+                                px-3! py-1.5! mx-1! my-1!
+                                rounded-lg
+                                hover:bg-[#131319]/80
+                                cursor-pointer
+                                transition-colors
+                                duration-0
+                            "
+                        >
+                            <EllipsisVertical size={20} className="text-[#8888BA]" />
+                            <span className="text-sm!">More</span>
+                            <BsChevronRight size={15} className="text-[#8888BA] ml-20!" />
+
+                        </div>
                     
                 </div>
 
-                    <div className="w-full! flex flex-1 items-center group focus-within:ring-2 focus-within:ring-[#957AAA] bg-[#16161D] transition-all duration-300 rounded-3xl ml-4! pl-4!">
+                    <div className="w-full! flex flex-1 items-center group focus-within:ring-2 focus-within:ring-[#957AAA] bg-[#16161D] transition-all duration-300 rounded-3xl ml-3! pl-4!">
 
-                        <Search size={22} className="text-[#52526B] transition-colors group-focus-within:text-[#957AAA]" />
+                        <SlMagnifier size={18} strokeWidth={50} className="text-[#52526B] transition-colors group-focus-within:text-[#957AAA]" />
 
                         <input
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
-                            onFocus={() => setIsSearchFocused(true)}
+                            onFocus={() => setIsSidebarSearchFocused(true)}
                             className="
-                                w-full h-11!
+                                w-full h-12!
                                 rounded-3xl 
-                                py-2! pl-5!
+                                pl-3!
                                 text-white 
                                 outline-none!
                             "
@@ -201,7 +286,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                         chats-scroll
                         transition-all duration-50 ease-out
 
-                        ${isSearchFocused
+                        ${isSidebarSearchFocused
                             ? "scale-95 opacity-0 pointer-events-none"
                             : "scale-100 opacity-100"
                         }
@@ -232,7 +317,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                         overflow-y-auto chats-scroll
                         transition-all duration-50 ease-out
 
-                        ${isSearchFocused
+                        ${isSidebarSearchFocused
                             ? "opacity-100 scale-100"
                             : "opacity-0 scale-105 pointer-events-none"
                         }

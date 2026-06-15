@@ -159,3 +159,12 @@ aside.EmojiPickerReact {
     --epr-category-label-height: 25px;
 }
 
+.epr-emoji-category-label {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    padding-left: 8px !important;
+    letter-spacing: 0.1px !important;
+}
+
+
+
