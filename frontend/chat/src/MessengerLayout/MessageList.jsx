@@ -9,7 +9,7 @@ import { ContextMenuWrapper } from "./ContextMenuWrapper";
 import { MdOutlineContentCopy } from "react-icons/md";
 
 export const MessageList = ({ messages, contentStyle }) => {
-    const { contextMenu, setContextMenu, openReply, showToast, selectedChatId, handleDeleteMessage, searchText, filteredSearchMessages, currentSearchIndex } = useMessengerContext();
+    const { contextMenu, setContextMenu, openReply, showToast, selectedChat, selectedChatId, handleDeleteMessage, handlePinMessage, handleUnpinMessage, searchText, filteredSearchMessages, currentSearchIndex } = useMessengerContext();
     const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
     const [highlightMsgId, setHighlightMsgId] = useState(null);
 
@@ -32,6 +32,21 @@ export const MessageList = ({ messages, contentStyle }) => {
         closeMenu();
     }
 
+    const handlePinClick = () => {
+        if (!contextMenu.messageData || !selectedChatId) return;
+
+        const pinnedMessages = selectedChat?.pinnedMessages || [];
+        const isCurrentPinned = pinnedMessages.some(msg => msg.id === contextMenu.messageData.id);
+
+        if(isCurrentPinned) {
+            handleUnpinMessage(selectedChatId, contextMenu.messageData.id);
+        } else {
+            handlePinMessage(selectedChatId, contextMenu.messageData);
+        }
+        
+        closeMenu();
+    };
+
     const handleCopyClick = async () => {
         if (!contextMenu.messageData || !contextMenu.messageData.text) return;
 
@@ -47,29 +62,41 @@ export const MessageList = ({ messages, contentStyle }) => {
     }
     
     const bottomRef = useRef(null);
+    const highlightTimeoutRef = useRef(null);
 
     useEffect(() => {
-        if (searchText && filteredSearchMessages.length > 0) {
-            const targetMessage = filteredSearchMessages[currentSearchIndex];
+        if (highlightTimeoutRef.current) {
+            clearTimeout(highlightTimeoutRef.current);
+        }
 
-            if (targetMessage.id) {
-                const element = document.getElementById(`msg-${targetMessage.id}`);
-                if (element) {
-                    element.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center"
-                    });
+        if (!searchText || filteredSearchMessages.length === 0) {
+            setHighlightMsgId(null);
+            return;
+        }
 
-                    setHighlightMsgId(targetMessage.id);
+        const targetMessage = filteredSearchMessages[currentSearchIndex];
 
-                    const timer = setTimeout(() => {
-                        setHighlightMsgId(null);
-                    }, 2000);
+        if (targetMessage?.id) {
+            const element = document.getElementById(`msg-${targetMessage.id}`);
+            if (element) {
+                element.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
 
-                    return () => clearTimeout(timer);
-                }
+                setHighlightMsgId(targetMessage.id);
+
+                highlightTimeoutRef.current = setTimeout(() => {
+                    setHighlightMsgId(null);
+                }, 2000);
             }
         }
+
+        return () => {
+            if (highlightTimeoutRef.current) {
+                clearTimeout(highlightTimeoutRef.current);
+            }
+        };
     }, [searchText, currentSearchIndex, filteredSearchMessages]);
 
     useEffect(() => {
@@ -183,10 +210,11 @@ export const MessageList = ({ messages, contentStyle }) => {
                     </button>
                             
                     <button
+                        onClick={handlePinClick}
                         className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
                     >
                         <Pin size={18} strokeWidth={2.5} className="text-[#8888BA]"/>
-                        <span>Pin</span>
+                        <span>{(selectedChat?.pinnedMessages || []).some(msg => msg.id === contextMenu.messageData?.id) ? "Unpin" : "Pin"}</span>
                     </button>
                         
                     <button

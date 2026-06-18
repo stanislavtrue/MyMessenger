@@ -4,9 +4,10 @@ import { useMessengerContext } from "../context/MessengerContext"
 import { TypingIndicator } from "../components/indicators/TypingIndicator";
 import { useEffect, useRef, useState } from "react";
 import { SearchDropdown } from "./SearchDropdown";
+import { PinnedMessageBar } from "./PinnedMessageBar";
 
 export const ChatHeader = ({ chat, isMobile, onBack }) => {
-    const { isChatSearchFocused, setIsChatSearchFocused, searchText, setSearchText, filteredSearchMessages, currentSearchIndex, setCurrentSearchIndex, closeChatSearch, handleNextSearch, handlePrevSearch } = useMessengerContext();
+    const { selectedChat, isChatSearchFocused, setIsChatSearchFocused, searchText, setSearchText, filteredSearchMessages, currentSearchIndex, setCurrentSearchIndex, closeChatSearch, handleNextSearch, handlePrevSearch } = useMessengerContext();
     const [isDropdownVisisble, setIsDropdownVisible] = useState(false);
 
     const inputRef = useRef(null);
@@ -107,6 +108,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                     </div>
 
                     <div className="flex items-center gap-1! ml-auto! mr-4!">
+                        <PinnedMessageBar chat={selectedChat} />
 
                         <div 
                             onClick={() => setIsChatSearchFocused(true)}
@@ -115,7 +117,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                                 h-10 w-10 rounded-full
                                 text-[#707099] hover:bg-[#282836]
                                 active:scale-90 active:bg-[#52526B]
-                                transition-all duration-300
+                                transition-all duration-200
                                 cursor-pointer
                             "
                         >
@@ -127,7 +129,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                             h-10 w-10 rounded-full
                             text-[#707099] hover:bg-[#282836]
                             active:scale-90 active:bg-[#52526B]
-                            transition-all duration-300
+                            transition-all duration-200
                             cursor-pointer
                         ">
                             <EllipsisVertical size={20} strokeWidth={3} className=" "/>
@@ -137,7 +139,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
 
                 <div className={`
                     absolute inset-0 flex items-center w-full h-full
-                    transition-opacity duration-200 ease-in-out
+                    transition-opacity duration-100 ease-in-out
                     ${isChatSearchFocused ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
                 `}>
                     <div className="flex flex-1 items-center gap-3">
@@ -152,7 +154,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                             focus-within:bg-[#1F1F28]
                             focus-within:shadow-[0px_0px_10px_rgba(0,0,0,0.5)]
 
-                            transition-all duration-300 ease-in-out
+                            transition-all duration-200 ease-in-out
                             
                             ${searchText.trim() && isDropdownVisisble
                                 ? "rounded-t-3xl rounded-b-none"

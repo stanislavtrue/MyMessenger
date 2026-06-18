@@ -177,6 +177,11 @@ export const useMessenger = () => {
     const handleSelectChat = (chatId) => {
         setSelectedChatId(chatId);
 
+        setIsChatSearchFocused(false);
+        if (chatSearch?.setSearchText) {
+            chatSearch.setSearchText("");
+        }
+
         setChats(prevChats => prevChats.map(chat => {
             if (chat.id === chatId) {
                 return {
@@ -193,6 +198,37 @@ export const useMessenger = () => {
         }));
     };
 
+    const handlePinMessage = (chatId, message) => {
+        setChats(prevChats => prevChats.map(chat => {
+            if (chat.id === chatId) {
+                const pinnedMessages = chat.pinnedMessages || [];
+
+                if (pinnedMessages.some(msg => msg.id === message.id)) return chat;
+
+                return {
+                    ...chat,
+                    pinnedMessages: [...pinnedMessages, message] 
+                };
+            }
+
+            return chat;
+        }));
+    };
+
+    const handleUnpinMessage = (chatId, messageId) => {
+        setChats(prevChats => prevChats.map(chat => {
+            if (chat.id === chatId) {
+                const pinnedMessages = chat.pinnedMessages || [];
+                return {
+                    ...chat,
+                    pinnedMessages: pinnedMessages.filter(msg => msg.id !== messageId) 
+                };
+            }
+
+            return chat;
+        }));
+    };
+
     const handleDeleteMessage = (chatId, messageId) => {
         setChats(prevChats => 
             prevChats.map(chat => {
@@ -204,11 +240,14 @@ export const useMessenger = () => {
                         closeReply();
                     }
 
+                    const pinnedMessages = chat.pinnedMessages || [];
+
                     return {
                         ...chat,
                         lastMessage: nextLastMessage ? nextLastMessage.text : "No messages yet",
                         time: nextLastMessage ? nextLastMessage.time : "",
-                        messages: updatedMessages
+                        messages: updatedMessages,
+                        pinnedMessages: pinnedMessages.filter(msg => msg.id !== messageId)
                     };
                 }
 
@@ -301,6 +340,8 @@ export const useMessenger = () => {
         setSelectedChatId: handleSelectChat,
         handleSendMessage,
         handleDeleteMessage,
+        handlePinMessage,
+        handleUnpinMessage,
         replyToMessage,
         setReplyToMessage,
         replyPreview,
