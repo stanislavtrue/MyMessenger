@@ -1,104 +1,30 @@
 import { formatDividerDate } from "../utils/formatDividerDate";
-import { useEffect, useRef, useState } from "react";
 import { MessageBubble } from "./MessageBubble";
-import { useContextMenu } from "../hooks/useContextMenu";
-import { Copy, Pin, Trash } from "lucide-react";
-import { SlActionRedo, SlActionUndo } from "react-icons/sl"
 import { useMessengerContext } from "../context/MessengerContext";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
-import { MdOutlineContentCopy } from "react-icons/md";
+import { useMessageSearchNavigation } from "../hooks/useMessageSearchNavigation";
+import { useAutoScroll } from "../hooks/useAutoScroll";
+import { MESSAGE_CONTEXT_MENU } from "../constants/messageMenuItems";
 
 export const MessageList = ({ messages, contentStyle }) => {
-    const { contextMenu, setContextMenu, showMenu, closeMenu, openReply, showToast, selectedChat, selectedChatId, handleDeleteMessage, handlePinMessage, handleUnpinMessage, searchText, filteredSearchMessages, currentSearchIndex, highlightMsgId, triggerHighlight } = useMessengerContext();
+    const messengerContext = useMessengerContext();
+    const { 
+        contextMenu, showMenu, closeMenu, openReply, searchText, 
+        filteredSearchMessages, currentSearchIndex, highlightMsgId, triggerHighlight 
+    } = messengerContext;
 
-    const handleReplyClick = () => {
-        openReply(contextMenu.messageData);
-        document.getElementById("message-input")?.focus();
-        closeMenu();
-    }
+    useMessageSearchNavigation(searchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
+    const bottomRef = useAutoScroll([messages]);
 
     const handleQuickReply = (message) => {
         openReply(message);
         document.getElementById("message-input")?.focus();
     }
-
-    const handleDeleteClick = () => {
-        if (!contextMenu.messageData || !selectedChatId) return;
-
-        handleDeleteMessage(selectedChatId, contextMenu.messageData.id);
-
-        closeMenu();
-    }
-
-    const handlePinClick = () => {
-        if (!contextMenu.messageData || !selectedChatId) return;
-
-        const pinnedMessages = selectedChat?.pinnedMessages || [];
-        const isCurrentPinned = pinnedMessages.some(msg => msg.id === contextMenu.messageData.id);
-
-        if(isCurrentPinned) {
-            handleUnpinMessage(selectedChatId, contextMenu.messageData.id);
-        } else {
-            handlePinMessage(selectedChatId, contextMenu.messageData);
-        }
-        
-        closeMenu();
-    };
-
-    const handleCopyClick = async () => {
-        if (!contextMenu.messageData || !contextMenu.messageData.text) return;
-
-        try {
-            await navigator.clipboard.writeText(contextMenu.messageData.text);
-            showToast("Copied to Clipboard")
-            console.log("Text copied to clipboard");
-        } catch (err) {
-            console.error("Text didn't copy to clipboard", err);
-        } finally {
-            closeMenu();
-        }
-    }
     
-    const bottomRef = useRef(null);
-
-    useEffect(() => {
-        if (!searchText || filteredSearchMessages.length === 0) {
-            return;
-        }
-
-        const targetMessage = filteredSearchMessages[currentSearchIndex];
-
-        if (targetMessage?.id) {
-            const element = document.getElementById(`msg-${targetMessage.id}`);
-            if (element) {
-                element.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-
-                triggerHighlight(targetMessage.id);
-            }
-        }
-    }, [searchText, currentSearchIndex, filteredSearchMessages]);
-
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({
-            behavior: "smooth"
-        });
-    }, [messages]);
-
     return (
-        <div className="
-            relative
-            flex flex-col 
-            w-full h-full 
-            py-4!
-        ">
+        <div className="relative flex flex-col w-full h-full py-4!">
             {contextMenu.visible && contextMenu.type === "message" && (
-                <div 
-                    onClick={closeMenu}
-                    className="fixed inset-0 z-40"
-                />
+                <div onClick={closeMenu} className="fixed inset-0 z-40"/>
             )}
 
             <div className="mt-auto! w-full flex flex-col">
@@ -120,13 +46,9 @@ export const MessageList = ({ messages, contentStyle }) => {
                         nextMessage.date !== message.date;
                         
                     const isTargetMessage = contextMenu.visible && contextMenu.type === "message" && contextMenu.messageData?.id === message.id;
-
                     const isHighlighed = isTargetMessage || highlightMsgId === message.id;
 
-                    let spacingClass = "mb-1.5!";
-                    if (isLastMessage) {
-                        spacingClass = "mb-3!";
-                    }
+                    const spacingClass = isLastMessage ? "mb-3!" : "mb-1.5!";
 
                     return (
                         <div 
@@ -150,7 +72,6 @@ export const MessageList = ({ messages, contentStyle }) => {
                                     message-row-highlight ${spacingClass} 
                                     ${isHighlighed ? "active" : ""}`}
                             >
-
                                 <div style={contentStyle} className="mx-auto!">
 
                                     <div 
@@ -158,7 +79,6 @@ export const MessageList = ({ messages, contentStyle }) => {
                                         className="w-full flex flex-col"
                                     >
                                         <MessageBubble
-                                            key={message.id}
                                             message={message}
                                             isFirstMessage={isFirstMessage}
                                             isLastMessage={isLastMessage}
@@ -175,46 +95,34 @@ export const MessageList = ({ messages, contentStyle }) => {
             </div>
 
                 <ContextMenuWrapper type="message">
-                    <button
-                        onClick={handleReplyClick}
-                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
-                    >
-                        <SlActionUndo size={18} strokeWidth={40} className="text-[#8888BA]" />
-                        <span>Reply</span>
-                    </button>
+                    {MESSAGE_CONTEXT_MENU.map((item) => {
+                        const Icon = item.icon;
+                        const currentLabel = item.label(contextMenu.messageData, messengerContext);
 
-                    <button
-                        onClick={handleCopyClick}
-                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
-                    >
-                        <MdOutlineContentCopy size={18} className="text-[#8888BA]"/>
-                        <span>Copy Text</span>
-                    </button>
-                            
-                    <button
-                        onClick={handlePinClick}
-                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
-                    >
-                        <Pin size={18} strokeWidth={2.5} className="text-[#8888BA]"/>
-                        <span>{(selectedChat?.pinnedMessages || []).some(msg => msg.id === contextMenu.messageData?.id) ? "Unpin" : "Pin"}</span>
-                    </button>
-                        
-                    <button
-                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-white rounded-lg hover:bg-[#131319]/80! cursor-pointer transition-colors duration-0"
-                    >
-                        <SlActionRedo size={18} strokeWidth={40} className="text-[#8888BA]"/>
-                        <span>Forward</span>
-                    </button>
-
-                    <button
-                        onClick={handleDeleteClick}
-                        className="flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! text-red-500! rounded-lg hover:bg-[#131319]/80! hover:text-white! cursor-pointer transition-colors duration-0"
-                    >
-                        <Trash size={18} strokeWidth={2.5} />
-                        <span>Delete</span>
-                    </button>
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={async () => {
+                                    if (contextMenu.messageData) {
+                                        await item.action(contextMenu.messageData, messengerContext);
+                                    }
+                                    closeMenu();
+                                }}
+                                className={`
+                                    flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! rounded-lg
+                                    cursor-pointer transition-colors duration-0 w-full text-left
+                                    ${item.isDanger
+                                        ? "text-red-500! hover:bg-[#131319]/80! hover:text-white!"
+                                        : "text-white hover:bg-[#131319]/80!"
+                                    }    
+                                `}
+                            >
+                                <Icon size={18} className={item.isDanger ? "" : "text-[#8888BA]"} />
+                                <span>{currentLabel}</span>
+                            </button>
+                        );
+                    })}
                 </ContextMenuWrapper>
-
         </div>
     );
-}
+};

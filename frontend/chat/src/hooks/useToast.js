@@ -17,5 +17,5 @@ export const useToast = () => {
         return () => clearTimeout(toastTimeoutRef.current);
     }, []);
 
-    return { toast, setToast };
+    return { toast, showToast };
 };
