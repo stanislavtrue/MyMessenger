@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMessengerContext } from "../context/MessengerContext"
 import { useRipple } from "../hooks/useRipple";
 
 export const PinnedMessageBar = ({ chat }) => {
-    const { handleUnpinMessage, selectedChatId } = useMessengerContext();
+    const { handleUnpinMessage, selectedChatId, triggerHighlight } = useMessengerContext();
     const { ripples, createRipple } = useRipple();
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -31,6 +31,8 @@ export const PinnedMessageBar = ({ chat }) => {
                 behavior: "smooth",
                 block: "center"
             });
+
+            triggerHighlight(currentPinned.id);
         }
 
         setCurrentIndex((prevIndex) => (prevIndex === 0 ? pinnedMessages.length - 1 : prevIndex - 1));

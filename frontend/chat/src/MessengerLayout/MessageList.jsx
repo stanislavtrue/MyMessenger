@@ -9,9 +9,7 @@ import { ContextMenuWrapper } from "./ContextMenuWrapper";
 import { MdOutlineContentCopy } from "react-icons/md";
 
 export const MessageList = ({ messages, contentStyle }) => {
-    const { contextMenu, setContextMenu, openReply, showToast, selectedChat, selectedChatId, handleDeleteMessage, handlePinMessage, handleUnpinMessage, searchText, filteredSearchMessages, currentSearchIndex } = useMessengerContext();
-    const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
-    const [highlightMsgId, setHighlightMsgId] = useState(null);
+    const { contextMenu, setContextMenu, showMenu, closeMenu, openReply, showToast, selectedChat, selectedChatId, handleDeleteMessage, handlePinMessage, handleUnpinMessage, searchText, filteredSearchMessages, currentSearchIndex, highlightMsgId, triggerHighlight } = useMessengerContext();
 
     const handleReplyClick = () => {
         openReply(contextMenu.messageData);
@@ -62,15 +60,9 @@ export const MessageList = ({ messages, contentStyle }) => {
     }
     
     const bottomRef = useRef(null);
-    const highlightTimeoutRef = useRef(null);
 
     useEffect(() => {
-        if (highlightTimeoutRef.current) {
-            clearTimeout(highlightTimeoutRef.current);
-        }
-
         if (!searchText || filteredSearchMessages.length === 0) {
-            setHighlightMsgId(null);
             return;
         }
 
@@ -84,19 +76,9 @@ export const MessageList = ({ messages, contentStyle }) => {
                     block: "center"
                 });
 
-                setHighlightMsgId(targetMessage.id);
-
-                highlightTimeoutRef.current = setTimeout(() => {
-                    setHighlightMsgId(null);
-                }, 2000);
+                triggerHighlight(targetMessage.id);
             }
         }
-
-        return () => {
-            if (highlightTimeoutRef.current) {
-                clearTimeout(highlightTimeoutRef.current);
-            }
-        };
     }, [searchText, currentSearchIndex, filteredSearchMessages]);
 
     useEffect(() => {

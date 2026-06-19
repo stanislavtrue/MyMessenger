@@ -1,178 +1,53 @@
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { mockChats } from "../data/mockChats"
 import { formatTime } from "../utils/formatTime";
 import { formatDate } from "../utils/formatDate";
+
 import { useChatSearch } from "./useChatSearch";
+import { useToast } from "./useToast";
+import { useReply } from "./useReply";
+import { useHighlightMessage } from "./useHighlightMessage";
+import { useMessengerKeyboard } from "./useMessengerKeyboard";
+import { useContextMenu } from "./useContextMenu";
+import { useWindowWidth } from "./useWindowWidth";
+import { useMockIncomingMessages } from "./useMockIncomingMessages";
 
 export const useMessenger = () => {
     const [chats, setChats] = useState(mockChats);
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [sidebarWidth, setSidebarWidth] = useState(33);
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
     const [isSidebarSearchFocused, setIsSidebarSearchFocused] = useState(false);
     const [isChatSearchFocused, setIsChatSearchFocused] = useState(false);
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-    const [replyToMessage, setReplyToMessage] = useState(null);
-    const [replyPreview, setReplyPreview] = useState(null);
-    const [toast, setToast] = useState(null);
 
-    const [contextMenu, setContextMenu] = useState({
-        visible: false,
-        x: 0,
-        y: 0,
-        isUp: false,
-        isLeft: false,
-        type: null,
-        messageData: null,
-        isMeasuring: true,
-    });
+    const windowWidth = useWindowWidth();
+    const { toast, showToast } = useToast();
+    const { replyToMessage, replyPreview, openReply, closeReply, setReplyToMessage } = useReply()
+    const { highlightMsgId, setHighlightMsgId, triggerHighlight } = useHighlightMessage();
+    const { contextMenu, setContextMenu, showMenu, closeMenu } = useContextMenu();
     
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
-
     const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
 
-    const replyTimeoutRef = useRef(null);
-    const toastTimeoutRef = useRef(null);
+    useMockIncomingMessages(setChats, selectedChatId);
 
-    const showToast = (text) => {
-        clearTimeout(toastTimeoutRef.current);
-
-        setToast({
-            id: Date.now(),
-            text
-        });
-
-        toastTimeoutRef.current = setTimeout(() => {
-            setToast(null);
-        }, 3000);
-    };
-
-    const openReply = (message) => {
-        clearTimeout(replyTimeoutRef.current)
-        setReplyPreview(message);
-
-        // mount 'preview' before launching animation
-        setTimeout(() => {
-            setReplyToMessage(message);
-        }, 0);
-    };
-
-    const closeReply = () => {
-        setReplyToMessage(null);
-
-        replyTimeoutRef.current = setTimeout(() => {
-            setReplyPreview(null);
-        }, 200);
-    };
-
-    useEffect(() => {
-        return () => {
-            clearTimeout(toastTimeoutRef.current);
-        };
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            clearTimeout(replyTimeoutRef.current);
-        };
-    }, []);
-
-    useEffect(() => {
-        const handleEscape = (event) => {
-            if (event.key !== "Escape") return;
-
-            if (contextMenu.visible) {
-                setContextMenu(prev => ({
-                    ...prev,
-                    visible: false,
-                }));
-                return;
-            }
-
-            if (isSidebarMenuOpen) {
-                setIsSidebarMenuOpen(false);
-                return;
-            }
-            
-            if (isEmojiPickerOpen) {
-                setIsEmojiPickerOpen(false);
-                return;
-            }
-
-            if (isSidebarSearchFocused) {
-                setIsSidebarSearchFocused(false);
-                return;
-            }
-
-            if (isChatSearchFocused) {
-                chatSearch.closeChatSearch();
-                return;
-            }
-
-            if (replyToMessage) {
-                closeReply();
-                return;
-            }
-
-            if (selectedChatId) {
-                setSelectedChatId(null);
-            }
-        };
-
-        document.addEventListener("keydown", handleEscape);
-
-        return () => {
-            document.removeEventListener("keydown", handleEscape);
-        }
+    useMessengerKeyboard({
+        contextMenuVisible: contextMenu.visible,
+        closeMenu,
+        isSidebarMenuOpen,
+        setIsSidebarMenuOpen,
+        isEmojiPickerOpen,
+        setIsEmojiPickerOpen,
+        isSidebarSearchFocused,
+        setIsSidebarSearchFocused,
+        isChatSearchFocused,
+        closeChatSearch: chatSearch.closeChatSearch,
+        replyToMessage,
+        closeReply,
+        selectedChatId,
+        setSelectedChatId
     }, [contextMenu.visible, isSidebarMenuOpen, isSidebarSearchFocused, isChatSearchFocused, isEmojiPickerOpen, selectedChatId, replyToMessage])
-
-    useEffect(() => {
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-        };
-
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-
-            setChats(prevChats => {
-                const inactiveChats = prevChats.filter(c => c.id !== selectedChatId);
-                if (inactiveChats.length === 0) return prevChats;
-
-                const randomChat = inactiveChats[Math.floor(Math.random() * inactiveChats.length)];
-                const spamMessage = {
-                    id: Date.now(),
-                    text: "It`s spam!!! I'll ddos you!!!",
-                    time: formatTime(),
-                    date: formatDate(),
-                    isOwnMessage: false,
-                    status: "sent"
-                };
-                
-                return prevChats.map(chat => {
-                    if (chat.id === randomChat.id) {
-                        return {
-                            ...chat,
-                            lastMessage: spamMessage.text,
-                            time: formatTime(),
-                            unreadCount: (chat.unreadCount || 0) + 1,
-                            messages: [...chat.messages, spamMessage]
-                        };
-                    }
-                    return chat;
-                });
-            });
-        }, 30000);
-
-        return () => clearInterval(interval);
-    }, [selectedChatId, chats]);
 
     const handleSelectChat = (chatId) => {
         setSelectedChatId(chatId);
@@ -323,18 +198,22 @@ export const useMessenger = () => {
         selectedChatId,
         sidebarWidth,
         windowWidth,
-
         isSidebarMenuOpen,
         setIsSidebarMenuOpen,
         isSidebarSearchFocused,
         setIsSidebarSearchFocused,
-
         isChatSearchFocused,
         setIsChatSearchFocused,
         ...chatSearch,
 
         contextMenu,
         setContextMenu,
+        showMenu,
+        closeMenu,
+
+        highlightMsgId,
+        setHighlightMsgId,
+        triggerHighlight,
 
         setSidebarWidth,
         setSelectedChatId: handleSelectChat,
@@ -342,6 +221,7 @@ export const useMessenger = () => {
         handleDeleteMessage,
         handlePinMessage,
         handleUnpinMessage,
+
         replyToMessage,
         setReplyToMessage,
         replyPreview,

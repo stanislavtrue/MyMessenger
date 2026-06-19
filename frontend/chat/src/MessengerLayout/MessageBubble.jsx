@@ -40,7 +40,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 ${radiusClass}
 
                 ${message.isOwnMessage
-                    ? "ml-auto! mr-4! bg-[#363646]"
+                    ? "ml-auto! mr-4! bg-[#252530]"
                     : "mr-auto! ml-4! bg-[#5A4282]"
                 }
             `}
@@ -75,11 +75,11 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 </span>
 
                 {message.isOwnMessage && (
-                    <div className="flex items-center relative w-4.5 h-3 ml-0.5! shrink-0">
+                    <div className="flex items-center relative w-2 h-3 shrink-0">
                         <Check
                             size={14}
                             className={`
-                                absolute right-0 -bottom-0.5 transition-colors duration-200
+                                absolute -left-1.5 -bottom-0.5 transition-colors duration-200
                                 ${message.status === "read" ? "text-[#E2D9F3]" : "text-[#FFFFFF]/60"}
                             `}
                         />
@@ -87,7 +87,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                         {message.status === "read" && (
                             <Check 
                                 size={14}                           
-                                className="absolute text-[#E2D9F3] right-1.5 -bottom-0.5"
+                                className="absolute text-[#E2D9F3] left-0 -bottom-0.5"
                             />
                         )}
 
@@ -100,26 +100,26 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 <>
                     <div className={`
                             absolute
-                            -bottom-0
+                            bottom-0
                             w-2 h-2
                             opacity-85
 
                             ${message.isOwnMessage
-                                ? "right-[-8px] rounded-full bg-[#363646]" 
-                                : "left-[-8px] rounded-full bg-[#5A4282]"
+                                ? "-right-2 rounded-full bg-[#252530]" 
+                                : "-left-2 rounded-full bg-[#5A4282]"
                             }
                         `}
                     />
                 
                     <div className={`
                             absolute
-                            -bottom-0
+                            bottom-0
                             w-1 h-1
                             opacity-70
 
                             ${message.isOwnMessage
-                                ? "right-[-14px] rounded-full bg-[#363646]"
-                                : "left-[-14px] rounded-full bg-[#5A4282]"
+                                ? "-right-3.5 rounded-full bg-[#252530]"
+                                : "-left-3.5 rounded-full bg-[#5A4282]"
                             }
                         `} 
                     />

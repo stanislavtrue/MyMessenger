@@ -8,14 +8,12 @@ import { useSidebarSearch } from "../hooks/useSidebarSearch";
 import { useSidebarResize } from "../hooks/useSidebarResize";
 import { useMessengerContext } from "../context/MessengerContext";
 import { PiBookmarkSimple } from "react-icons/pi";
-import { useContextMenu } from "../hooks/useContextMenu";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
 
 export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
     const { searchText, setSearchText, sortedChats, filteredChats } = useSidebarSearch(chats);
     const { handleMouseDown } = useSidebarResize(sidebarWidth, setSidebarWidth);
-    const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSidebarSearchFocused, setIsSidebarSearchFocused, contextMenu, setContextMenu } = useMessengerContext();
-    const { showMenu, closeMenu } = useContextMenu(contextMenu, setContextMenu);
+    const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSidebarSearchFocused, setIsSidebarSearchFocused, contextMenu, showMenu, closeMenu } = useMessengerContext();
 
     const menuRef = useRef(null);
     const buttonRef = useRef(null);
