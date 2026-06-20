@@ -3,7 +3,7 @@ import { useMessengerContext } from "../context/MessengerContext";
 import { highlightText } from "../utils/highlightText";
 
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
-    const { searchText, filteredSearchMessages, currentSearchIndex } = useMessengerContext();
+    const { searchText } = useMessengerContext();
 
     let radiusClass = "";
 

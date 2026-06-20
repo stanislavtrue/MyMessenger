@@ -1,7 +1,7 @@
 import { BsExclamationCircleFill } from "react-icons/bs";
-import { ChatArea } from "./MessengerLayout/ChatArea";
-import { Sidebar } from "./MessengerLayout/Sidebar";
-import { MessengerProvider, useMessengerContext } from "./context/MessengerContext";
+import { Sidebar } from "@/features/messenger/components/Sidebar";
+import { MessengerProvider, useMessengerContext } from "@/features/messenger/context/MessengerContext";
+import { ChatArea } from "@/features/messenger/components/ChatArea";
 
 export const MessengerContent = () => {
     const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage, toast } = useMessengerContext();

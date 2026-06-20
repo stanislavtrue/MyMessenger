@@ -1,15 +1,15 @@
 import { useState } from "react"
-import { mockChats } from "../data/mockChats"
-import { formatTime } from "../utils/formatTime";
-import { formatDate } from "../utils/formatDate";
+import { mockChats } from "../mocks/mockChats";
+import { formatDate } from "@/utils/formatDate";
+import { formatTime } from "@/utils/formatTime";
 
 import { useChatSearch } from "./useChatSearch";
-import { useToast } from "./useToast";
-import { useReply } from "./useReply";
-import { useHighlightMessage } from "./useHighlightMessage";
+import { useToast } from "../../../hooks/useToast";
 import { useMessengerKeyboard } from "./useMessengerKeyboard";
 import { useContextMenu } from "./useContextMenu";
-import { useWindowWidth } from "./useWindowWidth";
+import { useWindowWidth } from "@/hooks/useWindowWidth";
+import { useHighlightMessage } from "./useHighlightMessage";
+import { useReply } from "./useReply";
 import { useMockIncomingMessages } from "./useMockIncomingMessages";
 
 export const useMessenger = () => {
@@ -31,23 +31,6 @@ export const useMessenger = () => {
     const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
 
     useMockIncomingMessages(setChats, selectedChatId);
-
-    useMessengerKeyboard({
-        contextMenuVisible: contextMenu.visible,
-        closeMenu,
-        isSidebarMenuOpen,
-        setIsSidebarMenuOpen,
-        isEmojiPickerOpen,
-        setIsEmojiPickerOpen,
-        isSidebarSearchFocused,
-        setIsSidebarSearchFocused,
-        isChatSearchFocused,
-        closeChatSearch: chatSearch.closeChatSearch,
-        replyToMessage,
-        closeReply,
-        selectedChatId,
-        setSelectedChatId
-    }, [contextMenu.visible, isSidebarMenuOpen, isSidebarSearchFocused, isChatSearchFocused, isEmojiPickerOpen, selectedChatId, replyToMessage])
 
     const handleSelectChat = (chatId) => {
         setSelectedChatId(chatId);
@@ -191,6 +174,23 @@ export const useMessenger = () => {
 
         closeReply();
     };
+
+    useMessengerKeyboard({
+        contextMenuVisible: contextMenu.visible,
+        closeMenu,
+        isSidebarMenuOpen,
+        setIsSidebarMenuOpen,
+        isEmojiPickerOpen,
+        setIsEmojiPickerOpen,
+        isSidebarSearchFocused,
+        setIsSidebarSearchFocused,
+        isChatSearchFocused,
+        closeChatSearch: chatSearch.closeChatSearch,
+        replyToMessage,
+        closeReply,
+        selectedChatId,
+        setSelectedChatId: handleSelectChat
+    });
 
     return {
         chats,

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useMessengerContext } from "../context/MessengerContext"
-import { useRipple } from "../hooks/useRipple";
+import { useRipple } from "@/hooks/useRipple";
 
 export const PinnedMessageBar = ({ chat }) => {
-    const { handleUnpinMessage, selectedChatId, triggerHighlight } = useMessengerContext();
+    const { triggerHighlight } = useMessengerContext();
     const { ripples, createRipple } = useRipple();
     const [currentIndex, setCurrentIndex] = useState(0);
 

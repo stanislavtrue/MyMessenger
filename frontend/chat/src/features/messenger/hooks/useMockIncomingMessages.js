@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { formatTime } from "../utils/formatTime";
-import { formatDate } from "../utils/formatDate";
+import { formatDate } from "@/utils/formatDate";
+import { formatTime } from "@/utils/formatTime";
 
 export const useMockIncomingMessages = (setChats, selectedChatId) => {
     useEffect(() => {

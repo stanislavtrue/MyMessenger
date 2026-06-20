@@ -6,9 +6,9 @@ import { useSidebarSearch } from "../hooks/useSidebarSearch";
 import { useSidebarResize } from "../hooks/useSidebarResize";
 import { useMessengerContext } from "../context/MessengerContext";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
-import { SidebarMenu } from "../components/SidebarMenu";
-import { ChatList } from "../components/ChatList";
 import { CHAT_CONTEXT_MENU } from "../constants/sidebarMenuItems";
+import { SidebarMenu } from "@/features/messenger/components/SidebarMenu";
+import { ChatList } from "@/features/messenger/components/ChatList";
 
 export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
     const { searchText, setSearchText, sortedChats, filteredChats } = useSidebarSearch(chats);
@@ -132,7 +132,7 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                     animationClasses={isSidebarSearchFocused ? "scale-95 opacity-0" : "scale-100 opacity-100"}
                 />
             
-                <ChatList 
+                <ChatList
                     chats={searchText.length > 0 ? filteredChats : []}
                     isVisible={isSidebarSearchFocused}
                     selectedChatId={selectedChatId}

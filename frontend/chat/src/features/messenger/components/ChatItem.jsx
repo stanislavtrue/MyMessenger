@@ -1,6 +1,6 @@
-import { formatSidebarDate } from "../utils/formatSidebarDate"
-import { useRipple } from "../hooks/useRipple";
-import { TypingIndicator } from "../components/indicators/TypingIndicator";
+import { useRipple } from "@/hooks/useRipple";
+import { formatSidebarDate } from "../utils/formatSidebarDate";
+import { TypingIndicator } from "./indicators/TypingIndicator";
 
 export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDate, selectedChatId, setSelectedChatId, isContextActive, onContextMenu} ) => {
     const isSelected = selectedChatId === chat.id;
@@ -84,7 +84,7 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
                     {chat.name}
                 </span>
                 {chat.status === "typing" ? (
-                    <TypingIndicator 
+                    <TypingIndicator
                         activeColor={isSelected ? "#FFFFFF" : "#52526B"}
                         textClassName={`
                             text-sm!

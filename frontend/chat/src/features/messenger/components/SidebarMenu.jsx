@@ -1,5 +1,4 @@
 import { EllipsisVertical, Plus, Settings } from "lucide-react";
-import { useRef } from "react";
 import { BsPeople, BsPerson, BsChevronRight } from "react-icons/bs";
 import { PiBookmarkSimple } from "react-icons/pi";
 

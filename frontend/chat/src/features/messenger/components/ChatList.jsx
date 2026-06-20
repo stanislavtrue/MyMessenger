@@ -1,5 +1,5 @@
-import { useMessengerContext } from "../context/MessengerContext"
-import { ChatItem } from "../MessengerLayout/ChatItem";
+import { ChatItem } from "@/features/messenger/components/ChatItem";
+import { useMessengerContext } from "@/features/messenger/context/MessengerContext";
 
 export const ChatList = ({ chats, isVisible, selectedChatId, onSelectChat, animationClasses }) => {
     const { contextMenu, showMenu } = useMessengerContext();
