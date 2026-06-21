@@ -32,6 +32,30 @@ export const useMessenger = () => {
 
     useMockIncomingMessages(setChats, selectedChatId);
 
+    const handleSetReaction = (messageId, emoji) => {
+        setChats((prevChats) =>
+            prevChats.map((chat) => {
+                if (chat.id !== selectedChatId) return chat;
+
+                const updatedMessages = chat.messages.map((msg) => {
+                    if (msg.id !== messageId) return msg;
+
+                    const isSameReaction = msg.reaction === emoji;
+
+                    return {
+                        ...msg,
+                        reaction: isSameReaction ? null : emoji,
+                    };
+                });
+
+                return {
+                    ...chat,
+                    messages: updatedMessages,
+                };
+            })
+        );
+    };
+
     const handleSelectChat = (chatId) => {
         setSelectedChatId(chatId);
 
@@ -230,6 +254,7 @@ export const useMessenger = () => {
 
         isEmojiPickerOpen,
         setIsEmojiPickerOpen,
+        handleSetReaction,
 
         toast,
         showToast,

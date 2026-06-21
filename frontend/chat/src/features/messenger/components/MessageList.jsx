@@ -10,11 +10,11 @@ export const MessageList = ({ messages, contentStyle }) => {
     const messengerContext = useMessengerContext();
     const { 
         contextMenu, showMenu, closeMenu, openReply, searchText, 
-        filteredSearchMessages, currentSearchIndex, highlightMsgId, triggerHighlight 
+        filteredSearchMessages, currentSearchIndex, highlightMsgId, triggerHighlight
     } = messengerContext;
 
     useMessageSearchNavigation(searchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
-    const bottomRef = useAutoScroll([messages]);
+    const bottomRef = useAutoScroll([messages.length]);
 
     const handleQuickReply = (message) => {
         openReply(message);

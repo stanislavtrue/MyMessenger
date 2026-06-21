@@ -3,7 +3,7 @@ import { useMessengerContext } from "../context/MessengerContext";
 import { highlightText } from "../utils/highlightText";
 
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
-    const { searchText } = useMessengerContext();
+    const { searchText, handleSetReaction } = useMessengerContext();
 
     let radiusClass = "";
 
@@ -35,7 +35,6 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 w-fit
                 max-w-[75%]
                 rounded-2xl
-                
                 py-1! px-3!
                 ${radiusClass}
 
@@ -66,9 +65,56 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             
             <div className="flex items-end justify-between w-full gap-2">
 
-                <span className="flex-1 text-white text-sm! whitespace-pre-wrap! overflow-hidden">
-                    {highlightText(message.text, searchText)}
-                </span>
+                <div className="flex flex-col">
+                    <span className="flex-1 text-white text-sm! whitespace-pre-wrap! overflow-hidden">
+                        {highlightText(message.text, searchText)}
+                    </span>
+                    <div className={`
+                        absolute -bottom-2 z-30
+                        w-8 h-4 group cursor-pointer
+                        ${message.isOwnMessage ? "-left-1" : "-right-1"}    
+                    `}>
+                        <div 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleSetReaction(message.id, "❤️");
+                            }}
+                            className={`
+                                absolute -bottom-1 z-30
+                                flex items-center justify-center
+                                size-6 cursor-pointer
+                                opacity-0 scale-75 pointer-events-none
+                                group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto
+                                transition-all duration-200 ease-out
+                                hover:scale-140! active:scale-90!
+                                
+                                ${message.isOwnMessage ? "-left-1" : "-right-1"}
+                            `}
+                        >
+                            {"❤️"}
+                        </div>
+                    </div>
+
+                    {message.reaction && (
+                        <div 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleSetReaction?.(message.id, message.reaction);
+                            }}
+                            className={`
+                                z-10 w-fit gap-2 my-1!
+                                flex justify-center items-center
+                                px-1.5! py-0.5! rounded-full
+                                text-md! select-none animate-scale-up 
+                                cursor-pointer
+                                ${message.isOwnMessage ? "bg-[#CFA4F2]/80 hover:bg-[#CFA4F2]" : "bg-white/80 hover:bg-white"}
+                            `}
+                        >
+                            <span>{message.reaction}</span>
+                            <div className="size-5 rounded-full bg-white"/>
+                        </div>
+                    )}
+                </div>
 
                 <span style={{fontFamily: "Roboto"}} className="text-xs! opacity-50 leading-none ml-auto! shrink-0 select-none">
                     {message.time?.slice(0, 5)}
