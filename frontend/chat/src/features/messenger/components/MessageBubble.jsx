@@ -1,43 +1,20 @@
 import { Check } from "lucide-react";
 import { useMessengerContext } from "../context/MessengerContext";
 import { highlightText } from "../utils/highlightText";
+import { getBubbleRadiusClass } from "../utils/bubbleRadius";
+import { QuickReactionButton } from "./QuickReactionButton";
+import { ActiveReactionBadge } from "./ActiveReactionBadge";
 
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
     const { searchText, handleSetReaction } = useMessengerContext();
 
-    let radiusClass = "";
-
-    if (!isFirstMessage && !isLastMessage) {
-        if (message.isOwnMessage) {
-            radiusClass="rounded-br-md rounded-tr-md"
-        } else {
-            radiusClass="rounded-bl-md rounded-tl-md"
-        }
-    }
-    else if (isFirstMessage && !isLastMessage) {
-        if (message.isOwnMessage) {
-            radiusClass="rounded-br-md"
-        } else {
-            radiusClass="rounded-bl-md"
-        }
-    }
-    else if (!isFirstMessage && isLastMessage) {
-        if (message.isOwnMessage) {
-            radiusClass="rounded-tr-md"
-        } else {
-            radiusClass="rounded-tl-md"
-        }
-    }
+    const radiusClass = getBubbleRadiusClass(message.isOwnMessage, isFirstMessage, isLastMessage);
 
     return (
         <div className={`
-                relative
-                w-fit
-                max-w-[75%]
-                rounded-2xl
-                py-1! px-3!
+                relative w-fit max-w-[75%]
+                rounded-2xl py-1! px-3!
                 ${radiusClass}
-
                 ${message.isOwnMessage
                     ? "ml-auto! mr-4! bg-[#252530]"
                     : "mr-auto! ml-4! bg-[#5A4282]"
@@ -64,55 +41,28 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             )}
             
             <div className="flex items-end justify-between w-full gap-2">
-
                 <div className="flex flex-col">
                     <span className="flex-1 text-white text-sm! whitespace-pre-wrap! overflow-hidden">
                         {highlightText(message.text, searchText)}
                     </span>
-                    <div className={`
-                        absolute -bottom-2 z-30
-                        w-8 h-4 group cursor-pointer
-                        ${message.isOwnMessage ? "-left-1" : "-right-1"}    
-                    `}>
-                        <div 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleSetReaction(message.id, "❤️");
-                            }}
-                            className={`
-                                absolute -bottom-1 z-30
-                                flex items-center justify-center
-                                size-6 cursor-pointer
-                                opacity-0 scale-75 pointer-events-none
-                                group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto
-                                transition-all duration-200 ease-out
-                                hover:scale-140! active:scale-90!
-                                
-                                ${message.isOwnMessage ? "-left-1" : "-right-1"}
-                            `}
-                        >
-                            {"❤️"}
-                        </div>
-                    </div>
+
+                    <QuickReactionButton 
+                        isOwnMessage={message.isOwnMessage}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleSetReaction(message.id, "❤️")
+                        }}
+                    />
 
                     {message.reaction && (
-                        <div 
+                        <ActiveReactionBadge
+                            reaction={message.reaction}
+                            isOwnMessage={message.isOwnMessage}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleSetReaction?.(message.id, message.reaction);
+                                handleSetReaction(message.id, message.reaction);
                             }}
-                            className={`
-                                z-10 w-fit gap-2 my-1!
-                                flex justify-center items-center
-                                px-1.5! py-0.5! rounded-full
-                                text-md! select-none animate-scale-up 
-                                cursor-pointer
-                                ${message.isOwnMessage ? "bg-[#CFA4F2]/80 hover:bg-[#CFA4F2]" : "bg-white/80 hover:bg-white"}
-                            `}
-                        >
-                            <span>{message.reaction}</span>
-                            <div className="size-5 rounded-full bg-white"/>
-                        </div>
+                        />
                     )}
                 </div>
 
@@ -145,11 +95,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             {isLastMessage && (
                 <>
                     <div className={`
-                            absolute
-                            bottom-0
-                            w-2 h-2
-                            opacity-85
-
+                            absolute bottom-0 w-2 h-2 opacity-85
                             ${message.isOwnMessage
                                 ? "-right-2 rounded-full bg-[#252530]" 
                                 : "-left-2 rounded-full bg-[#5A4282]"
@@ -158,11 +104,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                     />
                 
                     <div className={`
-                            absolute
-                            bottom-0
-                            w-1 h-1
-                            opacity-70
-
+                            absolute bottom-0 w-1 h-1 opacity-70
                             ${message.isOwnMessage
                                 ? "-right-3.5 rounded-full bg-[#252530]"
                                 : "-left-3.5 rounded-full bg-[#5A4282]"
@@ -171,7 +113,6 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                     />
                 </>
             )}
-
         </div>
     );
 }

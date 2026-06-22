@@ -21,19 +21,11 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
             onClick={handleClick}
             onContextMenu={onContextMenu}
             className={`
-                relative
-                overflow-hidden
-                transition-colors 
-                flex 
-                items-center 
-                gap-2
-                px-2!
-                py-2!
+                relative flex items-center gap-2 px-2! py-2!
+                w-[97%] rounded-2xl m-auto!
+                select-none overflow-hidden
+                transition-colors duration-0 
                 cursor-pointer
-                w-[97%] rounded-2xl
-                m-auto!
-                select-none
-                duration-0
                 
                 ${isSelected
                     ? "bg-[#6F4F9C] hover:bg-[#6F4F9C]"
@@ -63,11 +55,7 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
             <div className="relative w-14 h-14 rounded-full bg-[#5A4282] flex items-center justify-center text-white text-2xl! z-10 shrink-0">
                 {(chat.status === "online" || chat.status === "typing") && (
                     <div className={`
-                        absolute
-                        w-3.5 h-3.5
-                        rounded-full
-                        bottom-0 right-1
-                        border-2! 
+                        absolute w-3.5 h-3.5 rounded-full bottom-0 right-1 border-2! 
 
                         ${isSelected 
                             ? "bg-white border-[#6F4F9C]!"
@@ -93,9 +81,7 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
                     />
                 ) : (
                     <span className={`
-                            text-[#52526B] 
-                            text-sm!
-                            truncate
+                            text-[#52526B] text-sm! truncate
 
                             ${isSelected
                                 ? "text-[#FFFFFF]"
@@ -116,9 +102,7 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
                 className="flex flex-col items-end justify-between h-12 z-12 shrink-0 ml-auto"
             >
                 <span className={`
-                    text-xs! 
-                    transition-colors 
-                    duration-200
+                    text-xs! transition-colors duration-200
 
                     ${isSelected
                         ? "text-[#FFFFFF]"
@@ -131,12 +115,9 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
 
                 {unreadCount > 0 ? (
                     <div className={`
-                            min-w-6 h-6
-                            text-[#FFFFFF]/80
-                            rounded-full
-                            px-1.5!
                             flex items-center justify-center
-                            text-sm! font-semibold!
+                            min-w-6 h-6 px-1.5! text-[#FFFFFF]/80
+                            rounded-full text-sm! font-semibold!
                             transition-all duration-200
 
                             ${isSelected
