@@ -7,7 +7,7 @@ input::placeholder {
     color: #52526B
 }
 body {
-    font-family: 'B612', sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 .messages-scroll::-webkit-scrollbar {
     display: none;
@@ -46,7 +46,7 @@ body {
     position: absolute;
     border-radius: 50%;
     transform: scale(0);
-    animation: ripple-effect 1500ms ease-out;
+    animation: ripple-effect 2500ms ease-out;
     background-color: rgba(0, 0, 0, 0.1);
     pointer-events: none;
 }
@@ -145,12 +145,12 @@ body {
 }
 
 aside.EmojiPickerReact {
-    --epr-bg-color: #1F1F28;
-    --epr-text-color: #52526B;
+    --epr-bg-color: #111111;
+    --epr-text-color: #7F88C0;
     --epr-emoji-padding: 7px;
     --epr-horizontal-padding: 4px;
     --epr-emoji-size: 32px;
-    --epr-picker-border-radius: 20px;
+    --epr-picker-border-radius: 30px;
     --epr-highlight-color: #FFFFFF;
     --epr-hover-bg-color: #282836;
     --epr-focus-bg-color: #282836;

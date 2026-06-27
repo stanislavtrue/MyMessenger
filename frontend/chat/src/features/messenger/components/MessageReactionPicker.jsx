@@ -4,7 +4,7 @@ export const MessageReactionPicker = ({ onReactionSelect }) => {
     return (
         <div className="
             flex items-center gap-1.5
-            bg-[#272739] rounded-2xl
+            bg-[#111111] rounded-2xl
             shadow-black/50 shadow-lg
             animate-scale-up mb-1! px-2!
             w-fit select-none

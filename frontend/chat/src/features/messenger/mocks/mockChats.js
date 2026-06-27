@@ -2,6 +2,7 @@ export const mockChats = [
     {
         id: 1,
         name: "John Cena",
+        avatar: "/JohnAvatar.jpg",
         lastMessage: "Goodbuy!",
         time: "18:37",
         unreadCount: 0,
@@ -124,6 +125,7 @@ export const mockChats = [
     {
         id: 2,
         name: "Elon Musk",
+        avatar: "/ElonAvatar.jpg",
         lastMessage: "Hi, how r u?",
         time: "15:34",
         unreadCount: 0,
@@ -133,6 +135,7 @@ export const mockChats = [
     {
         id: 3,
         name: "Cristiano Ronaldo",
+        avatar: "/CristianoAvatar.jpg",
         lastMessage: "Go football!?",
         time: "Fri",
         unreadCount: 0,
@@ -142,6 +145,7 @@ export const mockChats = [
     {
         id: 4,
         name: "Noname",
+        avatar: null,
         lastMessage: "Есть работа курьером, зп-300000к",
         time: "Tue",
         unreadCount: 0,
@@ -151,6 +155,7 @@ export const mockChats = [
     {
         id: 5,
         name: "Linus Torwalds",
+        avatar: "/LinusAvatar.jpg",
         lastMessage: "",
         time: "",
         unreadCount: 0,
@@ -168,6 +173,7 @@ export const mockChats = [
     {
         id: 6,
         name: "Martin",
+        avatar: null,
         lastMessage: "",
         time: "Wed",
         unreadCount: 0,
@@ -177,6 +183,7 @@ export const mockChats = [
     {
         id: 7,
         name: "Alex",
+        avatar: null,
         lastMessage: "",
         time: "Mon",
         unreadCount: 0,
@@ -186,6 +193,7 @@ export const mockChats = [
     {
         id: 8,
         name: "Steve Jobs",
+        avatar: "/SteveAvatar.jpg",
         lastMessage: "",
         time: "Mon",
         unreadCount: 0,
@@ -195,6 +203,7 @@ export const mockChats = [
     {
         id: 9,
         name: "Scammers",
+        avatar: null,
         lastMessage: "",
         time: "Mon",
         unreadCount: 0,

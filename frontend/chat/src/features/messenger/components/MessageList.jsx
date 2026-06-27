@@ -22,12 +22,12 @@ export const MessageList = ({ messages, contentStyle }) => {
     }
     
     return (
-        <div className="relative flex flex-col w-full h-full py-4!">
+        <div className="relative flex flex-col w-full py-4!">
             {contextMenu.visible && contextMenu.type === "message" && (
                 <div onClick={closeMenu} className="fixed inset-0 z-40"/>
             )}
 
-            <div className="mt-auto! w-full flex flex-col">
+            <div className="w-full flex flex-col">
 
                 {messages.map((message, index) => {
                     const previousMessage = messages[index - 1];
@@ -58,7 +58,7 @@ export const MessageList = ({ messages, contentStyle }) => {
 
                             {showDivider && (
                                 <div className="flex justify-center my-4! select-none pointer-events-none">
-                                    <div style={{fontFamily: "Roboto"}} className="px-2! py-1! bg-[#1F1F28] text-sm! font-semibold! rounded-2xl">
+                                    <div className="px-2! py-1! bg-[#D236E0]/20 text-sm! font-semibold! rounded-2xl">
                                         {formatDividerDate(message.date)}
                                     </div>
                                 </div>
@@ -72,7 +72,7 @@ export const MessageList = ({ messages, contentStyle }) => {
                                     message-row-highlight ${spacingClass} 
                                     ${isHighlighed ? "active" : ""}`}
                             >
-                                <div style={contentStyle} className="mx-auto!">
+                                <div className="w-full max-w-180 px-4! mx-auto!">
 
                                     <div 
                                         onContextMenu={(e) => showMenu(e, message, "message")}
@@ -109,15 +109,15 @@ export const MessageList = ({ messages, contentStyle }) => {
                                     closeMenu();
                                 }}
                                 className={`
-                                    flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! rounded-lg
+                                    flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! rounded-2xl
                                     cursor-pointer transition-colors duration-0 w-full text-left
                                     ${item.isDanger
-                                        ? "text-red-500! hover:bg-[#131319]/80! hover:text-white!"
-                                        : "text-white hover:bg-[#131319]/80!"
+                                        ? "text-red-500! hover:bg-[#282836]/60! hover:text-white!"
+                                        : "text-white hover:bg-[#282836]/60!"
                                     }    
                                 `}
                             >
-                                <Icon size={18} className={item.isDanger ? "" : "text-[#8888BA]"} />
+                                <Icon size={18} className={item.isDanger ? "" : "text-[#7F88C0]"} />
                                 <span>{currentLabel}</span>
                             </button>
                         );

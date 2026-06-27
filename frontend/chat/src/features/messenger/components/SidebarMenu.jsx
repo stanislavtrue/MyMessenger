@@ -2,7 +2,7 @@ import { EllipsisVertical, Plus, Settings } from "lucide-react";
 import { BsPeople, BsPerson, BsChevronRight } from "react-icons/bs";
 import { PiBookmarkSimple } from "react-icons/pi";
 
-export const SidebarMenu = ({ isOpen, menuRef }) => {
+export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
     return (
         <div 
             style={{ fontFamily: "Roboto" }}
@@ -10,9 +10,9 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
             className={`
                 absolute z-50
                 top-13 left-2
-                w-55 h-fit
-                rounded-xl
-                bg-[#272739]/80
+                w-46 h-fit
+                rounded-2xl
+                bg-[#111111]/90
                 backdrop-blur-xs
                 shadow-black/60
                 shadow-lg
@@ -31,7 +31,7 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
             <div className="
                 flex items-center gap-4
                 px-3! py-1! mx-1! my-1!
-                rounded-md hover:bg-[#131319]/80
+                rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
                 <div className="size-5.5 bg-white rounded-full" />
@@ -44,7 +44,7 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
             <div className="
                 flex items-center gap-4
                 px-3! py-1! mx-1! my-1!
-                rounded-lg hover:bg-[#131319]/80
+                rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
                 <Plus size={22} className="text-[#8888BA]" />
@@ -57,7 +57,7 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
             <div className="
                 flex items-center gap-4.5
                 px-3! py-1.5! mx-1! my-1!
-                rounded-lg hover:bg-[#131319]/80
+                rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
                 <BsPerson size={20} className="text-[#8888BA]" />
@@ -68,7 +68,7 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
             <div className="
                 flex items-center gap-4.5
                 px-3! py-1.5! mx-1! my-1!
-                rounded-lg hover:bg-[#131319]/80
+                rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
                 <PiBookmarkSimple size={20} className="text-[#8888BA]" />
@@ -76,12 +76,15 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
 
             </div>
 
-            <div className="
-                flex items-center gap-4.5
-                px-3! py-1.5! mx-1! my-1!
-                rounded-lg hover:bg-[#131319]/80
-                cursor-pointer transition-colors duration-0
-            ">
+            <div 
+                onClick={onContactsClick}
+                className="
+                    flex items-center gap-4.5
+                    px-3! py-1.5! mx-1! my-1!
+                    rounded-2xl hover:bg-[#282836]/50
+                    cursor-pointer transition-colors duration-0
+                "
+            >
                 <BsPeople size={20} className="text-[#8888BA]" />
                 <span className="text-sm!">Contacts</span>
 
@@ -90,7 +93,7 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
             <div className="
                 flex items-center gap-4.5
                 px-3! py-1.5! mx-1! my-1!
-                rounded-lg hover:bg-[#131319]/80
+                rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
                 <Settings size={20} className="text-[#8888BA]" />
@@ -101,12 +104,12 @@ export const SidebarMenu = ({ isOpen, menuRef }) => {
             <div className="
                 flex items-center gap-4.5
                 px-3! py-1.5! mx-1! my-1!
-                rounded-lg hover:bg-[#131319]/80
+                rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <EllipsisVertical size={20} className="text-[#8888BA]" />
+                <EllipsisVertical size={20} className="text-[#8888BA] shrink-0" />
                 <span className="text-sm!">More</span>
-                <BsChevronRight size={15} className="text-[#8888BA] ml-20!" />
+                <BsChevronRight size={15} className="text-[#8888BA] ml-14! shrink-0" />
             </div>         
         </div>
     );

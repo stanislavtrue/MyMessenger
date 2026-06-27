@@ -1,21 +1,32 @@
 import { useState } from "react"
-import { sortChats } from "../utils/sortChats";
 
 export const useSidebarSearch = (chats) => {
     const [searchText, setSearchText] = useState("");
+    const [isContactsMode, setIsContactsMode] = useState(false);
 
-    const sortedChats = useMemo(() => sortChats(chats), [chats]);
+    const activeChats = useMemo(() => {
+        return chats.filter(chat => chat.messages && chat.messages.length > 0);
+    }, [chats]);
 
-    const filteredChats = useMemo(() => 
-        sortedChats.filter(chat => 
-            chat.name.toLowerCase().includes(searchText.toLowerCase())
-        ), [sortedChats, searchText]
-    );
+    const contacts = useMemo(() => chats, [chats]);
+
+    const filteredResults = useMemo(() => {
+        const query = searchText.toLowerCase();
+        if (!query) return [];
+        if (isContactsMode) {
+            return contacts.filter(c => c.name?.toLowerCase().includes(query));
+        } else {
+            return activeChats.filter(c => c.name?.toLowerCase().includes(query));
+        }
+    }, [searchText, isContactsMode, activeChats, contacts]);
 
     return {
         searchText,
         setSearchText,
-        sortedChats,
-        filteredChats,
+        isContactsMode,
+        setIsContactsMode,
+        activeChats,
+        contacts,
+        filteredResults
     };
 };

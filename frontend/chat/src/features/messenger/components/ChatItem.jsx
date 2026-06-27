@@ -1,8 +1,9 @@
 import { useRipple } from "@/hooks/useRipple";
 import { formatSidebarDate } from "../utils/formatSidebarDate";
 import { TypingIndicator } from "./indicators/TypingIndicator";
+import { Avatar } from "./Avatar";
 
-export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDate, selectedChatId, setSelectedChatId, isContextActive, onContextMenu} ) => {
+export const ChatItem = ({ chat, lastMessageText, lastMessageTime, lastMessageDate, selectedChatId, setSelectedChatId, isContextActive, onContextMenu }) => {
     const isSelected = selectedChatId === chat.id;
     const { ripples, createRipple } = useRipple();
 
@@ -52,7 +53,7 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
                 />
             ))}
 
-            <div className="relative w-14 h-14 rounded-full bg-[#5A4282] flex items-center justify-center text-white text-2xl! z-10 shrink-0">
+            <div className="relative w-14 h-14 rounded-full bg-linear-to-b from-[#D95353] to-[#732C2C] flex items-center justify-center text-white text-2xl! z-10 shrink-0">
                 {(chat.status === "online" || chat.status === "typing") && (
                     <div className={`
                         absolute w-3.5 h-3.5 rounded-full bottom-0 right-1 border-2! 
@@ -63,8 +64,10 @@ export const ChatItem = ( {chat, lastMessageText, lastMessageTime, lastMessageDa
                         }
                     `}  />
                 )}
-
-                {chat.name[0]}
+                <Avatar 
+                    avatar={chat.avatar}
+                    name={chat.name}
+                />
             </div>
 
             <div className="flex flex-col min-w-0 flex-1 z-10">

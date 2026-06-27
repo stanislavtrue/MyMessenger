@@ -9,7 +9,15 @@ export const MessengerContent = () => {
     const isMobile = windowWidth < 768;
 
     return (
-        <div className="h-screen flex overflow-hidden bg-[#111111] relative">
+        <div 
+            className="h-screen flex overflow-hidden relative"
+            style={{
+                backgroundImage: "url('/bg-pattern.png')",
+                backgroundRepeat: "repeat",
+                backgroundPosition: "center top",
+                backgroundSize: "auto"
+            }}
+        >
 
             {toast && (
                 <div 

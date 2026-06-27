@@ -15,7 +15,7 @@ import { useMockIncomingMessages } from "./useMockIncomingMessages";
 export const useMessenger = () => {
     const [chats, setChats] = useState(mockChats);
     const [selectedChatId, setSelectedChatId] = useState(null);
-    const [sidebarWidth, setSidebarWidth] = useState(33);
+    const [sidebarWidth, setSidebarWidth] = useState(26);
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
     const [isSidebarSearchFocused, setIsSidebarSearchFocused] = useState(false);
     const [isChatSearchFocused, setIsChatSearchFocused] = useState(false);
@@ -57,6 +57,7 @@ export const useMessenger = () => {
     };
 
     const handleSelectChat = (chatId) => {
+        closeMenu();
         setSelectedChatId(chatId);
 
         setIsChatSearchFocused(false);

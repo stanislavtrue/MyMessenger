@@ -14,10 +14,11 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
         <div className={`
                 relative w-fit max-w-[75%]
                 rounded-2xl py-1! px-3!
+                shadow-[5px_5px_12px_rgba(0,0,0,0.5)]
                 ${radiusClass}
                 ${message.isOwnMessage
-                    ? "ml-auto! mr-4! bg-[#252530]"
-                    : "mr-auto! ml-4! bg-[#5A4282]"
+                    ? "ml-auto! mr-4! bg-[#7D55B5]"
+                    : "mr-auto! ml-4! bg-[#28292B]"
                 }
             `}
         >
@@ -96,18 +97,22 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                 <>
                     <div className={`
                             absolute bottom-0 w-2 h-2 opacity-85
+                            shadow-[3px_3px_4px_rgba(0,0,0,0.5)]
+
                             ${message.isOwnMessage
-                                ? "-right-2 rounded-full bg-[#252530]" 
-                                : "-left-2 rounded-full bg-[#5A4282]"
+                                ? "-right-2 rounded-full bg-[#7D55B5]" 
+                                : "-left-2 rounded-full bg-[#28292B]"
                             }
                         `}
                     />
                 
                     <div className={`
                             absolute bottom-0 w-1 h-1 opacity-70
+                            shadow-[3px_3px_2px_rgba(0,0,0,0.5)]
+
                             ${message.isOwnMessage
-                                ? "-right-3.5 rounded-full bg-[#252530]"
-                                : "-left-3.5 rounded-full bg-[#5A4282]"
+                                ? "-right-3.5 rounded-full bg-[#7D55B5]"
+                                : "-left-3.5 rounded-full bg-[#28292B]"
                             }
                         `} 
                     />

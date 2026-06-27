@@ -4,14 +4,16 @@ import { PinnedMessageBar } from "./PinnedMessageBar";
 import { ChatStatus } from "@/features/messenger/components/ChatStatus";
 import { ChatSearchBar } from "@/features/messenger/components/ChatSearchBar";
 import { useMessengerContext } from "../context/MessengerContext";
+import { Avatar } from "./Avatar";
 
 export const ChatHeader = ({ chat, isMobile, onBack }) => {
     const { selectedChat, isChatSearchFocused, setIsChatSearchFocused } = useMessengerContext();
     
     return (
         <div className="
-            relative w-full h-14 bg-[#1F1F28] 
-            flex items-center m-auto! select-none
+            relative h-12 bg-[#111111] 
+            flex items-center select-none
+            rounded-3xl
         ">
             {isMobile && (
                 <div 
@@ -29,14 +31,15 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
             )}
 
             <div className={`
-                w-10 h-10 
-                rounded-full bg-[#5A4282] 
-                flex items-center justify-center 
                 text-white! text-xl! shrink-0
 
-                ${isMobile ? "ml-2!" : "ml-6!"}
+                ${isMobile ? "ml-2!" : "ml-1!"}
             `}>
-                {chat.name[0]}
+                <Avatar 
+                    size="size-10"
+                    avatar={chat.avatar}
+                    name={chat.name}
+                />
             </div>
 
             <div className="relative flex flex-1 items-center h-full min-w-0 ">
@@ -46,20 +49,18 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                     transition-opacity duration-200 ease-in-out
                     ${isChatSearchFocused ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"}
                 `}>
-                    <div className="flex flex-col ml-2! min-w-0 cursor-pointer">
-                        <span className="text-white text-lg! truncate">{chat.name}</span>
+                    <div className="flex flex-col ml-3! min-w-0 cursor-pointer">
+                        <span className="text-white font-medium! truncate">{chat.name}</span>
                         <ChatStatus status={chat.status}/>        
                     </div>
 
-                    <div className="flex items-center gap-1! ml-auto! mr-4!">
-                        <PinnedMessageBar chat={selectedChat} />
-
+                    <div className="flex items-center ml-auto! gap-0.5 mr-1!">
                         <div 
                             onClick={() => setIsChatSearchFocused(true)}
                             className="
                                 flex items-center justify-center
                                 h-10 w-10 rounded-full
-                                text-[#707099] hover:bg-[#282836]
+                                text-[#7F88C0] hover:bg-[#282836]/50
                                 active:scale-90 active:bg-[#52526B]
                                 transition-all duration-200 cursor-pointer
                             "
@@ -70,7 +71,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                         <div className="
                             flex items-center justify-center
                             h-10 w-10 rounded-full
-                            text-[#707099] hover:bg-[#282836]
+                            text-[#7F88C0] hover:bg-[#282836]/50
                             active:scale-90 active:bg-[#52526B]
                             transition-all duration-200
                             cursor-pointer

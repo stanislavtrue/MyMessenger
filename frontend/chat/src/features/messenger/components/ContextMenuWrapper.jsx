@@ -53,7 +53,7 @@ export const ContextMenuWrapper = ({ children, type, width = "w-42" }) => {
                 }}
                 className={`
                     fixed z-50 flex flex-col context-menu
-                    bg-[#272739]/80 backdrop-blur-md
+                    bg-[#111111]/80 backdrop-blur-md
                     rounded-xl shadow-lg shadow-black/70
                     px-1! py-1!
                     ${width} ${animationClass}

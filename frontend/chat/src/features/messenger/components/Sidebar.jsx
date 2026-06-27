@@ -9,9 +9,10 @@ import { ContextMenuWrapper } from "./ContextMenuWrapper";
 import { CHAT_CONTEXT_MENU } from "../constants/sidebarMenuItems";
 import { SidebarMenu } from "@/features/messenger/components/SidebarMenu";
 import { ChatList } from "@/features/messenger/components/ChatList";
+import { ContactItem } from "./ContactItem";
 
 export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
-    const { searchText, setSearchText, sortedChats, filteredChats } = useSidebarSearch(chats);
+    const { searchText, setSearchText, isContactsMode, setIsContactsMode, activeChats, contacts, filteredResults } = useSidebarSearch(chats);
     const { handleMouseDown } = useSidebarResize(sidebarWidth, setSidebarWidth);
     const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSidebarSearchFocused, setIsSidebarSearchFocused, contextMenu, closeMenu } = useMessengerContext();
 
@@ -20,151 +21,199 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
 
     const handleSelectChat = (chatId) => {
         setSelectedChatId(chatId);
-
         setIsSidebarSearchFocused(false);
         setSearchText("");
     };
+
+    const showBack = isSidebarSearchFocused || isContactsMode;
 
     return (
         <div 
             id="sidebar"
             style={{
                 width: isMobile ? "100%" : `${sidebarWidth}%`,
-                minWidth: isMobile ? "100%" : "240px",
-                maxWidth: isMobile ? "100%" : "650px"
+                minWidth: isMobile ? "100%" : "350px",
+                maxWidth: isMobile ? "100%" : "500px"
             }}
-            className="relative h-screen w-full flex flex-col border-r! border-[#282836]! bg-[#1F1F28] select-none shrink-0"
+            className="relative h-screen flex flex-col p-4! pr-1.5! select-none shrink-0"
         >
 
-            {isSidebarMenuOpen && (
-                <div 
-                    onClick={() => setIsSidebarMenuOpen(false)}
-                    className="fixed inset-0 z-40"
-                />
-            )}
-
-            {contextMenu.visible && contextMenu.type === "chat" && (
-                <div
-                    onClick={closeMenu}
-                    className="fixed inset-0 z-40"
-                />
-            )}
-
             <div className="
-                px-3! pt-1! pb-3! 
-                text-center 
+                relative flex-1 flex flex-col w-full h-full
+                rounded-3xl bg-[#1F1F28]/60
+                border! border-[#808080]! select-none 
+                overflow-hidden
             ">
-                <div className="flex items-center relative">
 
+                {isSidebarMenuOpen && (
                     <div 
-                        ref={buttonRef} 
-                        onClick={() => {
-                            if (isSidebarSearchFocused) {
-                                setIsSidebarSearchFocused(false)
-                                setSearchText("")
-                            } else {
-                                setIsSidebarMenuOpen(!isSidebarMenuOpen);
-                            }
-                        }}
-                        className="
-                            relative flex items-center justify-center 
-                            h-11 w-11 rounded-full hover:bg-[#282836]
-                            active:scale-90 active:bg-[#52526B]
-                            transition-all duration-300
-                            cursor-pointer overflow-hidden
-                        "
-                    >
-                        <TfiMenu 
-                            size={22}
-                            className={`
-                                absolute text-[#707099]
-                                transition-all duration-300
-                                
-                                ${isSidebarSearchFocused
-                                    ? "opacity-0 rotate-180 scale-50"
-                                    : "opacity-100 rotate-0 scale-100"
+                        onClick={() => setIsSidebarMenuOpen(false)}
+                        className="fixed inset-0 z-40"
+                    />
+                )}
+
+                {contextMenu.visible && contextMenu.type === "chat" && (
+                    <div
+                        onClick={closeMenu}
+                        className="fixed inset-0 z-40"
+                    />
+                )}
+
+                <div className="
+                    px-3! pt-1! pb-3! 
+                    text-center 
+                ">
+                    <div className="flex items-center relative">
+
+                        <div 
+                            ref={buttonRef} 
+                            onClick={() => {
+                                if (showBack) {
+                                    setIsSidebarSearchFocused(false)
+                                    setIsContactsMode(false);
+                                    setSearchText("")
+                                } else {
+                                    setIsSidebarMenuOpen(!isSidebarMenuOpen);
                                 }
-                            `}
-                        />
-
-                        <ArrowLeft
-                            size={22}
-                            className={`
-                                absolute text-[#707099]
-                                transition-all duration-300    
-
-                                ${isSidebarSearchFocused
-                                    ? "opacity-100 rotate-0 scale-100"
-                                    : "opacity-0 -rotate-180 scale-50"
-                                }
-                            `}
-                        />
-                    </div>
-
-                    <SidebarMenu isOpen={isSidebarMenuOpen} menuRef={menuRef} />
-
-                    <div className="w-full! flex flex-1 items-center group focus-within:ring-2 focus-within:ring-[#957AAA] bg-[#16161D] transition-all duration-300 rounded-3xl ml-3! pl-4!">
-
-                        <SlMagnifier size={18} strokeWidth={50} className="text-[#52526B] transition-colors group-focus-within:text-[#957AAA]" />
-
-                        <input
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            onFocus={() => setIsSidebarSearchFocused(true)}
+                            }}
                             className="
-                                w-full h-12! pl-3!
-                                rounded-3xl text-white outline-none!
+                                relative flex items-center justify-center 
+                                h-11 w-11 rounded-full hover:bg-[#282836]
+                                active:scale-90 active:bg-[#52526B]
+                                transition-all duration-300
+                                cursor-pointer overflow-hidden
                             "
-                            type="text"
-                            placeholder="Search"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="relative flex-1 overflow-hidden">
-
-                <ChatList
-                    chats={sortedChats}
-                    isVisible={!isSidebarSearchFocused}
-                    selectedChatId={selectedChatId}
-                    onSelectChat={handleSelectChat}
-                    animationClasses={isSidebarSearchFocused ? "scale-95 opacity-0" : "scale-100 opacity-100"}
-                />
-            
-                <ChatList
-                    chats={searchText.length > 0 ? filteredChats : []}
-                    isVisible={isSidebarSearchFocused}
-                    selectedChatId={selectedChatId}
-                    onSelectChat={handleSelectChat}
-                    animationClasses={isSidebarSearchFocused ? "opacity-100 scale-100" : "opacity-0 scale-105"}
-                />
-
-                <ContextMenuWrapper type="chat" width="w-52">
-                    {CHAT_CONTEXT_MENU.map((item) => {
-                        const Icon = item.icon;
-
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={() => closeMenu()}
+                        >
+                            <TfiMenu 
+                                size={22}
                                 className={`
-                                    flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! rounded-lg
-                                    cursor-pointer transition-colors duration-0 w-full text-left
+                                    absolute text-white
+                                    transition-all duration-300
                                     
-                                    ${item.isDanger
-                                        ? "text-red-500! hover:bg-[#131319]/80! hover:text-white!"
-                                        : "text-white hover:bg-[#131319]!"
+                                    ${showBack
+                                        ? "opacity-0 rotate-180 scale-50"
+                                        : "opacity-100 rotate-0 scale-100"
                                     }
                                 `}
-                            >
-                                <Icon strokeWidth={2.5} size={18} className={item.isDanger ? "" : "text-[#8888BA]"} />
-                                <span>{item.label}</span>
-                            </button>
-                        );
-                    })}
-                </ContextMenuWrapper>
-            
+                            />
+
+                            <ArrowLeft
+                                size={26}
+                                className={`
+                                    absolute text-white
+                                    transition-all duration-300    
+
+                                    ${showBack
+                                        ? "opacity-100 rotate-0 scale-100"
+                                        : "opacity-0 -rotate-180 scale-50"
+                                    }
+                                `}
+                            />
+                        </div>
+
+                        <SidebarMenu 
+                            isOpen={isSidebarMenuOpen} 
+                            menuRef={menuRef} 
+                            onContactsClick={() => {
+                                setIsContactsMode(true);
+                                setIsSidebarMenuOpen(false);
+                            }} 
+                        />
+
+                        <div className="w-full! flex flex-1 items-center group focus-within:ring-2 focus-within:ring-[#957AAA] bg-[#111111] transition-all duration-300 rounded-3xl ml-3! pl-4!">
+
+                            <SlMagnifier size={18} strokeWidth={50} className="text-[#7F88C0] transition-colors group-focus-within:text-[#957AAA]" />
+
+                            <input
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
+                                onFocus={() => setIsSidebarSearchFocused(true)}
+                                className="
+                                    w-full h-11! pl-3!
+                                    rounded-3xl text-white outline-none!
+                                    placeholder:text-[#7F88C0]!
+                                "
+                                type="text"
+                                placeholder="Search"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="relative flex-1 overflow-hidden">
+
+                    {!showBack && (
+                        <ChatList
+                            chats={activeChats}
+                            isVisible={true}
+                            selectedChatId={selectedChatId}
+                            onSelectChat={handleSelectChat}
+                            animationClasses={"scale-100 opacity-100"}
+                        />
+                    )}
+                
+                    {isContactsMode && !searchText && (
+                        <div className="animate-scale-up">
+                            {contacts.map(contact => (
+                                <ContactItem
+                                    key={contact.id}
+                                    contact={contact}
+                                    isSelected={contact.id === selectedChatId}
+                                    onSelect={handleSelectChat}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {searchText.length > 0 && (
+                        <div className="animate-scale-up">
+                            {isContactsMode ? (
+                                filteredResults.map(contact => (
+                                    <ContactItem
+                                        key={contact.id}
+                                        contact={contact}
+                                        isSelected={contact.id === selectedChatId}
+                                        onSelect={handleSelectChat}
+                                    />
+                                ))
+                            ) : (
+                                <ChatList
+                                    chats={filteredResults}
+                                    isVisible={true}
+                                    selectedChatId={selectedChatId}
+                                    onSelectChat={handleSelectChat}
+                                    animationClasses="opacity-100 scale-100"
+                                />
+                            )}
+                        </div>
+                    )}
+                    
+                    <ContextMenuWrapper type="chat" width="w-48">
+                        {CHAT_CONTEXT_MENU.map((item) => {
+                            const Icon = item.icon;
+
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => closeMenu()}
+                                    className={`
+                                        flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! rounded-2xl
+                                        cursor-pointer transition-colors duration-0 w-full text-left
+                                        
+                                        ${item.isDanger
+                                            ? "text-red-500! hover:bg-[#282835]/50! hover:text-white!"
+                                            : "text-white hover:bg-[#282836]/50!"
+                                        }
+                                    `}
+                                >
+                                    <Icon strokeWidth={2.5} size={18} className={item.isDanger ? "" : "text-[#8888BA]"} />
+                                    <span>{item.label}</span>
+                                </button>
+                            );
+                        })}
+                    </ContextMenuWrapper>
+                
+                </div>
             </div>
             {!isMobile && (
                 <div 

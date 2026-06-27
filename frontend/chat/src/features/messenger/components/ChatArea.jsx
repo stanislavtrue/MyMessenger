@@ -1,38 +1,48 @@
-import { Heading } from "@chakra-ui/react";
 import { ChatHeader } from "./ChatHeader";
 import { MessageInput } from "./MessageInput";
 import { MessageList } from "./MessageList";
+import { PinnedMessageBar } from "./PinnedMessageBar";
 
 export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, onBack}) => {
 
     if(!selectedChat) {
         return (
-            <div className="flex-1 h-screen bg-[#111111] flex justify-center items-center">
-                <div className="w-fit px-3! py-1! bg-[#1F1F28] rounded-3xl">
-                    <Heading size="sm" fontFamily="B612" fontWeight="medium" className="text-center">Select a chat to start messaging</Heading>
-                </div>
-            </div>
+            <div className="flex-1 h-screen flex justify-center items-center" />
         );
     }
 
-    const contentStyle = {
-        maxWidth: isMobile ? "100%" : `${960 - ((sidebarWidth - 13) / 20) * 240}px`,
-        width: "100%"
-    };
-
     return (
-        <div className="flex-1 h-screen bg-[#111111] flex flex-col min-w-0">
-            <ChatHeader chat={selectedChat} isMobile={isMobile} onBack={onBack} />
-            
-            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#282836] scrollbar-track-transparent">
-                <div className="w-full h-full mx-auto! transition-all duration-75 ease-out">
-                    <MessageList messages={selectedChat.messages} contentStyle={contentStyle} />
+        <div className="relative flex-1 h-screen flex flex-col p-4! pl-1.5! min-w-0">
+            <div className="
+                relative flex-1 flex flex-col w-full h-full
+                bg-[#1F1F28]/60 rounded-3xl
+                border! border-[#808080]! overflow-hidden
+            ">
+                <div className="absolute top-0 inset-x-0 z-30 pointer-events-none">
+                    <div className="max-w-180 mx-auto! w-full">
+                        <div className="bg-[#1F1F28]/10 backdrop-blur-xs pointer-events-auto">
+                            <div className="pt-3! mx-auto! transition-all duration-75 ease-out">
+                                <ChatHeader chat={selectedChat} isMobile={isMobile} onBack={onBack} />
+                            </div>
+                            <div className="max-w-180 mx-auto! mt-2! transition-all duration-75 ease-out">
+                                <PinnedMessageBar chat={selectedChat} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div className="pb-4! px-4!">
-                <div style={contentStyle} className="mx-auto! transition-all duration-75 ease-out">
-                    <MessageInput onSendMessage={onSendMessage}/>
+                
+                <div className="w-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#282836] scrollbar-track-transparent">
+                    <div className="w-full transition-all duration-75 ease-out pt-25! pb-12!">
+                        <MessageList messages={selectedChat.messages}/>
+                    </div>
+                </div>
+                
+                <div className="absolute bottom-0 inset-x-0 z-30 pointer-events-none">
+                    <div className="max-w-180 mx-auto! transition-all duration-75 ease-out">
+                        <div className="pb-3! bg-linear-to-b from-[#1F1F28]/0 to-[#1F1F28]/30 rounded-3xl backdrop-blur-xs pointer-events-auto">
+                            <MessageInput onSendMessage={onSendMessage}/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
