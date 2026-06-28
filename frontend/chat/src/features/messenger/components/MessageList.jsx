@@ -6,7 +6,7 @@ import { useMessageSearchNavigation } from "../hooks/useMessageSearchNavigation"
 import { useAutoScroll } from "../hooks/useAutoScroll";
 import { MESSAGE_CONTEXT_MENU } from "../constants/messageMenuItems";
 
-export const MessageList = ({ messages, contentStyle }) => {
+export const MessageList = ({ messages}) => {
     const messengerContext = useMessengerContext();
     const { 
         contextMenu, showMenu, closeMenu, openReply, searchText, 
@@ -22,12 +22,12 @@ export const MessageList = ({ messages, contentStyle }) => {
     }
     
     return (
-        <div className="relative flex flex-col w-full py-4!">
+        <div className="relative flex flex-col w-full flex-1">
             {contextMenu.visible && contextMenu.type === "message" && (
                 <div onClick={closeMenu} className="fixed inset-0 z-40"/>
             )}
 
-            <div className="w-full flex flex-col">
+            <div className="w-full flex flex-col mt-auto! justify-end">
 
                 {messages.map((message, index) => {
                     const previousMessage = messages[index - 1];

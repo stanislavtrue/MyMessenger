@@ -4,7 +4,7 @@ import { highlightText } from "../utils/highlightText";
 import { Avatar } from "./Avatar";
 
 export const SearchDropdown = ({ chat }) => {
-    const { filteredSearchMessages, searchText, currentSearchIndex, setCurrentSearchIndex } = useMessengerContext();
+    const { currentUser, filteredSearchMessages, searchText, currentSearchIndex, setCurrentSearchIndex } = useMessengerContext();
 
     if (!searchText.trim()) return null;
 
@@ -29,7 +29,8 @@ export const SearchDropdown = ({ chat }) => {
                     ) : (
                         filteredSearchMessages.map((msg, index) => {
                             const isSelected = index === currentSearchIndex;
-                            const senderName = msg.isOwnMessage ? "Main user" : chat.name;
+                            const senderName = msg.isOwnMessage ? currentUser.displayName : chat.user.displayName;
+                            const senderAvatar = msg.isOwnMessage ? currentUser.avatar : chat.user.avatar;
                         
                             return (
                                 <div
@@ -48,8 +49,8 @@ export const SearchDropdown = ({ chat }) => {
                                     `}>
                                         <Avatar 
                                             size="size-11"
-                                            avatar={chat.avatar}
-                                            name={chat.name}
+                                            avatar={senderAvatar}
+                                            name={senderName}
                                         />
                                     </div>
 

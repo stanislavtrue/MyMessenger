@@ -1,8 +1,11 @@
 import { EllipsisVertical, Plus, Settings } from "lucide-react";
 import { BsPeople, BsPerson, BsChevronRight } from "react-icons/bs";
 import { PiBookmarkSimple } from "react-icons/pi";
+import { Avatar } from "./Avatar";
+import { useMessengerContext } from "../context/MessengerContext";
 
 export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
+    const { currentUser } = useMessengerContext();
     return (
         <div 
             style={{ fontFamily: "Roboto" }}
@@ -34,8 +37,12 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <div className="size-5.5 bg-white rounded-full" />
-                <span className="text-sm!">User</span>
+                <Avatar 
+                    size="size-5.5"
+                    avatar={currentUser.avatar}
+                    name={currentUser.displayName}
+                />
+                <span className="text-sm!">{currentUser.displayName}</span>
 
             </div>
 
@@ -47,7 +54,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <Plus size={22} className="text-[#8888BA]" />
+                <Plus size={22} className="text-[#7F88C0]" />
                 <span className="text-sm!">Add Account</span>
 
             </div>
@@ -60,7 +67,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <BsPerson size={20} className="text-[#8888BA]" />
+                <BsPerson size={20} className="text-[#7F88C0]" />
                 <span className="text-sm!">My Profile</span>
 
             </div>
@@ -71,7 +78,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <PiBookmarkSimple size={20} className="text-[#8888BA]" />
+                <PiBookmarkSimple size={20} className="text-[#7F88C0]" />
                 <span className="text-sm!">Saved Messages</span>
 
             </div>
@@ -85,7 +92,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                     cursor-pointer transition-colors duration-0
                 "
             >
-                <BsPeople size={20} className="text-[#8888BA]" />
+                <BsPeople size={20} className="text-[#7F88C0]" />
                 <span className="text-sm!">Contacts</span>
 
             </div>
@@ -96,7 +103,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <Settings size={20} className="text-[#8888BA]" />
+                <Settings size={20} className="text-[#7F88C0]" />
                 <span className="text-sm!">Settings</span>
 
             </div>
@@ -107,9 +114,9 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <EllipsisVertical size={20} className="text-[#8888BA] shrink-0" />
+                <EllipsisVertical size={20} className="text-[#7F88C0] shrink-0" />
                 <span className="text-sm!">More</span>
-                <BsChevronRight size={15} className="text-[#8888BA] ml-14! shrink-0" />
+                <BsChevronRight size={15} className="text-[#7F88C0] ml-14! shrink-0" />
             </div>         
         </div>
     );

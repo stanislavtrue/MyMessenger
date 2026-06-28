@@ -40,12 +40,12 @@ export const ContactItem = ({ contact, isSelected, onSelect }) => {
 
             <Avatar
                 size="size-10!"
-                name={contact.name}
-                avatar={contact.avatar}
+                name={contact.user.displayName}
+                avatar={contact.user.avatar}
             />
             <div className="flex flex-col flex-1 min-w-0">
-                <span className="truncate">{contact.name}</span>
-                <ChatStatus status={contact.status} />
+                <span className="truncate">{contact.user.displayName}</span>
+                <ChatStatus status={contact.user.status} />
             </div>
 
         </div>

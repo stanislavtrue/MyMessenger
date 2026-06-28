@@ -54,7 +54,7 @@ export const ChatItem = ({ chat, lastMessageText, lastMessageTime, lastMessageDa
             ))}
 
             <div className="relative w-14 h-14 rounded-full bg-linear-to-b from-[#D95353] to-[#732C2C] flex items-center justify-center text-white text-2xl! z-10 shrink-0">
-                {(chat.status === "online" || chat.status === "typing") && (
+                {(chat.user.status === "online" || chat.user.status === "typing") && (
                     <div className={`
                         absolute w-3.5 h-3.5 rounded-full bottom-0 right-1 border-2! 
 
@@ -65,16 +65,16 @@ export const ChatItem = ({ chat, lastMessageText, lastMessageTime, lastMessageDa
                     `}  />
                 )}
                 <Avatar 
-                    avatar={chat.avatar}
-                    name={chat.name}
+                    avatar={chat.user.avatar}
+                    name={chat.user.displayName}
                 />
             </div>
 
             <div className="flex flex-col min-w-0 flex-1 z-10">
                 <span className="text-white font-medium text-lg! truncate">
-                    {chat.name}
+                    {chat.user.displayName}
                 </span>
-                {chat.status === "typing" ? (
+                {chat.user.status === "typing" ? (
                     <TypingIndicator
                         activeColor={isSelected ? "#FFFFFF" : "#52526B"}
                         textClassName={`

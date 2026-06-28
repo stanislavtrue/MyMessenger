@@ -14,7 +14,7 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
         <div className={`
                 relative w-fit max-w-[75%]
                 rounded-2xl py-1! px-3!
-                shadow-[5px_5px_12px_rgba(0,0,0,0.5)]
+                shadow-[2px_8px_12px_rgba(0,0,0,0.8)]
                 ${radiusClass}
                 ${message.isOwnMessage
                     ? "ml-auto! mr-4! bg-[#7D55B5]"

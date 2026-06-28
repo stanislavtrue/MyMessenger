@@ -20,6 +20,12 @@ export const useMessenger = () => {
     const [isSidebarSearchFocused, setIsSidebarSearchFocused] = useState(false);
     const [isChatSearchFocused, setIsChatSearchFocused] = useState(false);
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+    const [currentUser] = useState({
+        id: "main_user_id",
+        displayName: "Empty",
+        username: "empty_dev",
+        avatar: "/MainUserAvatar.jpg"
+    });
 
     const windowWidth = useWindowWidth();
     const { toast, showToast } = useToast();
@@ -218,6 +224,7 @@ export const useMessenger = () => {
     });
 
     return {
+        currentUser,
         chats,
         selectedChat,
         selectedChatId,

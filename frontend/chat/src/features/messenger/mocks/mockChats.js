@@ -1,12 +1,16 @@
 export const mockChats = [
     {
         id: 1,
-        name: "John Cena",
-        avatar: "/JohnAvatar.jpg",
+        user: {
+            id: "user_cena",
+            displayName: "John Cena",
+            username: "john_cena",
+            avatar: "/JohnAvatar.jpg",
+            status: "typing",
+        },
         lastMessage: "Goodbuy!",
         time: "18:37",
         unreadCount: 0,
-        status: "typing",
         messages: [
             {
                 id: 1,
@@ -124,42 +128,58 @@ export const mockChats = [
     },
     {
         id: 2,
-        name: "Elon Musk",
-        avatar: "/ElonAvatar.jpg",
+        user: {
+            id: "user_elon",
+            displayName: "Elon Musk",
+            username: "elon_musk",
+            avatar: "/ElonAvatar.jpg",
+            status: "offline",
+        },
         lastMessage: "Hi, how r u?",
         time: "15:34",
         unreadCount: 0,
-        status: "offline",
         messages: []
     },
     {
         id: 3,
-        name: "Cristiano Ronaldo",
-        avatar: "/CristianoAvatar.jpg",
+        user: {
+            id: "user_cristiano",
+            displayName: "Cristiano Ronaldo",
+            username: "cristiano_ronaldo",
+            avatar: "/CristianoAvatar.jpg",
+            status: "offline",
+        },
         lastMessage: "Go football!?",
         time: "Fri",
         unreadCount: 0,
-        status: "offline",
         messages: []
     },
     {
         id: 4,
-        name: "Noname",
-        avatar: null,
+        user: {
+            id: "user_nonane",
+            displayName: "Noname",
+            username: "noname",
+            avatar: null,
+            status: "online",
+        },
         lastMessage: "Есть работа курьером, зп-300000к",
         time: "Tue",
         unreadCount: 0,
-        status: "online",
         messages: []
     },
     {
         id: 5,
-        name: "Linus Torwalds",
-        avatar: "/LinusAvatar.jpg",
+        user: {
+            id: "user_linus",
+            displayName: "Linus Torwalds",
+            username: "linus_torwalds",
+            avatar: "/LinusAvatar.jpg",
+            status: "online",
+        },
         lastMessage: "",
         time: "",
         unreadCount: 0,
-        status: "online",
         messages: [
             {
                 id: 1,
@@ -172,42 +192,58 @@ export const mockChats = [
     },
     {
         id: 6,
-        name: "Martin",
-        avatar: null,
+        user: {
+            id: "user_martin",
+            displayName: "Martin",
+            username: "martin",
+            avatar: null,
+            status: "online",
+        },
         lastMessage: "",
         time: "Wed",
         unreadCount: 0,
-        status: "online",
         messages: []
     },
     {
         id: 7,
-        name: "Alex",
-        avatar: null,
+        user: {
+            id: "user_alex",
+            displayName: "Alex",
+            username: "alex",
+            avatar: null,
+            status: "online",
+        },
         lastMessage: "",
         time: "Mon",
         unreadCount: 0,
-        status: "offline",
         messages: []
     },
     {
         id: 8,
-        name: "Steve Jobs",
-        avatar: "/SteveAvatar.jpg",
+        user: {
+            id: "user_steve",
+            displayName: "Steve Jobs",
+            username: "steve_jobs",
+            avatar: "/SteveAvatar.jpg",
+            status: "offline",
+        },
         lastMessage: "",
         time: "Mon",
         unreadCount: 0,
-        status: "offline",
         messages: []
     },
     {
         id: 9,
-        name: "Scammers",
-        avatar: null,
+        user: {
+            id: "user_scammers",
+            displayName: "Scammers",
+            username: "scammers",
+            avatar: null,
+            status: "offline",
+        },
         lastMessage: "",
         time: "Mon",
         unreadCount: 0,
-        status: "offline",
         messages: []
     },                
 ]

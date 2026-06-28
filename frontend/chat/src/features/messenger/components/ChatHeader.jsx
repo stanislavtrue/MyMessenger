@@ -37,8 +37,8 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
             `}>
                 <Avatar 
                     size="size-10"
-                    avatar={chat.avatar}
-                    name={chat.name}
+                    avatar={chat.user.avatar}
+                    name={chat.user.displayName}
                 />
             </div>
 
@@ -50,8 +50,8 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                     ${isChatSearchFocused ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"}
                 `}>
                     <div className="flex flex-col ml-3! min-w-0 cursor-pointer">
-                        <span className="text-white font-medium! truncate">{chat.name}</span>
-                        <ChatStatus status={chat.status}/>        
+                        <span className="text-white font-medium! truncate">{chat.user.displayName}</span>
+                        <ChatStatus status={chat.user.status}/>        
                     </div>
 
                     <div className="flex items-center ml-auto! gap-0.5 mr-1!">

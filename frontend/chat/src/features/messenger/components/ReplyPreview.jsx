@@ -1,8 +1,19 @@
 import { X } from "lucide-react";
 import { SlActionUndo } from "react-icons/sl";
+import { useMessengerContext } from "../context/MessengerContext";
+import { useRipple } from "@/hooks/useRipple";
 
 export const ReplyPreview = ({ replyPreview, replyToMessage, onClose }) => {
+    const { selectedChat, currentUser } = useMessengerContext();
+    const { ripples, createRipple } = useRipple();
+
     if (!replyPreview) return null;
+
+    const handleBarClick = (e) => {
+        createRipple(e);
+    }
+
+    const replyTargetName = replyPreview.isOwnMessage ? currentUser.displayName : selectedChat.user.displayName;
 
     return (
         <div className={`
@@ -16,8 +27,23 @@ export const ReplyPreview = ({ replyPreview, replyToMessage, onClose }) => {
             <div className="flex items-center justify-between px-4! pt-2! my-auto! select-none">
                 <div className="flex flex-1 items-center gap-4 min-w-0">
                     <SlActionUndo size={22} strokeWidth={40} className="text-[#8F5EB5] shrink-0"/>
-                    <div className="flex flex-col justify-center h-10 flex-1 min-w-0 bg-[#8F5EB5]/20 rounded-sm border-l-4! border-[#8F5EB5]! shrink-0 cursor-pointer hover:bg-[#8F5EB5]/15">
-                        <span className="ml-2! text-sm! text-[#C083F0]">User</span>
+                    <div 
+                        onClick={handleBarClick}
+                        className="relative overflow-hidden flex flex-col justify-center h-10 flex-1 min-w-0 bg-[#8F5EB5]/20 rounded-sm border-l-4! border-[#8F5EB5]! shrink-0 cursor-pointer hover:bg-[#8F5EB5]/30"
+                    >
+                        {ripples.map((ripple) => (
+                            <span
+                                key={ripple.id}
+                                className="animate-ripple"
+                                style={{
+                                    top: ripple.y,
+                                    left: ripple.x,
+                                    width: ripple.size,
+                                    height: ripple.size,
+                                }}
+                            />
+                        ))}
+                        <span className="ml-2! text-sm! text-[#C083F0]">Reply to {replyTargetName}</span>
                         <span className="ml-2! text-sm! truncate pr-2!">{replyPreview.text}</span>
                     </div>
                 </div>
