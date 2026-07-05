@@ -9,11 +9,11 @@ import { MESSAGE_CONTEXT_MENU } from "../constants/messageMenuItems";
 export const MessageList = ({ messages}) => {
     const messengerContext = useMessengerContext();
     const { 
-        contextMenu, showMenu, closeMenu, openReply, searchText, 
+        contextMenu, showMenu, closeMenu, openReply, chatSearchText, 
         filteredSearchMessages, currentSearchIndex, highlightMsgId, triggerHighlight
     } = messengerContext;
 
-    useMessageSearchNavigation(searchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
+    useMessageSearchNavigation(chatSearchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
     const bottomRef = useAutoScroll([messages.length]);
 
     const handleQuickReply = (message) => {

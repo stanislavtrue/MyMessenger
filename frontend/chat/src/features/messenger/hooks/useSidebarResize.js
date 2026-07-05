@@ -10,7 +10,7 @@ export const useSidebarResize = ( sidebarWidth, setSidebarWidth ) => {
             
             const newWidth = startWidth + (delta / window.innerWidth) * 100;
 
-            if (newWidth >= 18 && newWidth <= 26) {
+            if (newWidth >= 13 && newWidth <= 33) {
                 setSidebarWidth(newWidth);
             }
         };

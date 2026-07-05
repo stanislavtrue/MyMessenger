@@ -1,32 +1,64 @@
-import { useState } from "react"
+import { useMemo } from "react"
 
-export const useSidebarSearch = (chats) => {
-    const [searchText, setSearchText] = useState("");
-    const [isContactsMode, setIsContactsMode] = useState(false);
-
+export const useSidebarSearch = (chats, sidebarSearchText, isContactsMode) => {
+    const contacts = chats;
+    
     const activeChats = useMemo(() => {
         return chats.filter(chat => chat.messages && chat.messages.length > 0);
     }, [chats]);
 
-    const contacts = useMemo(() => chats, [chats]);
+    const searchResults = useMemo(() => {
+        const query = sidebarSearchText.toLowerCase().trim().replace(/^@/, "");
 
-    const filteredResults = useMemo(() => {
-        const query = searchText.toLowerCase();
-        if (!query) return [];
         if (isContactsMode) {
-            return contacts.filter(c => c.name?.toLowerCase().includes(query));
-        } else {
-            return activeChats.filter(c => c.name?.toLowerCase().includes(query));
+            if (!query) return { filteredChats: [], filteredContacts: contacts, filteredMessages: [] };
+
+            const filteredContacts = chats.filter(chat => {
+                const user = chat?.user;
+                if (!user) return false;
+                return user.displayName?.toLowerCase().includes(query) || user.username?.toLowerCase().includes(query);
+            });
+
+            return { filteredChats: [], filteredContacts, filteredMessages: [] };
+        } 
+
+        if (!query) {
+            return { filteredChats: chats, filteredContacts: [], filteredMessages: [] };
         }
-    }, [searchText, isContactsMode, activeChats, contacts]);
+
+        const filteredChats = chats.filter(chat => 
+            chat.user?.displayName?.toLowerCase().includes(query) || chat.user?.username?.toLowerCase().includes(query)
+        );
+
+        const filteredContacts = chats.filter(chat => 
+            chat.user?.displayName?.toLowerCase().includes(query) || chat.user?.username?.toLowerCase().includes(query)
+        );
+
+        const filteredMessages = [];
+        chats.forEach(chat => {
+            if (chat.messages && Array.isArray(chat.messages)) {
+                chat.messages.forEach(msg => {
+                    if (msg.text?.toLowerCase().includes(query)) {
+                        filteredMessages.push({
+                            ...msg,
+                            chatId: chat.id,
+                            chatUser: chat.user
+                        });
+                    }
+                });
+            }
+        });
+
+        return {
+            filteredChats,
+            filteredContacts,
+            filteredMessages
+        };
+    }, [chats, isContactsMode, sidebarSearchText, contacts]);
 
     return {
-        searchText,
-        setSearchText,
-        isContactsMode,
-        setIsContactsMode,
         activeChats,
         contacts,
-        filteredResults
+        ...searchResults 
     };
 };

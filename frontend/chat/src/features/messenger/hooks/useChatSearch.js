@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react"
 
 export const useChatSearch = (selectedChat, isChatSearchFocused, setIsChatSearchFocused) => {
-    const [searchText, setSearchText] = useState("");
+    const [chatSearchText, setChatSearchText] = useState("");
     const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
 
     const filteredSearchMessages = selectedChat
         ? [...selectedChat.messages].filter(msg => 
-            msg.text.toLowerCase().includes(searchText.toLowerCase().trim()))
+            msg.text.toLowerCase().includes(chatSearchText.toLowerCase().trim()))
         .reverse()
     : [];
 
     const closeChatSearch = () => {
         setIsChatSearchFocused(false);
-        setSearchText("");
+        setChatSearchText("");
         setCurrentSearchIndex(0);
     };
 
@@ -29,13 +29,13 @@ export const useChatSearch = (selectedChat, isChatSearchFocused, setIsChatSearch
     };
 
     useEffect(() => {
-        setSearchText("");
+        setChatSearchText("");
         setCurrentSearchIndex(0)
     }, [selectedChat?.id]);
 
     return {
-        searchText,
-        setSearchText,
+        chatSearchText,
+        setChatSearchText,
         filteredSearchMessages,
         currentSearchIndex,
         setCurrentSearchIndex,

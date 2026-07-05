@@ -9,6 +9,7 @@ export const useMessengerKeyboard = ({
     setIsEmojiPickerOpen,
     isSidebarSearchFocused,
     setIsSidebarSearchFocused,
+    closeSidebarSearch,
     isChatSearchFocused,
     closeChatSearch,
     replyToMessage,
@@ -37,7 +38,7 @@ export const useMessengerKeyboard = ({
             }
 
             if (isSidebarSearchFocused) {
-                setIsSidebarSearchFocused(false);
+                closeSidebarSearch();
                 return;
             }
 

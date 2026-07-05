@@ -9,15 +9,23 @@ export const MessengerContent = () => {
     const isMobile = windowWidth < 768;
 
     return (
-        <div 
-            className="h-screen flex overflow-hidden relative"
-            style={{
-                backgroundImage: "url('/bg-pattern.png')",
-                backgroundRepeat: "repeat",
-                backgroundPosition: "center top",
-                backgroundSize: "auto"
-            }}
-        >
+        <div className="h-screen flex overflow-hidden relative" >
+            <div
+                className="absolute inset-0"
+                style={{
+                    background: "linear-gradient(135deg,#330033,#6600ff,#ff9900)",
+
+                    WebkitMaskImage: "url('/background.png')",
+                    WebkitMastRepeat: "repeat",
+                    WebkitMaskSize: "450px",
+
+                    maskImage: "url('/background.png')",
+                    maskRepeat: "repeat",
+                    maskSize: "450px",
+
+                    opacity: 0.3
+                }}
+            />
 
             {toast && (
                 <div 

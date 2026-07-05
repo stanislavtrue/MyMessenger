@@ -27,7 +27,7 @@ export const Avatar = ({ name, avatar, size = "size-14"}) => {
         <div 
             className={`
                 ${size}
-                rounded-full
+                rounded-full shrink-0
                 flex items-center justify-center
                 text-white text-2xl! text-semibold!
                 bg-linear-to-b

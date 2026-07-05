@@ -6,7 +6,7 @@ import { SearchDropdown } from "@/features/messenger/components/SearchDropdown";
 
 export const ChatSearchBar = ({ chat, isVisible }) => {
     const {
-        searchText, setSearchText, filteredSearchMessages,
+        chatSearchText, setChatSearchText, filteredSearchMessages,
         setCurrentSearchIndex, closeChatSearch, handleNextSearch, handlePrevSearch
     } = useMessengerContext();
 
@@ -38,7 +38,7 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
 
                     transition-all duration-200 ease-in-out
                     
-                    ${searchText.trim() && isDropdownVisible
+                    ${chatSearchText.trim() && isDropdownVisible
                         ? "rounded-t-3xl rounded-b-none"
                         : "rounded-4xl"
                     }
@@ -48,9 +48,9 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
 
                     <input 
                         ref={inputRef}
-                        value={searchText}
+                        value={chatSearchText}
                         onChange={(e) => {
-                            setSearchText(e.target.value);
+                            setChatSearchText(e.target.value);
                             setCurrentSearchIndex(0);
                             setIsDropdownVisible(true);
                         }}
@@ -63,7 +63,7 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
                         className="w-full pl-3! outline-none!"
                     />
                         
-                    {searchText && filteredSearchMessages.length > 0  && (
+                    {chatSearchText && filteredSearchMessages.length > 0  && (
                         <div className="flex items-center shrink-0 p-0.5!"> 
                             <div onClick={handleNextSearch} className="flex items-center justify-center size-7 rounded-full text-[#7F88C0] hover:bg-[#282836] hover:text-white transition-colors">
                                 <ChevronUp size={26} />
@@ -90,7 +90,7 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
                 
 
                 <div className="
-                    flex items-center justify-center size-10 mr-4!
+                    flex items-center justify-center size-10 mr-1!
                     hover:bg-[#282836] rounded-full cursor-pointer
                 ">
                     <Calendar size={22} className="text-[#7F88C0]" />

@@ -6,7 +6,7 @@ import { QuickReactionButton } from "./QuickReactionButton";
 import { ActiveReactionBadge } from "./ActiveReactionBadge";
 
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
-    const { searchText, handleSetReaction } = useMessengerContext();
+    const { chatSearchText, handleSetReaction } = useMessengerContext();
 
     const radiusClass = getBubbleRadiusClass(message.isOwnMessage, isFirstMessage, isLastMessage);
 
@@ -42,9 +42,9 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
             )}
             
             <div className="flex items-end justify-between w-full gap-2">
-                <div className="flex flex-col">
+                <div className="flex flex-col z-10">
                     <span className="flex-1 text-white text-sm! whitespace-pre-wrap! overflow-hidden">
-                        {highlightText(message.text, searchText)}
+                        {highlightText(message.text, chatSearchText)}
                     </span>
 
                     <QuickReactionButton 

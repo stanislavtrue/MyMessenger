@@ -4,9 +4,9 @@ import { highlightText } from "../utils/highlightText";
 import { Avatar } from "./Avatar";
 
 export const SearchDropdown = ({ chat }) => {
-    const { currentUser, filteredSearchMessages, searchText, currentSearchIndex, setCurrentSearchIndex } = useMessengerContext();
+    const { currentUser, filteredSearchMessages, chatSearchText, currentSearchIndex, setCurrentSearchIndex } = useMessengerContext();
 
-    if (!searchText.trim()) return null;
+    if (!chatSearchText.trim()) return null;
 
     return (
         <div className="
@@ -24,7 +24,7 @@ export const SearchDropdown = ({ chat }) => {
                 <div className="flex flex-col py-1.5!">
                     {filteredSearchMessages.length === 0 ? (
                         <div className="px-4! py-3! text-center text-[#707099]">
-                            No results found for "<span>{searchText}</span>".
+                            No results found for "<span>{chatSearchText}</span>".
                         </div>
                     ) : (
                         filteredSearchMessages.map((msg, index) => {
@@ -60,7 +60,7 @@ export const SearchDropdown = ({ chat }) => {
                                         </span>
 
                                         <span className="text-white/50 text-sm! truncate mt-0.5!">
-                                            {highlightText(msg.text, searchText)}
+                                            {highlightText(msg.text, chatSearchText)}
                                         </span>
                                     </div>
                                 

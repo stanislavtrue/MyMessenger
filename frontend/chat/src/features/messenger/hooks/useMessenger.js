@@ -15,11 +15,13 @@ import { useMockIncomingMessages } from "./useMockIncomingMessages";
 export const useMessenger = () => {
     const [chats, setChats] = useState(mockChats);
     const [selectedChatId, setSelectedChatId] = useState(null);
-    const [sidebarWidth, setSidebarWidth] = useState(26);
+    const [sidebarWidth, setSidebarWidth] = useState(33);
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
     const [isSidebarSearchFocused, setIsSidebarSearchFocused] = useState(false);
     const [isChatSearchFocused, setIsChatSearchFocused] = useState(false);
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+    const [sidebarSearchText, setSidebarSearchText] = useState("");
+    const [isContactsMode, setIsContactsMode] = useState(false);
     const [currentUser] = useState({
         id: "main_user_id",
         displayName: "Empty",
@@ -32,11 +34,25 @@ export const useMessenger = () => {
     const { replyToMessage, replyPreview, openReply, closeReply, setReplyToMessage } = useReply()
     const { highlightMsgId, setHighlightMsgId, triggerHighlight } = useHighlightMessage();
     const { contextMenu, setContextMenu, showMenu, closeMenu } = useContextMenu();
+
+    console.log("Messenger search: ", sidebarSearchText);
     
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
     const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
 
     useMockIncomingMessages(setChats, selectedChatId);
+
+    const closeSidebarSearch = () => {
+        console.log("close");
+        setIsSidebarSearchFocused(false);
+        setIsContactsMode(false);
+        setSidebarSearchText("");
+        console.log({
+            sidebarSearchText,
+            isContactsMode,
+            isSidebarSearchFocused,
+        });
+    };
 
     const handleSetReaction = (messageId, emoji) => {
         setChats((prevChats) =>
@@ -67,8 +83,8 @@ export const useMessenger = () => {
         setSelectedChatId(chatId);
 
         setIsChatSearchFocused(false);
-        if (chatSearch?.setSearchText) {
-            chatSearch.setSearchText("");
+        if (chatSearch?.setChatSearchText) {
+            chatSearch.setChatSearchText("");
         }
 
         setChats(prevChats => prevChats.map(chat => {
@@ -215,6 +231,7 @@ export const useMessenger = () => {
         setIsEmojiPickerOpen,
         isSidebarSearchFocused,
         setIsSidebarSearchFocused,
+        closeSidebarSearch,
         isChatSearchFocused,
         closeChatSearch: chatSearch.closeChatSearch,
         replyToMessage,
@@ -233,6 +250,11 @@ export const useMessenger = () => {
         isSidebarMenuOpen,
         setIsSidebarMenuOpen,
         isSidebarSearchFocused,
+        sidebarSearchText,
+        setSidebarSearchText,
+        isContactsMode,
+        setIsContactsMode,
+        closeSidebarSearch,
         setIsSidebarSearchFocused,
         isChatSearchFocused,
         setIsChatSearchFocused,

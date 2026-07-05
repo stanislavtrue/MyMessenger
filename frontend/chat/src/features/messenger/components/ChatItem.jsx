@@ -29,8 +29,8 @@ export const ChatItem = ({ chat, lastMessageText, lastMessageTime, lastMessageDa
                 cursor-pointer
                 
                 ${isSelected
-                    ? "bg-[#6F4F9C] hover:bg-[#6F4F9C]"
-                    : "hover:bg-[#282836]"
+                    ? "bg-[#5D25AA]"
+                    : "hover:bg-[#282836]/50"
                 }
 
                 ${isContextActive && !isSelected
