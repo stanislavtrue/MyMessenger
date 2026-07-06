@@ -1,8 +1,8 @@
 import { EllipsisVertical, Plus, Settings } from "lucide-react";
 import { BsPeople, BsPerson, BsChevronRight } from "react-icons/bs";
 import { PiBookmarkSimple } from "react-icons/pi";
-import { Avatar } from "./Avatar";
-import { useMessengerContext } from "../context/MessengerContext";
+import { Avatar } from "../Avatar";
+import { useMessengerContext } from "../../context/MessengerContext";
 
 export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
     const { currentUser } = useMessengerContext();
@@ -37,7 +37,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl hover:bg-[#282836]/50
                 cursor-pointer transition-colors duration-0
             ">
-                <Avatar 
+                <Avatar
                     size="size-5.5"
                     avatar={currentUser.avatar}
                     name={currentUser.displayName}

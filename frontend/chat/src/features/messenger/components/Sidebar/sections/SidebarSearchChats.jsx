@@ -1,0 +1,29 @@
+import { useHorizontalWheel } from "@/features/messenger/hooks/useHorizontalWheel";
+import { MiniContactItem } from "../../MiniContactItem";
+
+export const SidebarSearchChats = ({ filteredChats, handleSelectChat }) => {
+    const scrollRef = useHorizontalWheel(0.2);
+
+    return (
+        <div className="absolute top-3 left-4 right-4 z-20">
+            {filteredChats.length > 0 && (
+                <div 
+                    ref={scrollRef}
+                    className="
+                        flex gap-2 py-2! px-2! overflow-x-auto 
+                        scrollbar-none bg-[#111111] rounded-full shrink-0
+                        shadow-[0px_0px_5px_rgba(102,102,102,0.3)]
+                    "
+                >
+                    {filteredChats.slice(0, 10).map((chat, idx) => (
+                        <MiniContactItem
+                            key={`search-mini-${chat.id}-${idx}`}
+                            chat={chat}
+                            onSelect={handleSelectChat}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};

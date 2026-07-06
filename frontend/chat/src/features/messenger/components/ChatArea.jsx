@@ -43,8 +43,7 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
         <div className="relative flex-1 h-screen flex flex-col p-4! pl-1.5! min-w-0">
             <div className="
                 relative flex-1 flex flex-col w-full h-full
-                bg-[#1F1F28]/60 rounded-3xl
-                border! border-[#808080]! overflow-hidden
+                bg-[#1F1F28]/60 rounded-3xl overflow-hidden
             ">
                 <div className="absolute top-0 inset-x-0 z-30 pointer-events-none">
                     <div className="max-w-180 mx-auto! w-full">

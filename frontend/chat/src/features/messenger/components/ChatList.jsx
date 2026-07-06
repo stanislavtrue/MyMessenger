@@ -1,7 +1,7 @@
 import { ChatItem } from "@/features/messenger/components/ChatItem";
 import { useMessengerContext } from "@/features/messenger/context/MessengerContext";
 
-export const ChatList = ({ chats, isVisible, selectedChatId, onSelectChat, animationClasses }) => {
+export const ChatList = ({ chats, isVisible, selectedChatId, onSelectChat }) => {
     const { contextMenu, showMenu } = useMessengerContext();
 
     return (
@@ -11,7 +11,6 @@ export const ChatList = ({ chats, isVisible, selectedChatId, onSelectChat, anima
             chats-scroll
             transition-all duration-50 ease-out
             ${isVisible ? "opacity-100 scale-100" : "pointer-events-none"}           
-            ${animationClasses}
         `}>
             {chats.map((chat) => {
                 const isContextActive = contextMenu.visible && contextMenu.type === "chat" && contextMenu.messageData?.id === chat.id;
