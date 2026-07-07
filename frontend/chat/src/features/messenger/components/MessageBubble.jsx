@@ -4,6 +4,7 @@ import { highlightText } from "../utils/highlightText";
 import { getBubbleRadiusClass } from "../utils/bubbleRadius";
 import { QuickReactionButton } from "./QuickReactionButton";
 import { ActiveReactionBadge } from "./ActiveReactionBadge";
+import { BsFillPinAngleFill } from "react-icons/bs";
 
 export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
     const { chatSearchText, handleSetReaction } = useMessengerContext();
@@ -67,30 +68,35 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                     )}
                 </div>
 
-                <span style={{fontFamily: "Roboto"}} className="text-xs! opacity-50 leading-none ml-auto! shrink-0 select-none">
-                    {message.time?.slice(0, 5)}
-                </span>
+                <div className="flex items-center gap-1.5 ml-auto! shrink-0 select-none">
+                    {message.isPinned && (
+                        <BsFillPinAngleFill size={12} className="text-white/60 shrink-0" />
+                    )}
 
-                {message.isOwnMessage && (
-                    <div className="flex items-center relative w-2 h-3 shrink-0">
-                        <Check
-                            size={14}
-                            className={`
-                                absolute -left-1.5 -bottom-0.5 transition-colors duration-200
-                                ${message.status === "read" ? "text-[#E2D9F3]" : "text-[#FFFFFF]/60"}
-                            `}
-                        />
+                    <span className="text-xs! opacity-50 leading-none shrink-0">
+                        {message.time?.slice(0, 5)}
+                    </span>
 
-                        {message.status === "read" && (
-                            <Check 
-                                size={14}                           
-                                className="absolute text-[#E2D9F3] left-0 -bottom-0.5"
+                    {message.isOwnMessage && (
+                        <div className="flex items-center relative w-2 h-3 shrink-0">
+                            <Check
+                                size={14}
+                                className={`
+                                    absolute -left-1.5 -bottom-0.5 transition-colors duration-200
+                                    ${message.status === "read" ? "text-[#E2D9F3]" : "text-[#FFFFFF]/60"}
+                                `}
                             />
-                        )}
 
-                    </div>
-                )}
+                            {message.status === "read" && (
+                                <Check 
+                                    size={14}                           
+                                    className="absolute text-[#E2D9F3] left-0 -bottom-0.5"
+                                />
+                            )}
 
+                        </div>
+                    )}
+                </div>
             </div>
 
             {isLastMessage && (

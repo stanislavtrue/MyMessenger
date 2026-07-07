@@ -7,7 +7,7 @@ import { SidebarContextMenu } from "./SidebarContextMenu";
 import { SidebarScreen } from "./screens/SidebarScreen";
 
 export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, selectedChatId, setSelectedChatId }) => {
-    const { handleMouseDown } = useSidebarResize(sidebarWidth, setSidebarWidth);
+    const { handleMouseDown, isResizing } = useSidebarResize(sidebarWidth, setSidebarWidth);
     const { isSidebarMenuOpen, setIsSidebarMenuOpen, isSidebarSearchFocused, setIsSidebarSearchFocused, contextMenu, closeMenu, sidebarSearchText, setSidebarSearchText, isContactsMode, setIsContactsMode, closeSidebarSearch } = useMessengerContext();
     const { activeChats, contacts, filteredChats, filteredContacts, filteredMessages } = useSidebarSearch(chats, sidebarSearchText, isContactsMode);
 
@@ -74,19 +74,20 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                     />
                     
                     <SidebarContextMenu closeMenu={closeMenu} />
+
                 
                 </div>
+                {!isMobile && (
+                    <div 
+                        onMouseDown={handleMouseDown}
+                        className={`
+                            absolute top-0 right-0 w-0.5 h-full
+                            hover:bg-[#5D25AA] cursor-col-resize transition-colors
+                            ${isResizing ? "bg-[#5D25AA]" : "bg-transparent"}
+                        `}
+                    />
+                )}
             </div>
-
-            {!isMobile && (
-                <div 
-                    onMouseDown={handleMouseDown}
-                    className="
-                        absolute top-0 right-0 w-1 h-full
-                        cursor-col-resize transition-colors
-                    "
-                />
-            )}
         </div>
     );
 }

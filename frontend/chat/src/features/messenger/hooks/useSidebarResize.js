@@ -1,6 +1,12 @@
+import { useState } from "react";
+
 export const useSidebarResize = ( sidebarWidth, setSidebarWidth ) => {
+    const [isResizing, setIsResizing] = useState(false);
+
     const handleMouseDown = (e) => {
         e.preventDefault();
+
+        setIsResizing(true);
         
         const startX = e.clientX;
         const startWidth = sidebarWidth;
@@ -16,6 +22,7 @@ export const useSidebarResize = ( sidebarWidth, setSidebarWidth ) => {
         };
 
         const handleMouseUp = () => {
+            setIsResizing(false);
             document.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("mouseup", handleMouseUp);
         };
@@ -24,5 +31,5 @@ export const useSidebarResize = ( sidebarWidth, setSidebarWidth ) => {
         document.addEventListener("mouseup", handleMouseUp);
     };
 
-    return { handleMouseDown };
+    return { handleMouseDown, isResizing };
 }

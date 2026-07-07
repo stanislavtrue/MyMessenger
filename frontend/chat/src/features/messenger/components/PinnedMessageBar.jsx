@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMessengerContext } from "../context/MessengerContext"
 import { useRipple } from "@/hooks/useRipple";
 import { Pin, X } from "lucide-react";
+import { ConfirmModal } from "./ConfirmModal";
 
 export const PinnedMessageBar = ({ chat }) => {
-    const { triggerHighlight } = useMessengerContext();
+    const { triggerHighlight, handleUnpinMessage, isConfirmModalOpen, setIsConfirmModalOpen, closeConfirmModal } = useMessengerContext();
     const { ripples, createRipple } = useRipple();
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -20,6 +21,11 @@ export const PinnedMessageBar = ({ chat }) => {
 
     const safeIndex = currentIndex >= pinnedMessages.length ? pinnedMessages.length - 1 : currentIndex;
     const currentPinned = pinnedMessages[safeIndex];
+
+    const handleConfirmUnpin = () => {
+        handleUnpinMessage(chat.id, currentPinned.id);
+        closeConfirmModal();
+    };
 
     const handleBarClick = (e) => {
         createRipple(e);
@@ -52,7 +58,12 @@ export const PinnedMessageBar = ({ chat }) => {
                 rounded-3xl
             "
         >
-            <div className="flex items-center justify-center size-10 rounded-full hover:bg-[#282836]/50 shrink-0">
+            <div className="
+                flex items-center justify-center size-10 
+                rounded-full active:scale-90 active:bg-[#52526B]
+                hover:bg-[#282836]/50 shrink-0 cursor-pointer
+                transition-all duration-200
+            ">
                 <Pin size={24} className="text-[#7F88C0]"/>
             </div>
 
@@ -109,9 +120,25 @@ export const PinnedMessageBar = ({ chat }) => {
                 </div>
             </div>
 
-            <div className="flex items-center mr-1! justify-center size-10 rounded-full hover:bg-[#282836]/50 shrink-0">
+            <div 
+                onClick={() => setIsConfirmModalOpen(true)}
+                className="
+                    flex items-center mr-1! justify-center size-10 
+                    rounded-full active:scale-90 active:bg-[#52526B]
+                    hover:bg-[#282836]/50 shrink-0 cursor-pointer
+                    transition-all duration-200
+                ">
                 <X size={24} className="text-[#7F88C0]"/>
             </div>
+            <ConfirmModal 
+                isOpen={isConfirmModalOpen}
+                onClose={closeConfirmModal}
+                onConfirm={handleConfirmUnpin}
+                title="Unpin message"
+                description="Would you like to unpin this message?"
+                confirmText="UNPIN"
+                isDanger={true}
+            />
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import { SidebarSearchChats } from "../sections/SidebarSearchChats";
 import { SidebarSearchContacts } from "../sections/SidebarSearchContacts";
 import { SidebarSearchMessages } from "../sections/SidebarSearchMessages";
+import { SidebarTabs } from "../sections/SidebarTabs";
 
 export const SearchScreen = ({
     filteredChats, filteredContacts, filteredMessages,
@@ -8,10 +9,14 @@ export const SearchScreen = ({
 }) => {
     return (
         <div className="relative flex flex-col flex-1 min-h-0">
-            <SidebarSearchChats 
-                filteredChats={filteredChats}
-                handleSelectChat={handleSelectChat}
-            />
+            {filteredChats.length > 0 ? (
+                <SidebarSearchChats 
+                    filteredChats={filteredChats}
+                    handleSelectChat={handleSelectChat}
+                />
+            ) : (
+                <SidebarTabs />
+            )}
 
             <div className="absolute h-4 w-full bg-linear-to-b from-[#1F1F28] to-[#1F1F28]/10 z-10"/>
 

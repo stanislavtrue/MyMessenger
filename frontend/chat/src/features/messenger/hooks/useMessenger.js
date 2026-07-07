@@ -22,6 +22,7 @@ export const useMessenger = () => {
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
     const [sidebarSearchText, setSidebarSearchText] = useState("");
     const [isContactsMode, setIsContactsMode] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [currentUser] = useState({
         id: "main_user_id",
         displayName: "Empty",
@@ -35,24 +36,18 @@ export const useMessenger = () => {
     const { highlightMsgId, setHighlightMsgId, triggerHighlight } = useHighlightMessage();
     const { contextMenu, setContextMenu, showMenu, closeMenu } = useContextMenu();
 
-    console.log("Messenger search: ", sidebarSearchText);
-    
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
     const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
 
     useMockIncomingMessages(setChats, selectedChatId);
 
     const closeSidebarSearch = () => {
-        console.log("close");
         setIsSidebarSearchFocused(false);
         setIsContactsMode(false);
         setSidebarSearchText("");
-        console.log({
-            sidebarSearchText,
-            isContactsMode,
-            isSidebarSearchFocused,
-        });
     };
+
+    const closeConfirmModal = () => setIsConfirmModalOpen(false);
 
     const handleSetReaction = (messageId, emoji) => {
         setChats((prevChats) =>
@@ -110,9 +105,14 @@ export const useMessenger = () => {
 
                 if (pinnedMessages.some(msg => msg.id === message.id)) return chat;
 
+                const updatedMessages = chat.messages.map(msg => 
+                    msg.id === message.id ? { ...msg, isPinned: true } : msg
+                );
+
                 return {
                     ...chat,
-                    pinnedMessages: [...pinnedMessages, message] 
+                    messages: updatedMessages,
+                    pinnedMessages: [...pinnedMessages, { ...message, isPinned: true }] 
                 };
             }
 
@@ -124,8 +124,14 @@ export const useMessenger = () => {
         setChats(prevChats => prevChats.map(chat => {
             if (chat.id === chatId) {
                 const pinnedMessages = chat.pinnedMessages || [];
+
+                const updatedMessages = chat.messages.map(msg =>
+                    msg.id === messageId ? { ...msg, isPinned: false } : msg
+                );
+
                 return {
                     ...chat,
+                    messages: updatedMessages,
                     pinnedMessages: pinnedMessages.filter(msg => msg.id !== messageId) 
                 };
             }
@@ -232,6 +238,8 @@ export const useMessenger = () => {
         isSidebarSearchFocused,
         setIsSidebarSearchFocused,
         closeSidebarSearch,
+        isConfirmModalOpen,
+        closeConfirmModal,
         isChatSearchFocused,
         closeChatSearch: chatSearch.closeChatSearch,
         replyToMessage,
@@ -285,6 +293,10 @@ export const useMessenger = () => {
         isEmojiPickerOpen,
         setIsEmojiPickerOpen,
         handleSetReaction,
+
+        isConfirmModalOpen,
+        setIsConfirmModalOpen,
+        closeConfirmModal,
 
         toast,
         showToast,

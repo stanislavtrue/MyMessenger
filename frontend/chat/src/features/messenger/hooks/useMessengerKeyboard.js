@@ -10,6 +10,8 @@ export const useMessengerKeyboard = ({
     isSidebarSearchFocused,
     setIsSidebarSearchFocused,
     closeSidebarSearch,
+    isConfirmModalOpen,
+    closeConfirmModal,
     isChatSearchFocused,
     closeChatSearch,
     replyToMessage,
@@ -21,6 +23,11 @@ export const useMessengerKeyboard = ({
     useEffect(() => {
         const handleEscape = (event) => {
             if (event.key !== "Escape") return;
+
+            if (isConfirmModalOpen) {
+                closeConfirmModal();
+                return;
+            }
 
             if (contextMenuVisible) {
                 closeMenu();
@@ -64,6 +71,7 @@ export const useMessengerKeyboard = ({
         };
 
     }, [
+        isConfirmModalOpen,
         contextMenuVisible,
         isSidebarMenuOpen,
         isEmojiPickerOpen,
