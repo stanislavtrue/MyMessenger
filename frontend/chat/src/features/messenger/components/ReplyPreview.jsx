@@ -4,13 +4,23 @@ import { useMessengerContext } from "../context/MessengerContext";
 import { useRipple } from "@/hooks/useRipple";
 
 export const ReplyPreview = ({ replyPreview, replyToMessage, onClose }) => {
-    const { selectedChat, currentUser } = useMessengerContext();
+    const { selectedChat, currentUser, triggerHighlight } = useMessengerContext();
     const { ripples, createRipple } = useRipple();
 
     if (!replyPreview) return null;
 
     const handleBarClick = (e) => {
         createRipple(e);
+        
+        const element = document.getElementById(`msg-${replyPreview.id}`);
+        if (element) {
+            element.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            triggerHighlight(replyPreview.id);
+        }
     }
 
     const replyTargetName = replyPreview.isOwnMessage ? currentUser.displayName : selectedChat.user.displayName;

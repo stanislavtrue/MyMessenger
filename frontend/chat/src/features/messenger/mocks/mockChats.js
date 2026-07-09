@@ -90,7 +90,13 @@ export const mockChats = [
                 time: "12.30",
                 date: "2026-05-30",
                 isOwnMessage: true,
-                status: "sent"
+                status: "sent",
+                reactions: [
+                    {
+                        emoji: "❤️",
+                        userId: "user_cena"
+                    }
+                ]
             },
             {
                 id: 11,

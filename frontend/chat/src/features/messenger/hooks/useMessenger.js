@@ -57,11 +57,37 @@ export const useMessenger = () => {
                 const updatedMessages = chat.messages.map((msg) => {
                     if (msg.id !== messageId) return msg;
 
-                    const isSameReaction = msg.reaction === emoji;
+                    const currentReactions = msg.reactions || [];
+
+                    const existingReactionIndex = currentReactions.findIndex(
+                        (r) => r.userId === currentUser.id
+                    );
+
+                    let updatedReactions = [...currentReactions];
+
+                    if (existingReactionIndex !== -1) {
+                        const existingReaction = currentReactions[existingReactionIndex];
+
+                        if (existingReaction.emoji === emoji) {
+                            updatedReactions = updatedReactions.filter(
+                                (r) => r.userId !== currentUser.id
+                            );
+                        } else {
+                            updatedReactions[existingReactionIndex] = {
+                                emoji,
+                                userId: currentUser.id
+                            };
+                        }
+                    } else {
+                        updatedReactions.push({
+                            emoji,
+                            userId: currentUser.id
+                        });
+                    }
 
                     return {
                         ...msg,
-                        reaction: isSameReaction ? null : emoji,
+                        reactions: updatedReactions
                     };
                 });
 
@@ -172,6 +198,11 @@ export const useMessenger = () => {
 
         const messageId = Date.now();
 
+        let senderName = "";
+        if (replyToMessage) {
+            senderName = replyToMessage.isOwnMessage ? currentUser.displayName : selectedChat.user.displayName;
+        }
+
         const newMessage = {
             id: messageId,
             text,
@@ -183,6 +214,7 @@ export const useMessenger = () => {
                 id: replyToMessage.id,
                 text: replyToMessage.text,
                 isOwnMessage: replyToMessage.isOwnMessage,
+                senderName: senderName
             } : null
         };
         

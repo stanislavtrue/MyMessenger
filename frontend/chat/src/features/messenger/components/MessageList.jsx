@@ -1,5 +1,5 @@
 import { formatDividerDate } from "../utils/formatDividerDate";
-import { MessageBubble } from "./MessageBubble";
+import { MessageBubble } from "./MessageBubble/MessageBubble";
 import { useMessengerContext } from "../context/MessengerContext";
 import { ContextMenuWrapper } from "./ContextMenuWrapper";
 import { useMessageSearchNavigation } from "../hooks/useMessageSearchNavigation";
