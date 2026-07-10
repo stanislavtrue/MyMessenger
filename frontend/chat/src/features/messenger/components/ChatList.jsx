@@ -1,4 +1,4 @@
-import { ChatItem } from "@/features/messenger/components/ChatItem";
+import { ChatItem } from "@/features/messenger/components/ChatItem/ChatItem";
 import { useMessengerContext } from "@/features/messenger/context/MessengerContext";
 
 export const ChatList = ({ chats, isVisible, selectedChatId, onSelectChat }) => {
