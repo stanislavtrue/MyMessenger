@@ -3,14 +3,14 @@ import { mockChats } from "../mocks/mockChats";
 import { formatDate } from "@/utils/formatDate";
 import { formatTime } from "@/utils/formatTime";
 
-import { useChatSearch } from "./useChatSearch";
+import { useChatSearch } from "./chat/useChatSearch";
 import { useToast } from "../../../hooks/useToast";
 import { useMessengerKeyboard } from "./useMessengerKeyboard";
-import { useContextMenu } from "./useContextMenu";
+import { useContextMenu } from "./contextMenu/useContextMenu";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
-import { useHighlightMessage } from "./useHighlightMessage";
-import { useReply } from "./useReply";
-import { useMockIncomingMessages } from "./useMockIncomingMessages";
+import { useHighlightMessage } from "./chat/useHighlightMessage";
+import { useMockIncomingMessages } from "./chat/useMockIncomingMessages";
+import { useReply } from "./chat/useReply";
 
 export const useMessenger = () => {
     const [chats, setChats] = useState(mockChats);
@@ -49,6 +49,7 @@ export const useMessenger = () => {
     };
 
     const closeConfirmModal = () => setIsConfirmModalOpen(false);
+    const closeAddContact = () => setIsAddContactOpen(false);
 
     const handleAddContact = ({ firstName, lastName, username }) => {
         const newChatId = Date.now();
@@ -71,7 +72,7 @@ export const useMessenger = () => {
         };
 
         setChats(prevChats => [newChat, ...prevChats]);
-        setIsAddContactOpen(false);
+        closeAddContact();
     };
 
     const handleSetReaction = (messageId, emoji) => {
@@ -297,6 +298,8 @@ export const useMessenger = () => {
         closeSidebarSearch,
         isConfirmModalOpen,
         closeConfirmModal,
+        isAddContactOpen,
+        closeAddContact,
         isChatSearchFocused,
         closeChatSearch: chatSearch.closeChatSearch,
         replyToMessage,
@@ -327,6 +330,7 @@ export const useMessenger = () => {
 
         isAddContactOpen,
         setIsAddContactOpen,
+        closeAddContact,
         handleAddContact,
 
         contextMenu,
