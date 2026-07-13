@@ -23,6 +23,7 @@ export const useMessenger = () => {
     const [sidebarSearchText, setSidebarSearchText] = useState("");
     const [isContactsMode, setIsContactsMode] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isAddContactOpen, setIsAddContactOpen] = useState(false);
     const [currentUser] = useState({
         id: "main_user_id",
         displayName: "Empty",
@@ -48,6 +49,30 @@ export const useMessenger = () => {
     };
 
     const closeConfirmModal = () => setIsConfirmModalOpen(false);
+
+    const handleAddContact = ({ firstName, lastName, username }) => {
+        const newChatId = Date.now();
+
+        const displayName = `${firstName} ${lastName}`.trim();
+
+        const newChat = {
+            id:newChatId,
+            user: {
+                id: `user_${username.toLowerCase()}`,
+                displayName: displayName,
+                username: username.replace("@", "").toLowerCase(),
+                avatar: null,
+                status: "offline",
+            },
+            lastMessage: "",
+            time: "",
+            unreadCount: 0,
+            messages: [],
+        };
+
+        setChats(prevChats => [newChat, ...prevChats]);
+        setIsAddContactOpen(false);
+    };
 
     const handleSetReaction = (messageId, emoji) => {
         setChats((prevChats) =>
@@ -299,6 +324,10 @@ export const useMessenger = () => {
         isChatSearchFocused,
         setIsChatSearchFocused,
         ...chatSearch,
+
+        isAddContactOpen,
+        setIsAddContactOpen,
+        handleAddContact,
 
         contextMenu,
         setContextMenu,
