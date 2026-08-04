@@ -1,14 +1,20 @@
 using Chat.API.Extensions;
-using Chat.Core.Interfaces;
-using Chat.Core.Services;
+using Chat.Domain.Interfaces;
+using Chat.Domain.Services;
 using Chat.Infrastructure;
+using Chat.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<ChatDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<UsersService>();
