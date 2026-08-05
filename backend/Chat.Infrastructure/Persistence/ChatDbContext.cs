@@ -8,4 +8,9 @@ public class ChatDbContext : DbContext
     public ChatDbContext(DbContextOptions<ChatDbContext> opitons) : base(opitons)
     {
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ChatDbContext).Assembly);
+    }
 }
