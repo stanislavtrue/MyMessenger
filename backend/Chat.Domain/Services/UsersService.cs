@@ -1,7 +1,7 @@
-using Chat.Core.Interfaces;
-using Chat.Core.Models;
+using Chat.Domain.Interfaces;
+using Chat.Domain.Models;
 
-namespace Chat.Core.Services;
+namespace Chat.Domain.Services;
 public class UsersService
 {
     private readonly IUsersRepository _usersRepository;
@@ -19,12 +19,12 @@ public class UsersService
     {
         var passwordHash = _passwordHasher.Generate(password);
         var user = User.Create(Guid.NewGuid(), username, passwordHash, email);
-        _usersRepository.Add(user);
+        await _usersRepository.Add(user);
     }
 
     public async Task<string> Login(string email, string password)
     {
-        var user = _usersRepository.GetByEmail(email);
+        var user = await _usersRepository.GetByEmail(email);
         var result = _passwordHasher.Verify(password, user.PasswordHash);
         if (result == false)
         {

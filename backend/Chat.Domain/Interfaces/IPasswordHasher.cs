@@ -1,4 +1,4 @@
-namespace Chat.Core.Interfaces;
+namespace Chat.Domain.Interfaces;
 public interface IPasswordHasher
 {
     string Generate(string password);

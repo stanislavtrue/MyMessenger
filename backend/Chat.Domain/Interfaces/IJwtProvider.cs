@@ -1,6 +1,6 @@
-using Chat.Core.Models;
+using Chat.Domain.Models;
 
-namespace Chat.Core.Interfaces;
+namespace Chat.Domain.Interfaces;
 public interface IJwtProvider
 {
     string GenerateToken(User user);

@@ -1,8 +1,9 @@
 using Chat.API.Extensions;
 using Chat.Domain.Interfaces;
 using Chat.Domain.Services;
-using Chat.Infrastructure;
+using Chat.Infrastructure.Authentication;
 using Chat.Infrastructure.Persistence;
+using Chat.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

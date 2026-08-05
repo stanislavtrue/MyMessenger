@@ -1,5 +1,5 @@
 using System.Text;
-using Chat.Infrastructure;
+using Chat.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 

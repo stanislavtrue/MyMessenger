@@ -1,6 +1,6 @@
-using Chat.Core.Interfaces;
+using Chat.Domain.Interfaces;
 
-namespace Chat.Infrastructure;
+namespace Chat.Infrastructure.Authentication;
 public class PasswordHasher : IPasswordHasher
 {
     public string Generate(string password) =>

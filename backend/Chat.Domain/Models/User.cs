@@ -1,4 +1,4 @@
-namespace Chat.Core.Models;
+namespace Chat.Domain.Models;
 public class User
 {
     public Guid Id { get; set; }

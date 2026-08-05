@@ -1,4 +1,4 @@
-namespace Chat.Infrastructure;
+namespace Chat.Infrastructure.Authentication;
 public class JwtOptions
 {
     public string SecretKey { get; set; } = string.Empty;

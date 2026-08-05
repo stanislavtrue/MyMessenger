@@ -3,10 +3,10 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Chat.Core.Interfaces;
-using Chat.Core.Models;
+using Chat.Domain.Interfaces;
+using Chat.Domain.Models;
 
-namespace Chat.Infrastructure;
+namespace Chat.Infrastructure.Authentication;
 public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
 {
     private readonly JwtOptions _options = options.Value;
