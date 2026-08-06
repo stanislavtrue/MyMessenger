@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ChatDbContext>(options =>
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IRefreshTokensRepository, RefreshTokensRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<UsersService>();

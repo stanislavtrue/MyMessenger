@@ -1,4 +1,5 @@
 using Chat.API.Contracts.Auth;
+using Chat.Domain.Interfaces;
 using Chat.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,25 @@ namespace Chat.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly UsersService _usersService;
+    private readonly IUsersRepository _usersRepository;
+    private readonly IRefreshTokensRepository _refreshTokenRepository;
 
-    public AuthController(UsersService usersService)
+    public AuthController(UsersService usersService, IUsersRepository usersRepository, IRefreshTokensRepository refreshTokensRepository)
     {
         _usersService = usersService;
+        _usersRepository = usersRepository;
+        _refreshTokenRepository = refreshTokensRepository;
+    }
+
+    private CookieOptions RefreshCookieOptions()
+    {
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
+        };
     }
 
     [HttpPost("register")]
@@ -26,17 +42,48 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserRequest request) 
     {
-        var token = await _usersService.Login(request.Email, request.Password);
+        var result = await _usersService.Login(request.Email, request.Password);
 
-        Response.Cookies.Append("access_token", token);
+        Response.Cookies.Append(
+            "refresh_token", 
+            result.RefreshToken, 
+            RefreshCookieOptions());
 
-        return Ok(new { Token = token });
+        return Ok(new { accessToken = result.AccessToken });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh()
+    {
+        var token = Request.Cookies["refresh_token"];
+
+        if (token is null)
+            return Unauthorized();
+
+        var result = await _usersService.Refresh(token);
+
+        if (result is null)
+            return Unauthorized();
+        
+        Response.Cookies.Append(
+            "refresh_token",
+            result.RefreshToken,
+            RefreshCookieOptions());
+
+        return Ok(new { accessToken = result.AccessToken });
     }
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult Me()
+    public async Task<IActionResult> Me()
     {
-        return Ok();
+        var userIdClaim = User.FindFirst("userId")!.Value;
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var user = await _usersRepository.GetById(userId);
+
+        return Ok(user.Username);
     }
 }

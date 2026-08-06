@@ -5,13 +5,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Chat.Domain.Interfaces;
 using Chat.Domain.Models;
+using System.Security.Cryptography;
 
 namespace Chat.Infrastructure.Authentication;
 public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
 {
     private readonly JwtOptions _options = options.Value;
 
-    public string GenerateToken(User user)
+    public string GenerateAccessToken(User user)
     {
         Claim[] claims = [new("userId", user.Id.ToString())];
 
@@ -22,10 +23,15 @@ public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
         var token = new JwtSecurityToken(
             claims: claims,
             signingCredentials: signingCredentials,
-            expires: DateTime.UtcNow.AddHours(_options.ExpiresHours));
+            expires: DateTime.UtcNow.AddMinutes(_options.ExpiresMinutes));
 
         var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
         return tokenValue;
+    }
+
+    public string GenerateRefreshTokenValue()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }

@@ -35,4 +35,13 @@ public class UsersRepository : IUsersRepository
 
         return User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email);
     }
+
+    public async Task<User> GetById(Guid id)
+    {
+        var userEntity = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new InvalidOperationException("User not found.");
+
+        return User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email);
+    }
 }
