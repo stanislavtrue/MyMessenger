@@ -31,7 +31,7 @@ public class UsersRepository : IUsersRepository
     {
         var userEntity = await _context.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == email) ?? throw new InvalidOperationException("User not found.");
+            .FirstOrDefaultAsync(u => u.Email == email) ?? throw new InvalidCredentialsException();
 
         return User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email);
     }
@@ -40,7 +40,7 @@ public class UsersRepository : IUsersRepository
     {
         var userEntity = await _context.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new InvalidOperationException("User not found.");
+            .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
 
         return User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email);
     }

@@ -36,7 +36,7 @@ public class UsersService
 
         if (isValid == false)
         {
-            throw new Exception("Failed to login");
+            throw new InvalidCredentialsException("Failed to login");
         }
 
         foreach(var token in activeRefreshTokens)
@@ -59,10 +59,10 @@ public class UsersService
         var refreshToken = await _refreshTokensRepository.GetByToken(refreshTokenValue);
 
         if (refreshToken is null)
-            throw new InvalidOperationException("Token not found");
+            throw new RefreshTokenNotFoundException();
         
         if (userId != refreshToken.UserId)
-            throw new InvalidOperationException("Invalid refresh token");
+            throw new InvalidRefreshTokenException();
 
         refreshToken.Revoke();
 

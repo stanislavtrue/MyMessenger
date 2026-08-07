@@ -1,4 +1,5 @@
 using Chat.API.Extensions;
+using Chat.API.Middlewares;
 using Chat.Domain.Interfaces;
 using Chat.Domain.Services;
 using Chat.Infrastructure.Authentication;
@@ -25,6 +26,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseWebSockets();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

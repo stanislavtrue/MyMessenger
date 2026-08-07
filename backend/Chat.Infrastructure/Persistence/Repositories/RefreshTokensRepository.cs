@@ -32,7 +32,7 @@ public class RefreshTokensRepository : IRefreshTokensRepository
     {
         var refreshTokenEntity = await _context.RefreshTokens
             .AsNoTracking()
-            .FirstOrDefaultAsync(rt => rt.Token == token) ?? throw new InvalidOperationException("Token not found");
+            .FirstOrDefaultAsync(rt => rt.Token == token) ?? throw new RefreshTokenNotFoundException();
 
         return RefreshToken.Restore(
             refreshTokenEntity.Id, 
@@ -72,7 +72,7 @@ public class RefreshTokensRepository : IRefreshTokensRepository
     public async Task Update(RefreshToken token)
     {
         var refreshTokenEntity = await _context.RefreshTokens
-            .FirstOrDefaultAsync(rt => rt.Id == token.Id) ?? throw new InvalidOperationException("Token not found");
+            .FirstOrDefaultAsync(rt => rt.Id == token.Id) ?? throw new RefreshTokenNotFoundException();
 
         refreshTokenEntity.RevokedAt = token.RevokedAt;
 
