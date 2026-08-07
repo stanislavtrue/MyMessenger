@@ -11,13 +11,11 @@ public class AuthController : ControllerBase
 {
     private readonly UsersService _usersService;
     private readonly IUsersRepository _usersRepository;
-    private readonly IRefreshTokensRepository _refreshTokenRepository;
 
-    public AuthController(UsersService usersService, IUsersRepository usersRepository, IRefreshTokensRepository refreshTokensRepository)
+    public AuthController(UsersService usersService, IUsersRepository usersRepository)
     {
         _usersService = usersService;
         _usersRepository = usersRepository;
-        _refreshTokenRepository = refreshTokensRepository;
     }
 
     private CookieOptions RefreshCookieOptions()
@@ -50,6 +48,27 @@ public class AuthController : ControllerBase
             RefreshCookieOptions());
 
         return Ok(new { accessToken = result.AccessToken });
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var token = Request.Cookies["refresh_token"];
+
+        var userIdClaim = User.FindFirst("userId")!.Value;
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        if (token is null)
+            return Unauthorized();
+        
+        await _usersService.Logout(userId, token);
+
+        Response.Cookies.Delete("refresh_token");
+
+        return Ok();
     }
 
     [HttpPost("refresh")]

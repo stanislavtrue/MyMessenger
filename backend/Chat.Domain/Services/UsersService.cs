@@ -46,6 +46,21 @@ public class UsersService
         return new LoginResult(accessToken, refreshToken.Token);
     }
 
+    public async Task Logout(Guid userId ,string refreshTokenValue)
+    {
+        var refreshToken = await _refreshTokensRepository.GetByToken(refreshTokenValue);
+
+        if (refreshToken is null)
+            throw new InvalidOperationException("Token not found");
+        
+        if (userId != refreshToken.UserId)
+            throw new InvalidOperationException("Invalid refresh token");
+
+        refreshToken.Revoke();
+        
+        await _refreshTokensRepository.Update(refreshToken);
+    }
+
     public async Task<LoginResult?> Refresh(string refreshTokenValue)
     {
         var refreshToken = await _refreshTokensRepository.GetByToken(refreshTokenValue);
@@ -60,7 +75,7 @@ public class UsersService
             return null;
         }
 
-        if (!refreshToken.IsActive || refreshToken.IsRevoked)
+        if (!refreshToken.IsActive)
             return null;
 
         var user = await _usersRepository.GetById(refreshToken.UserId);
