@@ -30,11 +30,19 @@ public class UsersService
     {
         var user = await _usersRepository.GetByEmail(email);
 
+        var activeRefreshTokens = await _refreshTokensRepository.GetActiveByUserId(user.Id);
+
         var isValid = _passwordHasher.Verify(password, user.PasswordHash);
 
         if (isValid == false)
         {
             throw new Exception("Failed to login");
+        }
+
+        foreach(var token in activeRefreshTokens)
+        {
+            token.Revoke();
+            await _refreshTokensRepository.Update(token);
         }
 
         var accessToken = _jwtProvider.GenerateAccessToken(user);
@@ -57,7 +65,7 @@ public class UsersService
             throw new InvalidOperationException("Invalid refresh token");
 
         refreshToken.Revoke();
-        
+
         await _refreshTokensRepository.Update(refreshToken);
     }
 

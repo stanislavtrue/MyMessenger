@@ -43,6 +43,32 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             refreshTokenEntity.RevokedAt);
     }
 
+    public async Task<List<RefreshToken>> GetActiveByUserId(Guid userId)
+    {
+        var refreshTokenEntities = await _context.RefreshTokens
+            .Where(rt => 
+                rt.UserId == userId && 
+                rt.RevokedAt == null && 
+                rt.ExpiresAt > DateTimeOffset.UtcNow)
+            .ToListAsync();
+
+        var refreshTokens = new List<RefreshToken>();
+
+        foreach(var tokenEntity in refreshTokenEntities)
+        {
+            refreshTokens.Add(RefreshToken.Restore(
+                tokenEntity.Id,
+                tokenEntity.UserId,
+                tokenEntity.Token,
+                tokenEntity.ExpiresAt,
+                tokenEntity.CreatedAt,
+                tokenEntity.RevokedAt
+            ));
+        }
+
+        return refreshTokens;
+    }
+
     public async Task Update(RefreshToken token)
     {
         var refreshTokenEntity = await _context.RefreshTokens
