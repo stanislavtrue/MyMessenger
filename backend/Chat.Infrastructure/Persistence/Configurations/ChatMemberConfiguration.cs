@@ -1,0 +1,23 @@
+using Chat.Infrastructure.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Chat.Infrastructure.Persistence.Configurations;
+public class ChatMemberConfiguration : IEntityTypeConfiguration<ChatMemberEntity>
+{
+    public void Configure(EntityTypeBuilder<ChatMemberEntity> builder)
+    {
+        builder.HasKey(cm => cm.Id);
+
+        builder.HasIndex(cm => cm.ChatId);
+        builder.HasIndex(cm => cm.UserId);
+
+        builder.HasOne(cm => cm.ChatRoom)
+            .WithMany(cr => cr.Members)
+            .HasForeignKey(cm => cm.ChatId);
+
+        builder.HasOne(cm => cm.User)
+            .WithMany(u => u.ChatMembers)
+            .HasForeignKey(cm => cm.UserId);
+    }
+}

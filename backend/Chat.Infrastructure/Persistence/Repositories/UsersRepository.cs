@@ -24,7 +24,6 @@ public class UsersRepository : IUsersRepository
         };
 
         await _context.Users.AddAsync(userEntity);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<User> GetByEmail(string email)

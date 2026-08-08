@@ -25,7 +25,6 @@ public class RefreshTokensRepository : IRefreshTokensRepository
         };
 
         await _context.AddAsync(refreshTokenEntity);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<RefreshToken?> GetByToken(string token)
@@ -75,7 +74,5 @@ public class RefreshTokensRepository : IRefreshTokensRepository
             .FirstOrDefaultAsync(rt => rt.Id == token.Id) ?? throw new RefreshTokenNotFoundException();
 
         refreshTokenEntity.RevokedAt = token.RevokedAt;
-
-        await _context.SaveChangesAsync();
     }
 }

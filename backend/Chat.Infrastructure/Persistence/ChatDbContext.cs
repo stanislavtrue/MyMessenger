@@ -5,7 +5,10 @@ namespace Chat.Infrastructure.Persistence;
 public class ChatDbContext : DbContext
 {
     public DbSet<UserEntity> Users => Set<UserEntity>();
-    public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+    public DbSet<MessageEntity> Messages => Set<MessageEntity>();
+    public DbSet<ChatRoomEntity> ChatRooms => Set<ChatRoomEntity>();
+    public DbSet<ChatMemberEntity> ChatMembers => Set<ChatMemberEntity>();
+    public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>(); 
     public ChatDbContext(DbContextOptions<ChatDbContext> opitons) : base(opitons)
     {
     }

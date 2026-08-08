@@ -8,13 +8,15 @@ public class UsersService
     private readonly IRefreshTokensRepository _refreshTokensRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtProvider _jwtProvider;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UsersService(IUsersRepository usersRepository, IRefreshTokensRepository refreshTokensRepository, IPasswordHasher passwordHasher, IJwtProvider jwtProvider)
+    public UsersService(IUsersRepository usersRepository, IRefreshTokensRepository refreshTokensRepository, IPasswordHasher passwordHasher, IJwtProvider jwtProvider, IUnitOfWork unitOfWOrk)
     {
         _usersRepository = usersRepository;
         _refreshTokensRepository = refreshTokensRepository;
         _passwordHasher = passwordHasher;
         _jwtProvider = jwtProvider;
+        _unitOfWork = unitOfWOrk;
     }
 
     public async Task Register(string username, string email, string password)
@@ -24,6 +26,8 @@ public class UsersService
         var user = User.Create(Guid.NewGuid(), username, passwordHash, email);
 
         await _usersRepository.Add(user);
+
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<LoginResult> Login(string email, string password)
@@ -51,6 +55,8 @@ public class UsersService
 
         await _refreshTokensRepository.Add(refreshToken);
 
+        await _unitOfWork.SaveChangesAsync();
+
         return new LoginResult(accessToken, refreshToken.Token);
     }
 
@@ -67,6 +73,8 @@ public class UsersService
         refreshToken.Revoke();
 
         await _refreshTokensRepository.Update(refreshToken);
+
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<LoginResult?> Refresh(string refreshTokenValue)
@@ -80,6 +88,9 @@ public class UsersService
         {
             refreshToken.Revoke();
             await _refreshTokensRepository.Update(refreshToken);
+
+            await _unitOfWork.SaveChangesAsync();
+
             return null;
         }
 
@@ -100,6 +111,8 @@ public class UsersService
         await _refreshTokensRepository.Update(refreshToken);
 
         await _refreshTokensRepository.Add(newRefreshToken);
+
+        await _unitOfWork.SaveChangesAsync();
 
         return new LoginResult(accessToken, newRefreshToken.Token);
     }

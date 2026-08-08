@@ -3,6 +3,7 @@ using System;
 using Chat.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Chat.Infrastructure.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260807212924_AddMessages")]
+    partial class AddMessages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,46 +25,6 @@ namespace Chat.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatMemberEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ChatId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChatId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ChatMembers");
-                });
-
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Chats");
-                });
-
             modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.MessageEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -69,9 +32,6 @@ namespace Chat.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ChatId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ChatRoomEntityId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("SenderId")
@@ -86,8 +46,6 @@ namespace Chat.Infrastructure.Migrations
                         .HasColumnType("character varying(2000)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChatRoomEntityId");
 
                     b.ToTable("Messages");
                 });
@@ -155,32 +113,6 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatMemberEntity", b =>
-                {
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", "ChatRoom")
-                        .WithMany("Members")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.UserEntity", "User")
-                        .WithMany("ChatMembers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChatRoom");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.MessageEntity", b =>
-                {
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", null)
-                        .WithMany("Messages")
-                        .HasForeignKey("ChatRoomEntityId");
-                });
-
             modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.RefreshTokenEntity", b =>
                 {
                     b.HasOne("Chat.Infrastructure.Persistence.Entities.UserEntity", "User")
@@ -192,17 +124,8 @@ namespace Chat.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", b =>
-                {
-                    b.Navigation("Members");
-
-                    b.Navigation("Messages");
-                });
-
             modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.UserEntity", b =>
                 {
-                    b.Navigation("ChatMembers");
-
                     b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618

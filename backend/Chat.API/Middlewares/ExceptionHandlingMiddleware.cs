@@ -39,6 +39,14 @@ public class ExceptionHandlingMiddleware
         {
             await WriteError(context, StatusCodes.Status404NotFound, "UserNotFound", ex.Message);
         }
+        catch (ChatNotFoundException ex)
+        {
+            await WriteError(context, StatusCodes.Status404NotFound, "ChatNotFound", ex.Message);
+        }
+        catch (ChatAccessDeniedException ex)
+        {
+            await WriteError(context, StatusCodes.Status403Forbidden, "Forbidden", ex.Message);
+        }
         catch (Exception)
         {
             await WriteError(context, StatusCodes.Status500InternalServerError, "InternalServerError", "Internal server error");
