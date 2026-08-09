@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { mockChats } from "../mocks/mockChats";
 import { formatDate } from "@/utils/formatDate";
 import { formatTime } from "@/utils/formatTime";
@@ -11,6 +11,7 @@ import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { useHighlightMessage } from "./chat/useHighlightMessage";
 import { useMockIncomingMessages } from "./chat/useMockIncomingMessages";
 import { useReply } from "./chat/useReply";
+import connection from "../services/chatHub";
 
 export const useMessenger = () => {
     const [chats, setChats] = useState(mockChats);
@@ -25,7 +26,7 @@ export const useMessenger = () => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isAddContactOpen, setIsAddContactOpen] = useState(false);
     const [currentUser] = useState({
-        id: "main_user_id",
+        id: "e660e148-03c7-4d3c-baca-2b7d8a185626",
         displayName: "Empty",
         username: "empty_dev",
         avatar: "/MainUserAvatar.jpg"
@@ -125,9 +126,27 @@ export const useMessenger = () => {
         );
     };
 
-    const handleSelectChat = (chatId) => {
+    const handleSelectChat = async (chatId) => {
         closeMenu();
         setSelectedChatId(chatId);
+
+        const accessToken = localStorage.getItem("accessToken");
+
+        const response = await fetch(`http://localhost:5079/api/messages/${chatId}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+
+        const messages = await response.json();
+
+        if (!response.ok) {
+            console.log(response.statusText);
+            return;
+        }
+
+        console.log(messages);
 
         setIsChatSearchFocused(false);
         if (chatSearch?.setChatSearchText) {
@@ -139,8 +158,11 @@ export const useMessenger = () => {
                 return {
                     ...chat,
                     unreadCount: 0,
-                    messages: chat.messages.map(msg => ({
+                    messages: messages.map(msg => ({
                         ...msg,
+                        isOwnMessage: msg.senderId === currentUser.id,
+                        time: formatTime(msg.sentAt),
+                        date: formatDate(msg.sentAt),
                         status: "read"
                     }))
                 };
@@ -219,10 +241,16 @@ export const useMessenger = () => {
         );
     };
 
-    const handleSendMessage = (text) => {
+    const handleSendMessage = async (text) => {
         if (!text.trim() || !selectedChatId) return;
 
-        const messageId = Date.now();
+        await connection.invoke(
+            "SendMessage",
+            selectedChatId,
+            text.trim()
+        );
+
+        {/*const messageId = Date.now();
 
         let senderName = "";
         if (replyToMessage) {
@@ -258,33 +286,41 @@ export const useMessenger = () => {
             })
         );
 
-        setTimeout(() => {
-            const friendMessage = {
-                id: Date.now() + 1,
-                text: "Hello!",
-                time: formatTime(),
-                date: formatDate(),
-                isOwnMessage: false,
-                status: "sent"
-            };
+        closeReply();*/}
+    };
+
+    useEffect(() => {
+        const handleReceiveMessage = (message) => {
+            const newMessage = {
+                id: message.id,
+                text: message.text,
+                time: formatTime(message.sentAt),
+                date: formatDate(message.sentAt),
+                isOwnMessage: message.senderId == currentUser.id,
+                status: "sent",
+                replyTo: null
+            }
 
             setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === selectedChatId) {
+                if (chat.id === message.chatId) {
                     return {
                         ...chat,
-                        lastMessage: friendMessage.text,
-                        time: formatTime(),
-                        unreadCount: 0,
-                        messages: [...chat.messages, friendMessage]
+                        lastMessage: message.text,
+                        time: formatTime(message.sentAt),
+                        messages: [...chat.messages, newMessage]
                     };
                 }
-                
+
                 return chat;
             }));
-        }, 3000);
+        };
 
-        closeReply();
-    };
+        connection.on("ReceiveMessage", handleReceiveMessage)
+
+        return () => {
+            connection.off("ReceiveMessage", handleReceiveMessage);
+        };
+    }, []);
 
     useMessengerKeyboard({
         contextMenuVisible: contextMenu.visible,

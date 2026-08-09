@@ -2,11 +2,30 @@ import { BsExclamationCircleFill } from "react-icons/bs";
 import { MessengerProvider, useMessengerContext } from "@/features/messenger/context/MessengerContext";
 import { ChatArea } from "@/features/messenger/components/chat/ChatArea";
 import { Sidebar } from "./features/messenger/components/sidebar/Sidebar";
+import connection from "./features/messenger/services/chatHub";
+import { useEffect } from "react";
 
 export const MessengerContent = () => {
     const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage, toast } = useMessengerContext();
 
     const isMobile = windowWidth < 768;
+
+    const chatId = "3d3e8f29-d7c6-42cb-9150-8136810fb347";
+
+    useEffect(() => {
+        const connect = async () => {
+            await connection.start();
+
+            console.log("Connected to ChatHub");
+
+            await connection.invoke("JoinChat", chatId);
+
+            console.log("Joined chat");
+        };
+
+        connect().catch(error => console.error(error));
+    }, []);
+
 
     return (
         <div className="h-screen flex overflow-hidden relative" >
@@ -16,7 +35,7 @@ export const MessengerContent = () => {
                     background: "linear-gradient(135deg,#330033,#6600ff,#ff9900)",
 
                     WebkitMaskImage: "url('/background.png')",
-                    WebkitMastRepeat: "repeat",
+                    WebkitMaskRepeat: "repeat",
                     WebkitMaskSize: "450px",
 
                     maskImage: "url('/background.png')",

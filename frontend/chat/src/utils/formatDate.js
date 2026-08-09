@@ -1,5 +1,5 @@
-export const formatDate = () => {
-    const now = new Date();
+export const formatDate = (date) => {
+    const now = new Date(date);
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');

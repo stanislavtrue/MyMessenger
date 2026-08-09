@@ -1,6 +1,6 @@
 export const mockChats = [
     {
-        id: 1,
+        id: "3d3e8f29-d7c6-42cb-9150-8136810fb347",
         user: {
             id: "user_cena",
             displayName: "John Cena",
