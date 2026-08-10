@@ -43,4 +43,21 @@ public class UsersRepository : IUsersRepository
 
         return User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email);
     }
+
+    public async Task<List<User>> GetByIds(List<Guid> ids)
+    {
+        var userEntities = await _context.Users
+            .AsNoTracking()
+            .Where(u => ids.Contains(u.Id))
+            .ToListAsync();
+
+        var users = new List<User>();
+
+        foreach(var userEntity in userEntities)
+        {
+            users.Add(User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email));
+        }
+
+        return users;
+    }
 }

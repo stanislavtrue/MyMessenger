@@ -25,12 +25,20 @@ public class ChatRoomsRepository : IChatRoomsRepository
         await _context.ChatRooms.AddAsync(chatEntity);
     }
 
-    public async Task<ChatRoom> GetById(Guid id)
+    public async Task<List<ChatRoom>> GetByIds(List<Guid> chatIds)
     {
-        var chatEntity = await _context.ChatRooms
+        var chatEntities = await _context.ChatRooms
             .AsNoTracking()
-            .FirstOrDefaultAsync(cr => cr.Id == id) ?? throw new ChatNotFoundException();
+            .Where(chat => chatIds.Contains(chat.Id))
+            .ToListAsync();
 
-        return ChatRoom.Restore(chatEntity.Id, chatEntity.Name, chatEntity.CreatedAt);
+        var chatRooms = new List<ChatRoom>();
+
+        foreach(var chatEntity in chatEntities)
+        {
+            chatRooms.Add(ChatRoom.Restore(chatEntity.Id, chatEntity.Name, chatEntity.CreatedAt));
+        }
+
+        return chatRooms;
     }
 }

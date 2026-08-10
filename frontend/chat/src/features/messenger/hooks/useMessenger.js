@@ -14,7 +14,7 @@ import { useReply } from "./chat/useReply";
 import connection from "../services/chatHub";
 
 export const useMessenger = () => {
-    const [chats, setChats] = useState(mockChats);
+    const [chats, setChats] = useState([]);
     const [selectedChatId, setSelectedChatId] = useState(null);
     const [sidebarWidth, setSidebarWidth] = useState(33);
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
@@ -51,6 +51,38 @@ export const useMessenger = () => {
 
     const closeConfirmModal = () => setIsConfirmModalOpen(false);
     const closeAddContact = () => setIsAddContactOpen(false);
+
+    useEffect(() => {
+        const getChats = async () => {
+            const accessToken = localStorage.getItem("accessToken");
+
+            const response = await fetch("http://localhost:5079/api/chatrooms", {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })
+
+            if (!response.ok) {
+                console.log(response.statusText);
+                return;
+            }
+            
+            const chats = await response.json();
+
+            const formattedChats = chats.map(chat => ({
+                ...chat,
+                messages: [],
+            }))
+
+            console.log("Formatted chats:", formattedChats)
+            console.log("Chats state:", chats);
+
+            setChats(formattedChats);
+        }
+
+        getChats();
+
+    }, [])
 
     const handleAddContact = ({ firstName, lastName, username }) => {
         const newChatId = Date.now();
@@ -133,18 +165,17 @@ export const useMessenger = () => {
         const accessToken = localStorage.getItem("accessToken");
 
         const response = await fetch(`http://localhost:5079/api/messages/${chatId}`, {
-            method: "GET",
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
 
-        const messages = await response.json();
-
         if (!response.ok) {
             console.log(response.statusText);
             return;
         }
+
+        const messages = await response.json();
 
         console.log(messages);
 
@@ -244,51 +275,18 @@ export const useMessenger = () => {
     const handleSendMessage = async (text) => {
         if (!text.trim() || !selectedChatId) return;
 
-        await connection.invoke(
-            "SendMessage",
-            selectedChatId,
-            text.trim()
-        );
+        try {
+            await connection.invoke(
+                "SendMessage",
+                selectedChatId,
+                text.trim()
+            );
 
-        {/*const messageId = Date.now();
-
-        let senderName = "";
-        if (replyToMessage) {
-            senderName = replyToMessage.isOwnMessage ? currentUser.displayName : selectedChat.user.displayName;
+            closeReply();
+        } catch (error) {
+            console.log("Failed to send message: ", error);
         }
-
-        const newMessage = {
-            id: messageId,
-            text,
-            time: formatTime(),
-            date: formatDate(),
-            isOwnMessage: true,
-            status: "sent",
-            replyTo: replyToMessage ? {
-                id: replyToMessage.id,
-                text: replyToMessage.text,
-                isOwnMessage: replyToMessage.isOwnMessage,
-                senderName: senderName
-            } : null
-        };
-        
-        setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === selectedChatId) {
-                    return {
-                        ...chat,
-                        lastMessage: text,
-                        time: formatTime(),
-                        messages: [...chat.messages, newMessage]
-                    };
-                }
-
-                return chat;
-            })
-        );
-
-        closeReply();*/}
-    };
-
+    }
     useEffect(() => {
         const handleReceiveMessage = (message) => {
             const newMessage = {
@@ -299,7 +297,7 @@ export const useMessenger = () => {
                 isOwnMessage: message.senderId == currentUser.id,
                 status: "sent",
                 replyTo: null
-            }
+            };
 
             setChats(prevChats => prevChats.map(chat => {
                 if (chat.id === message.chatId) {
