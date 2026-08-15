@@ -244,3 +244,16 @@ aside.EmojiPickerReact {
 .animate-modal-out {
     animation:  modalFadeOut 0.15s ease-in forwards;
 }
+
+@keyframes skeleton-wave {
+    0% {
+        transform: translateX(-100%) skew(-20deg);
+    }
+    100% {
+        transform: translateX(200%) skew(-20deg);
+    }
+}
+
+.animate-skeleton-wave {
+    animation: skeleton-wave 1.5s ease-in-out infinite;
+}

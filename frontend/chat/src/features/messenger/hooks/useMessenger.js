@@ -12,6 +12,7 @@ import { useHighlightMessage } from "./chat/useHighlightMessage";
 import { useMockIncomingMessages } from "./chat/useMockIncomingMessages";
 import { useReply } from "./chat/useReply";
 import connection from "../services/chatHub";
+import { apiFetch } from "@/api/apiFetch";
 
 export const useMessenger = () => {
     const [chats, setChats] = useState([]);
@@ -25,12 +26,8 @@ export const useMessenger = () => {
     const [isContactsMode, setIsContactsMode] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isAddContactOpen, setIsAddContactOpen] = useState(false);
-    const [currentUser] = useState({
-        id: "e660e148-03c7-4d3c-baca-2b7d8a185626",
-        displayName: "Empty",
-        username: "empty_dev",
-        avatar: "/MainUserAvatar.jpg"
-    });
+    const [currentUser, setCurrentUser] = useState(null);
+    const [isLoadingUser, setIsLoadingUser] = useState(true);
 
     const windowWidth = useWindowWidth();
     const { toast, showToast } = useToast();
@@ -53,14 +50,53 @@ export const useMessenger = () => {
     const closeAddContact = () => setIsAddContactOpen(false);
 
     useEffect(() => {
-        const getChats = async () => {
-            const accessToken = localStorage.getItem("accessToken");
+        const getCurrentUser = async () => {
+            try {
+                const response = await apiFetch("http://localhost:5079/api/auth/me");
 
-            const response = await fetch("http://localhost:5079/api/chatrooms", {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
+                if (!response.ok) {
+                    console.log(response.statusText);
+                    return;
                 }
-            })
+
+                const user = await response.json();
+
+                setCurrentUser({
+                    id: user.id,
+                    displayName: user.username,
+                    username: user.username,
+                    avatar: "/MainUserAvatar.jpg"
+                });
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        };
+
+        getCurrentUser();
+    }, [])
+
+    useEffect(() => {
+        const startConnection = async () => {
+            try {
+                if (connection.state === "Disconnected") {
+                    await connection.start();
+                }
+
+            } catch (error) {
+                console.error("SignalR connection error: ", error);
+            }
+        };
+
+        startConnection();
+
+        return () => {};
+    }, []);
+
+    useEffect(() => {
+        const getChats = async () => {
+            const response = await apiFetch("http://localhost:5079/api/chatrooms")
 
             if (!response.ok) {
                 console.log(response.statusText);
@@ -162,13 +198,7 @@ export const useMessenger = () => {
         closeMenu();
         setSelectedChatId(chatId);
 
-        const accessToken = localStorage.getItem("accessToken");
-
-        const response = await fetch(`http://localhost:5079/api/messages/${chatId}`, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
+        const response = await apiFetch(`http://localhost:5079/api/messages/${chatId}`)
 
         if (!response.ok) {
             console.log(response.statusText);
@@ -176,8 +206,6 @@ export const useMessenger = () => {
         }
 
         const messages = await response.json();
-
-        console.log(messages);
 
         setIsChatSearchFocused(false);
         if (chatSearch?.setChatSearchText) {
@@ -202,6 +230,25 @@ export const useMessenger = () => {
             return chat;
         }));
     };
+
+    useEffect(() => {
+        if (!selectedChatId) return;
+
+        const joinChat = async () => {
+            try {
+                if (connection.state !== "Connected") {
+                    console.log("SignalR isn't connected yet");
+                    return;
+                }
+
+                await connection.invoke("JoinChat", selectedChatId);
+            } catch (error) {
+                console.log("JoinChat error: ", error);
+            }
+        };
+
+        joinChat();
+    }, [selectedChatId]);
 
     const handlePinMessage = (chatId, message) => {
         setChats(prevChats => prevChats.map(chat => {
@@ -311,14 +358,16 @@ export const useMessenger = () => {
 
                 return chat;
             }));
-        };
 
+        };
         connection.on("ReceiveMessage", handleReceiveMessage)
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
         };
-    }, []);
+    }, [currentUser]);
+
+
 
     useMessengerKeyboard({
         contextMenuVisible: contextMenu.visible,
@@ -344,6 +393,7 @@ export const useMessenger = () => {
 
     return {
         currentUser,
+        isLoadingUser,
         chats,
         selectedChat,
         selectedChatId,

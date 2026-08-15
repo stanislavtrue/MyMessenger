@@ -34,7 +34,7 @@ public class ChatRoomsController : ControllerBase
                 chat.User.Id,
                 chat.User.Username,
                 chat.User.Username,
-                "Avatar"
+                null
             ),
             null,
             null,

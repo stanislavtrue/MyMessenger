@@ -66,7 +66,7 @@ app.UseAuthorization();
 
 app.UseWebSockets();
 
-app.MapHub<ChatHub>("/chatHub");
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

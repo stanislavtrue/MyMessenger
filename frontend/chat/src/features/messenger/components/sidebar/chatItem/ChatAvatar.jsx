@@ -4,11 +4,13 @@ export const ChatAvatar = ({ user, isSelected }) => {
     const showStatus = user.status === "online" || user.status === "typing";
 
     return (
-        <div className="
-            relative w-14 h-14 rounded-full text-white text-2xl! z-10
-            bg-linear-to-b from-[#D95353] to-[#732C2C] shrink-0
-            flex items-center justify-center
-        ">
+        <div className="relative inline-flex shrink-0">
+            <Avatar
+                avatar={user?.avatar}
+                name={user?.displayName || user?.username || "User"}
+                size="size-14"
+            />
+
             {showStatus && (
                 <div className={`
                     absolute w-3.5 h-3.5 rounded-full bottom-0 right-1 border-2! 
@@ -18,10 +20,6 @@ export const ChatAvatar = ({ user, isSelected }) => {
                     }
                 `}/>
             )}
-            <Avatar
-                avatar={user.avatar}
-                name={user.displayName}
-            />
         </div>
     );
 };

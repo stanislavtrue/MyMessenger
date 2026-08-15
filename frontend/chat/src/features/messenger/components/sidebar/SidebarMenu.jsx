@@ -6,9 +6,9 @@ import { Avatar } from "../common/Avatar";
 
 export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
     const { currentUser } = useMessengerContext();
+
     return (
         <div 
-            style={{ fontFamily: "Roboto" }}
             ref={menuRef}
             className={`
                 absolute z-50

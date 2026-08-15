@@ -16,6 +16,7 @@ export default function LoginPage() {
             headers: {
                 "Content-Type": "application/json"
             },
+            credentials: "include",
             body: JSON.stringify({
                 email: email,
                 password: password
@@ -94,7 +95,7 @@ export default function LoginPage() {
                             htmlFor="email" 
                             className="
                                 absolute left-4 origin-left transform text-white/50 group-hover:text-[#8774E4]
-                                group-focus-within:text-[#8774E4] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
+                                group-focus-within:text-[#8774E4] group-focus-within:-translate-y-6 group-focus-within:-translate-x-2
                                 group-focus-within:text-xs! group-focus-within:bg-[#1E1E22] group-focus-within:px-1! group-focus-within:font-medium!
                                 duration-200 cursor-text not-peer-placeholder-shown:-translate-y-5 not-peer-placeholder-shown:-translate-x-2
                                 not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1E1E22]
@@ -122,7 +123,7 @@ export default function LoginPage() {
                             htmlFor="password" 
                             className="
                                 absolute left-4 origin-left transform text-white/50 group-hover:text-[#8774E4]
-                                group-focus-within:text-[#8774E4] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
+                                group-focus-within:text-[#8774E4] group-focus-within:-translate-y-6 group-focus-within:-translate-x-2
                                 group-focus-within:text-xs! group-focus-within:bg-[#1E1E22] group-focus-within:px-1! group-focus-within:font-medium!
                                 duration-200 cursor-text not-peer-placeholder-shown:-translate-y-5 not-peer-placeholder-shown:-translate-x-2
                                 not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1E1E22]

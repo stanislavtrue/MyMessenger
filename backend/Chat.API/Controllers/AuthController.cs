@@ -103,6 +103,6 @@ public class AuthController : ControllerBase
 
         var user = await _usersRepository.GetById(userId);
 
-        return Ok(user.Username);
+        return Ok(user);
     }
 }

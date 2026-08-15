@@ -4,28 +4,18 @@ import { ChatArea } from "@/features/messenger/components/chat/ChatArea";
 import { Sidebar } from "./features/messenger/components/sidebar/Sidebar";
 import connection from "./features/messenger/services/chatHub";
 import { useEffect } from "react";
+import { MessengerSceleton } from "./features/messenger/components/MessengerSceleton";
 
 export const MessengerContent = () => {
-    const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage, toast } = useMessengerContext();
+    const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage, toast, isLoadingUser } = useMessengerContext();
 
     const isMobile = windowWidth < 768;
-
-    const chatId = "3d3e8f29-d7c6-42cb-9150-8136810fb347";
-
-    useEffect(() => {
-        const connect = async () => {
-            await connection.start();
-
-            console.log("Connected to ChatHub");
-
-            await connection.invoke("JoinChat", chatId);
-
-            console.log("Joined chat");
-        };
-
-        connect().catch(error => console.error(error));
-    }, []);
-
+    
+    if (isLoadingUser) {
+        return (
+            <MessengerSceleton />
+        );
+    }
 
     return (
         <div className="h-screen flex overflow-hidden relative" >
