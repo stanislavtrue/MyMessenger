@@ -1,7 +1,13 @@
 import { Check } from "lucide-react";
 
+export const MESSAGE_STATUS = {
+    SENT: 0,
+    DELIVERED: 1,
+    READ: 2,
+}
+
 export const BubbleStatus = ({ status }) => {
-    const isRead = status === "read";
+    const isRead = status === MESSAGE_STATUS.READ;
     return (
         <div className="flex items-center relative w-2 h-3 shrink-0">
             <Check

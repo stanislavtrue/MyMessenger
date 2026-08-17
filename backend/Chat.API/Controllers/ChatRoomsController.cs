@@ -32,13 +32,13 @@ public class ChatRoomsController : ControllerBase
             chat.ChatRoom.CreatedAt,
             new UserResponse(
                 chat.User.Id,
+                chat.User.DisplayName,
                 chat.User.Username,
-                chat.User.Username,
-                null
+                chat.User.AvatarUrl
             ),
             null,
             null,
-            0
+            chat.UnreadCount
         )).ToList();
 
         return Ok(response);

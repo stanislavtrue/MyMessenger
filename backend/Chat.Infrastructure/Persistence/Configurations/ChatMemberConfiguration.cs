@@ -19,5 +19,8 @@ public class ChatMemberConfiguration : IEntityTypeConfiguration<ChatMemberEntity
         builder.HasOne(cm => cm.User)
             .WithMany(u => u.ChatMembers)
             .HasForeignKey(cm => cm.UserId);
+
+        builder.Property(cm => cm.LastReadMessageId)
+            .IsRequired(false);
     }
 }

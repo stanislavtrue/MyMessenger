@@ -1,5 +1,3 @@
-using Chat.Domain.Models;
-
 namespace Chat.Infrastructure.Persistence.Entities;
 public class ChatMemberEntity
 {
@@ -8,4 +6,5 @@ public class ChatMemberEntity
     public Guid UserId { get; set; }
     public ChatRoomEntity ChatRoom { get; set; } = null!;
     public UserEntity User { get; set; } = null!;
+    public Guid? LastReadMessageId { get; set; }
 }

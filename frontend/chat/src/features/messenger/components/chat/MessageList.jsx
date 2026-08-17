@@ -1,25 +1,31 @@
+import { useRef } from "react";
 import { MESSAGE_CONTEXT_MENU } from "../../constants/messageMenuItems";
 import { useMessengerContext } from "../../context/MessengerContext";
 import { useAutoScroll } from "../../hooks/chat/useAutoScroll";
 import { useMessageSearchNavigation } from "../../hooks/chat/useMessageSearchNavigation";
+import { useReadMessages } from "../../hooks/chat/useReadMessages";
 import { formatDividerDate } from "../../utils/formatDividerDate";
 import { ContextMenuWrapper } from "../common/ContextMenuWrapper";
 import { MessageBubble } from "./messageBubble/MessageBubble";
 
-export const MessageList = ({ messages}) => {
+export const MessageList = ({ messages }) => {
     const messengerContext = useMessengerContext();
     const { 
-        contextMenu, showMenu, closeMenu, openReply, chatSearchText, 
-        filteredSearchMessages, currentSearchIndex, highlightMsgId, triggerHighlight
+        contextMenu, showMenu, closeMenu, openReply, chatSearchText, filteredSearchMessages, 
+        currentSearchIndex, highlightMsgId, triggerHighlight, markAsRead, selectedChatId
     } = messengerContext;
 
     useMessageSearchNavigation(chatSearchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
     const bottomRef = useAutoScroll([messages.length]);
 
+    const messagesContainerRef = useRef();
+
+    useReadMessages(messages, selectedChatId, messagesContainerRef, markAsRead);
+
     const handleQuickReply = (message) => {
         openReply(message);
         document.getElementById("message-input")?.focus();
-    }
+    };
     
     return (
         <div className="relative flex flex-col w-full flex-1">
@@ -27,7 +33,7 @@ export const MessageList = ({ messages}) => {
                 <div onClick={closeMenu} className="fixed inset-0 z-40"/>
             )}
 
-            <div className="w-full flex flex-col mt-auto! justify-end">
+            <div ref={messagesContainerRef} className="w-full flex flex-col mt-auto! justify-end">
 
                 {messages.map((message, index) => {
                     const previousMessage = messages[index - 1];
@@ -54,6 +60,8 @@ export const MessageList = ({ messages}) => {
                         <div 
                             key={message.id || index} 
                             id={`msg-${message.id}`}
+                            data-message-id={message.id}
+                            data-is-own={message.isOwnMessage}
                             className="w-full flex flex-col">
 
                             {showDivider && (

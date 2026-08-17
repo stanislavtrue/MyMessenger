@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Chat.Domain.Interfaces;
 using Chat.Domain.Models;
 using Chat.Infrastructure.Persistence.Entities;
@@ -20,7 +19,8 @@ public class ChatMembersRepository : IChatMembersRepository
         {
             Id = member.Id,
             ChatId = member.ChatId,
-            UserId = member.UserId
+            UserId = member.UserId,
+            LastReadMessageId = member.LastReadMessageId
         };
 
         await _context.ChatMembers.AddAsync(chatMemberEntity);
@@ -48,6 +48,15 @@ public class ChatMembersRepository : IChatMembersRepository
         return otherUserId;
     }
 
+    public async Task<Guid?> GetLastReadMessageId(Guid chatId, Guid currentUserId)
+    {
+        return await _context.ChatMembers
+            .AsNoTracking()
+            .Where(cm => cm.ChatId == chatId && cm.UserId != currentUserId)
+            .Select(cm => cm.LastReadMessageId)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<List<ChatMemberInfo>> GetOtherUsersByChatIds(List<Guid> chatIds, Guid currentUserId)
     {
         return await _context.ChatMembers
@@ -59,6 +68,31 @@ public class ChatMembersRepository : IChatMembersRepository
                 cm.ChatId, 
                 cm.UserId))
             .ToListAsync();
+    }
+
+    public async Task<List<ChatMember>> GetByUserIdAndChatIds(List<Guid> chatIds, Guid userId)
+    {
+        if (chatIds is null || !chatIds.Any())
+            return [];
+
+        var memberEntities = await _context.ChatMembers
+            .AsNoTracking()
+            .Where(cm => cm.UserId == userId && chatIds.Contains(cm.ChatId))
+            .ToListAsync();
+           
+        return memberEntities
+            .Select(e => ChatMember.Restore(e.Id, e.ChatId, e.UserId, e.LastReadMessageId))
+            .ToList();
+    }
+
+    public async Task MarkAsRead(Guid chatId, Guid userId, Guid messageId)
+    {
+        var member = await _context.ChatMembers
+            .FirstOrDefaultAsync(cm => 
+                cm.ChatId == chatId && 
+                cm.UserId == userId) ?? throw new ChatMemberNotFoundException();
+
+        member.LastReadMessageId = messageId;       
     }
 
     public async Task<bool> HasAccess(Guid chatId, Guid userId)

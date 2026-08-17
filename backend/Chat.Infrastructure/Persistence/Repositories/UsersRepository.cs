@@ -19,6 +19,8 @@ public class UsersRepository : IUsersRepository
         {
             Id = user.Id,
             Username = user.Username,
+            DisplayName = user.DisplayName,
+            AvatarUrl = user.AvatarUrl,
             PasswordHash = user.PasswordHash,
             Email = user.Email
         };
@@ -32,7 +34,7 @@ public class UsersRepository : IUsersRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == email) ?? throw new InvalidCredentialsException();
 
-        return User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email);
+        return User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.PasswordHash, userEntity.Email);
     }
 
     public async Task<User> GetById(Guid id)
@@ -41,7 +43,7 @@ public class UsersRepository : IUsersRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
 
-        return User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email);
+        return User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.PasswordHash, userEntity.Email);
     }
 
     public async Task<List<User>> GetByIds(List<Guid> ids)
@@ -55,7 +57,7 @@ public class UsersRepository : IUsersRepository
 
         foreach(var userEntity in userEntities)
         {
-            users.Add(User.Create(userEntity.Id, userEntity.Username, userEntity.PasswordHash, userEntity.Email));
+            users.Add(User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.PasswordHash, userEntity.Email));
         }
 
         return users;

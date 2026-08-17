@@ -1,3 +1,4 @@
+using Chat.Domain.Enums;
 using Chat.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -22,6 +23,24 @@ public class ChatHub : Hub
             throw new UserNotFoundException();
 
         return userId;
+    }
+
+    public async Task MarkMessageAsRead(Guid chatId, Guid messageId)
+    {
+        var userId = GetUserId();
+
+        if (!await _chatRoomsService.HasAccess(chatId, userId))
+            throw new ChatAccessDeniedException();
+
+        await _chatRoomsService.MarkAsRead(chatId, userId, messageId);
+
+        await Clients.Group(chatId.ToString())
+            .SendAsync("MessageStatusUpdated", new
+            {
+                ChatId = chatId,
+                MessageId = messageId,
+                Status = MessageStatus.Read
+            });
     }
 
     [Authorize]

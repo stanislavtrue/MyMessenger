@@ -1,4 +1,5 @@
 using Chat.API.Contracts.Auth;
+using Chat.API.DTOs;
 using Chat.Domain.Interfaces;
 using Chat.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -56,7 +57,7 @@ public class AuthController : ControllerBase
     {
         var token = Request.Cookies["refresh_token"];
 
-        var userIdClaim = User.FindFirst("userId")!.Value;
+        var userIdClaim = User.FindFirst("userId")?.Value;
 
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized();
@@ -96,13 +97,20 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public async Task<IActionResult> Me()
     {
-        var userIdClaim = User.FindFirst("userId")!.Value;
+        var userIdClaim = User.FindFirst("userId")?.Value;
 
         if (!Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized();
 
         var user = await _usersRepository.GetById(userId);
 
-        return Ok(user);
+        var response = new UserResponse(
+            user.Id,
+            user.DisplayName,
+            user.Username,
+            user.AvatarUrl
+        );
+
+        return Ok(response);
     }
 }

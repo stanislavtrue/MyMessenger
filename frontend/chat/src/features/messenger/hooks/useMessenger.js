@@ -63,9 +63,9 @@ export const useMessenger = () => {
 
                 setCurrentUser({
                     id: user.id,
-                    displayName: user.username,
+                    displayName: user.displayName,
                     username: user.username,
-                    avatar: "/MainUserAvatar.jpg"
+                    avatar: user.avatarUrl
                 });
             } catch (error) {
                 console.error(error);
@@ -78,6 +78,53 @@ export const useMessenger = () => {
     }, [])
 
     useEffect(() => {
+        const handleReceiveMessage = (message) => {
+            const newMessage = {
+                id: message.id,
+                text: message.text,
+                time: formatTime(message.sentAt),
+                date: formatDate(message.sentAt),
+                isOwnMessage: message.senderId == currentUser.id,
+                status: message.status,
+                replyTo: null
+            };
+
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id === message.chatId) {
+                    return {
+                        ...chat,
+                        lastMessage: message.text,
+                        time: formatTime(message.sentAt),
+                        messages: [...chat.messages, newMessage]
+                    };
+                }
+
+                return chat;
+            }));
+        };       
+
+        const handleStatusUpdated = ({ chatId, messageId, status }) => {
+            console.log("🔥 STATUS UPDATED", messageId, status);
+
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id === chatId) {
+                    const updatedMessages = chat.messages.map(msg =>
+                        msg.id === messageId ? { ...msg, status: status } : msg
+                    );
+
+                    return {
+                        ...chat,
+                        messages: updatedMessages
+                    };
+                }
+
+                return chat;
+            }));
+        };
+
+        connection.on("ReceiveMessage", handleReceiveMessage);
+        connection.on("MessageStatusUpdated", handleStatusUpdated)
+
         const startConnection = async () => {
             try {
                 if (connection.state === "Disconnected") {
@@ -91,8 +138,11 @@ export const useMessenger = () => {
 
         startConnection();
 
-        return () => {};
-    }, []);
+        return () => {
+            connection.off("ReceiveMessage", handleReceiveMessage);
+            connection.off("MessageStatusUpdated", handleStatusUpdated);
+        };
+    }, [currentUser?.id]);
 
     useEffect(() => {
         const getChats = async () => {
@@ -118,7 +168,22 @@ export const useMessenger = () => {
 
         getChats();
 
-    }, [])
+    }, []);
+
+    const markAsRead = async (chatId, messageId) => {
+        try {
+            await connection.invoke("MarkMessageAsRead", chatId, messageId);
+
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id === chatId) {
+                    return { ...chat, unreadCount: 0 };
+                }
+                return chat;
+            }));
+        } catch (error) {
+            console.error("Error marking message as read: ", error);
+        }
+    };
 
     const handleAddContact = ({ firstName, lastName, username }) => {
         const newChatId = Date.now();
@@ -207,6 +272,8 @@ export const useMessenger = () => {
 
         const messages = await response.json();
 
+        console.log(messages);
+
         setIsChatSearchFocused(false);
         if (chatSearch?.setChatSearchText) {
             chatSearch.setChatSearchText("");
@@ -222,7 +289,6 @@ export const useMessenger = () => {
                         isOwnMessage: msg.senderId === currentUser.id,
                         time: formatTime(msg.sentAt),
                         date: formatDate(msg.sentAt),
-                        status: "read"
                     }))
                 };
             }
@@ -334,41 +400,7 @@ export const useMessenger = () => {
             console.log("Failed to send message: ", error);
         }
     }
-    useEffect(() => {
-        const handleReceiveMessage = (message) => {
-            const newMessage = {
-                id: message.id,
-                text: message.text,
-                time: formatTime(message.sentAt),
-                date: formatDate(message.sentAt),
-                isOwnMessage: message.senderId == currentUser.id,
-                status: "sent",
-                replyTo: null
-            };
-
-            setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === message.chatId) {
-                    return {
-                        ...chat,
-                        lastMessage: message.text,
-                        time: formatTime(message.sentAt),
-                        messages: [...chat.messages, newMessage]
-                    };
-                }
-
-                return chat;
-            }));
-
-        };
-        connection.on("ReceiveMessage", handleReceiveMessage)
-
-        return () => {
-            connection.off("ReceiveMessage", handleReceiveMessage);
-        };
-    }, [currentUser]);
-
-
-
+   
     useMessengerKeyboard({
         contextMenuVisible: contextMenu.visible,
         closeMenu,
@@ -394,6 +426,7 @@ export const useMessenger = () => {
     return {
         currentUser,
         isLoadingUser,
+        markAsRead,
         chats,
         selectedChat,
         selectedChatId,

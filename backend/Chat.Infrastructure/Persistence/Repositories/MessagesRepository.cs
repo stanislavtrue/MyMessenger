@@ -50,4 +50,42 @@ public class MessagesRepository : IMessagesRepository
 
         return messages;
     }
+
+    public async Task<Message> GetById(Guid messageId)
+    {
+        var messageEntity = await _context.Messages
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == messageId) ?? throw new MessageNotFoundException();
+
+        return Message.Restore(messageEntity.Id, messageEntity.ChatId, messageEntity.SenderId, messageEntity.Text, messageEntity.SentAt);
+    }
+
+    public async Task<DateTimeOffset?> GetSentAtById(Guid messageId)
+    {
+        return await _context.Messages
+            .AsNoTracking()
+            .Where(m => m.Id == messageId)
+            .Select(m => m.SentAt)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<int> GetUnreadCount(Guid chatId, Guid? lastReadMessageId)
+    {
+        if (lastReadMessageId is null)
+        {
+            return await _context.Messages
+                .AsNoTracking()
+                .CountAsync(m => m.ChatId == chatId);
+        }
+
+        var lastReadMessageSentAt = await _context.Messages
+            .AsNoTracking()
+            .Where(m => m.Id == lastReadMessageId)
+            .Select(m => m.SentAt)
+            .FirstOrDefaultAsync();
+
+        return await _context.Messages
+            .AsNoTracking()
+            .CountAsync(m => m.ChatId == chatId && m.SentAt > lastReadMessageSentAt);
+    }
 }
