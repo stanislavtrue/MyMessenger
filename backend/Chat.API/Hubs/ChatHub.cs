@@ -35,11 +35,10 @@ public class ChatHub : Hub
         await _chatRoomsService.MarkAsRead(chatId, userId, messageId);
 
         await Clients.Group(chatId.ToString())
-            .SendAsync("MessageStatusUpdated", new
+            .SendAsync("MessagesRead", new
             {
                 ChatId = chatId,
-                MessageId = messageId,
-                Status = MessageStatus.Read
+                LastReadMessageId = messageId
             });
     }
 

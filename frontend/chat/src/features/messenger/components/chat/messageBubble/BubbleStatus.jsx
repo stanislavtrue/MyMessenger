@@ -1,10 +1,5 @@
+import { MESSAGE_STATUS } from "@/features/messenger/constants/messageBubbleStatus";
 import { Check } from "lucide-react";
-
-export const MESSAGE_STATUS = {
-    SENT: 0,
-    DELIVERED: 1,
-    READ: 2,
-}
 
 export const BubbleStatus = ({ status }) => {
     const isRead = status === MESSAGE_STATUS.READ;

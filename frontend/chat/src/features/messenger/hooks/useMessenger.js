@@ -13,6 +13,7 @@ import { useMockIncomingMessages } from "./chat/useMockIncomingMessages";
 import { useReply } from "./chat/useReply";
 import connection from "../services/chatHub";
 import { apiFetch } from "@/api/apiFetch";
+import { MESSAGE_STATUS } from "../constants/messageBubbleStatus";
 
 export const useMessenger = () => {
     const [chats, setChats] = useState([]);
@@ -78,6 +79,20 @@ export const useMessenger = () => {
     }, [])
 
     useEffect(() => {
+        const  startConnection = async () => {
+            try {
+                if (connection.state === "Disconnected") {
+                    await connection.start();
+                }
+            } catch (error) {
+                console.error("SignalR connection error: ", error);
+            }
+        };
+
+        startConnection();
+    }, []);
+
+    useEffect(() => {
         const handleReceiveMessage = (message) => {
             const newMessage = {
                 id: message.id,
@@ -103,44 +118,38 @@ export const useMessenger = () => {
             }));
         };       
 
-        const handleStatusUpdated = ({ chatId, messageId, status }) => {
-            console.log("🔥 STATUS UPDATED", messageId, status);
-
+        const handleMessagesRead = ({ chatId, lastReadMessageId }) => {
             setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === chatId) {
-                    const updatedMessages = chat.messages.map(msg =>
-                        msg.id === messageId ? { ...msg, status: status } : msg
-                    );
+                if (chat.id !== chatId) return chat;
 
-                    return {
-                        ...chat,
-                        messages: updatedMessages
-                    };
-                }
+                const lastReadIndex = chat.messages.findIndex(
+                    message => message.id === lastReadMessageId
+                );
 
-                return chat;
+                if (lastReadIndex === -1) return chat;
+
+                return {
+                    ...chat,
+                    messages: chat.messages.map((message, index) => {
+                        if (message.isOwnMessage && index <= lastReadIndex) {
+                            return {
+                                ...message,
+                                status: MESSAGE_STATUS.READ
+                            };
+                        }
+
+                        return message;
+                    })
+                };
             }));
         };
 
         connection.on("ReceiveMessage", handleReceiveMessage);
-        connection.on("MessageStatusUpdated", handleStatusUpdated)
-
-        const startConnection = async () => {
-            try {
-                if (connection.state === "Disconnected") {
-                    await connection.start();
-                }
-
-            } catch (error) {
-                console.error("SignalR connection error: ", error);
-            }
-        };
-
-        startConnection();
+        connection.on("MessagesRead", handleMessagesRead);
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
-            connection.off("MessageStatusUpdated", handleStatusUpdated);
+            connection.off("MessagesRead", handleMessagesRead);
         };
     }, [currentUser?.id]);
 
