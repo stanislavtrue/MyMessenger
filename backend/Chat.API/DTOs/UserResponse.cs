@@ -4,5 +4,7 @@ public record class UserResponse
     Guid Id,
     string DisplayName,
     string Username,
-    string? Avatar
+    string? Avatar,
+    bool isOnline,
+    DateTimeOffset? lastSeenAt
 );

@@ -66,7 +66,9 @@ export const useMessenger = () => {
                     id: user.id,
                     displayName: user.displayName,
                     username: user.username,
-                    avatar: user.avatarUrl
+                    avatar: user.avatarUrl,
+                    isOnline: user.isOnline,
+                    lastSeenAt: user.lastSeenAt
                 });
             } catch (error) {
                 console.error(error);
@@ -144,14 +146,33 @@ export const useMessenger = () => {
             }));
         };
 
+        const handleUserStatusChanged = ({ userId, isOnline, lastSeenAt }) => {
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.user.id === userId) {
+                    return {
+                        ...chat,
+                        user: {
+                            ...chat.user,
+                            isOnline: isOnline,
+                            lastSeenAt: lastSeenAt
+                        }
+                    };
+                }
+
+                return chat;
+            }));
+        };
+
         connection.on("ReceiveMessage", handleReceiveMessage);
         connection.on("MessagesRead", handleMessagesRead);
+        connection.on("UserStatusChanged", handleUserStatusChanged);
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
             connection.off("MessagesRead", handleMessagesRead);
+            connection.off("UserStatusChanged", handleUserStatusChanged);
         };
-    }, [currentUser?.id]);
+    }, [currentUser?.id, connection]);
 
     useEffect(() => {
         const getChats = async () => {

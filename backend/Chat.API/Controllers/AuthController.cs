@@ -108,7 +108,9 @@ public class AuthController : ControllerBase
             user.Id,
             user.DisplayName,
             user.Username,
-            user.AvatarUrl
+            user.AvatarUrl,
+            true,
+            user.LastSeenAt
         );
 
         return Ok(response);

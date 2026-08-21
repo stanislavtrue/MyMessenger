@@ -31,6 +31,9 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .IsRequired(false)
             .HasMaxLength(2048);
 
+        builder.Property(u => u.LastSeenAt)
+            .IsRequired(false);
+
         builder.Property(u => u.PasswordHash)
             .IsRequired();
     }

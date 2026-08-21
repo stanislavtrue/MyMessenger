@@ -21,6 +21,7 @@ public class UsersRepository : IUsersRepository
             Username = user.Username,
             DisplayName = user.DisplayName,
             AvatarUrl = user.AvatarUrl,
+            LastSeenAt = user.LastSeenAt,
             PasswordHash = user.PasswordHash,
             Email = user.Email
         };
@@ -34,7 +35,7 @@ public class UsersRepository : IUsersRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == email) ?? throw new InvalidCredentialsException();
 
-        return User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.PasswordHash, userEntity.Email);
+        return User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.LastSeenAt, userEntity.PasswordHash, userEntity.Email);
     }
 
     public async Task<User> GetById(Guid id)
@@ -43,7 +44,7 @@ public class UsersRepository : IUsersRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == id) ?? throw new UserNotFoundException();
 
-        return User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.PasswordHash, userEntity.Email);
+        return User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.LastSeenAt, userEntity.PasswordHash, userEntity.Email);
     }
 
     public async Task<List<User>> GetByIds(List<Guid> ids)
@@ -57,9 +58,16 @@ public class UsersRepository : IUsersRepository
 
         foreach(var userEntity in userEntities)
         {
-            users.Add(User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.PasswordHash, userEntity.Email));
+            users.Add(User.Restore(userEntity.Id, userEntity.Username, userEntity.DisplayName, userEntity.AvatarUrl, userEntity.LastSeenAt, userEntity.PasswordHash, userEntity.Email));
         }
 
         return users;
+    }
+
+    public async Task UpdateLastSeen(Guid userId, DateTimeOffset lastSeenAt)
+    {
+        await _context.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastSeenAt, lastSeenAt));
     }
 }

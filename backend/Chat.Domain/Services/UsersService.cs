@@ -116,4 +116,11 @@ public class UsersService
 
         return new LoginResult(accessToken, newRefreshToken.Token);
     }
+
+    public async Task UpdateLastSeen(Guid userId, DateTimeOffset lastSeenAt)
+    {
+        await _usersRepository.UpdateLastSeen(userId, lastSeenAt);
+
+        await _unitOfWork.SaveChangesAsync();
+    }
 }

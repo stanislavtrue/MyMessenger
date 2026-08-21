@@ -1,4 +1,5 @@
 using Chat.API.DTOs;
+using Chat.Domain.Interfaces;
 using Chat.Domain.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,12 @@ namespace Chat.API.Controllers;
 public class ChatRoomsController : ControllerBase
 {
     private readonly ChatRoomsService _chatRoomsService;
+    private readonly IUserStatusTracker _userStatusTracker;
 
-    public ChatRoomsController(ChatRoomsService chatRoomsService)
+    public ChatRoomsController(ChatRoomsService chatRoomsService, IUserStatusTracker userStatusTracker)
     {
         _chatRoomsService = chatRoomsService;
+        _userStatusTracker = userStatusTracker;
     }
 
     [Authorize]
@@ -26,20 +29,29 @@ public class ChatRoomsController : ControllerBase
 
         var chatRooms = await _chatRoomsService.GetByUserId(userId);
 
-        var response = chatRooms.Select(chat => new ChatRoomResponse(
-            chat.ChatRoom.Id,
-            chat.ChatRoom.Name,
-            chat.ChatRoom.CreatedAt,
-            new UserResponse(
-                chat.User.Id,
-                chat.User.DisplayName,
-                chat.User.Username,
-                chat.User.AvatarUrl
-            ),
-            null,
-            null,
-            chat.UnreadCount
-        )).ToList();
+        var responseTasks = chatRooms.Select(async chat => 
+        {
+            var isOnline = await _userStatusTracker.IsUserOnlineAsync(chat.User.Id);
+
+            return new ChatRoomResponse(
+                chat.ChatRoom.Id,
+                chat.ChatRoom.Name,
+                chat.ChatRoom.CreatedAt,
+                new UserResponse(
+                    chat.User.Id,
+                    chat.User.DisplayName,
+                    chat.User.Username,
+                    chat.User.AvatarUrl,
+                    isOnline,
+                    chat.User.LastSeenAt
+                ),
+                null,
+                null,
+                chat.UnreadCount
+            );
+        });
+
+        var response = await Task.WhenAll(responseTasks);
 
         return Ok(response);
     }

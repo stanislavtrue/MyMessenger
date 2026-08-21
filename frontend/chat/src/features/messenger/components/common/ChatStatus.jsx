@@ -1,7 +1,7 @@
 import { TypingIndicator } from "@/features/messenger/components/common/indicators/TypingIndicator";
 
-export const ChatStatus = ({ status }) => {
-    if (status === "typing") {
+export const ChatStatus = ({ isOnline }) => {
+    if (false) {
         return (
             <TypingIndicator 
                 activeColor="#AA8DD2"
@@ -10,7 +10,7 @@ export const ChatStatus = ({ status }) => {
         );
     }
     
-    if (status === "online") {
+    if (isOnline) {
         return <span className="text-[#AA8DD2] text-sm!">online</span>;
     }
 

@@ -7,4 +7,5 @@ public interface IUsersRepository
     Task<User> GetByEmail(string email);
     Task<User> GetById(Guid id);
     Task<List<User>> GetByIds(List<Guid> ids);
+    Task UpdateLastSeen(Guid userId, DateTimeOffset lastSeenAt);
 }

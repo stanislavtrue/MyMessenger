@@ -7,7 +7,7 @@ import { ChatSearchBar } from "./ChatSearchBar";
 
 export const ChatHeader = ({ chat, isMobile, onBack }) => {
     const { isChatSearchFocused, setIsChatSearchFocused } = useMessengerContext();
-    
+
     return (
         <div className="
             relative h-12 bg-[#111111] 
@@ -50,7 +50,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                 `}>
                     <div className="flex flex-col ml-3! min-w-0 cursor-pointer">
                         <span className="text-white font-medium! truncate">{chat.user.displayName}</span>
-                        <ChatStatus status={chat.user.status}/>        
+                        <ChatStatus isOnline={chat.user.isOnline}/>        
                     </div>
 
                     <div className="flex items-center ml-auto! gap-0.5 mr-1!">

@@ -6,7 +6,9 @@ using Chat.Domain.Services;
 using Chat.Infrastructure.Authentication;
 using Chat.Infrastructure.Persistence;
 using Chat.Infrastructure.Persistence.Repositories;
+using Chat.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,8 +17,15 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ChatDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("No connection string 'DefaultConnection'"));
 });
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")
+        ?? throw new InvalidOperationException("No connection string 'Redis'")));
+
+builder.Services.AddSingleton<IUserStatusTracker, RedisUserStatusTracker>();
 
 builder.Services.AddCors(options =>
 {
@@ -30,7 +39,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+});
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 
