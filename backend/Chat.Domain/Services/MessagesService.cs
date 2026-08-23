@@ -25,8 +25,12 @@ public class MessagesService
         );
 
         await _messagesRepository.Add(message);
-
+        
         await _unitOfWork.SaveChangesAsync();
+
+        await _chatMemberRepository.MarkAsRead(chatId, senderId, message.Id, unreadCount: 0);
+
+        await _chatMemberRepository.IncrementUnreadCount(chatId, senderId);
 
         return message;
     }

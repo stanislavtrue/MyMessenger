@@ -7,4 +7,5 @@ public class ChatMemberEntity
     public ChatRoomEntity ChatRoom { get; set; } = null!;
     public UserEntity User { get; set; } = null!;
     public Guid? LastReadMessageId { get; set; }
+    public int UnreadCount { get; set; } = 0;
 }

@@ -3,7 +3,7 @@ import { ChatAvatar } from "./ChatAvatar";
 import { ChatPreview } from "./ChatPreview";
 import { ChatMeta } from "./ChatMeta";
 
-export const ChatItem = ({ chat, lastMessageText, lastMessageTime, lastMessageDate, selectedChatId, setSelectedChatId, isContextActive, onContextMenu }) => {
+export const ChatItem = ({ chat, selectedChatId, setSelectedChatId, isContextActive, onContextMenu }) => {
     const { ripples, createRipple } = useRipple();
     const isSelected = selectedChatId === chat.id;
     const unreadCount = chat.unreadCount || 0;
@@ -43,9 +43,9 @@ export const ChatItem = ({ chat, lastMessageText, lastMessageTime, lastMessageDa
 
             <ChatAvatar user={chat.user} isSelected={isSelected} />
 
-            <ChatPreview user={chat.user} lastMessageText={lastMessageText} isSelected={isSelected} />
+            <ChatPreview user={chat.user} lastMessageText={chat.lastMessage} isSelected={isSelected} />
 
-            <ChatMeta lastMessageDate={lastMessageDate} lastMessageTime={lastMessageTime} unreadCount={unreadCount} isSelected={isSelected} />
+            <ChatMeta lastMessageAt={chat.lastMessageAt} unreadCount={unreadCount} isSelected={isSelected} />
         </div>
     );
 };

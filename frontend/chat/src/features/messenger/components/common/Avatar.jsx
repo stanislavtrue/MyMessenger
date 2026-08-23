@@ -29,12 +29,14 @@ export const Avatar = ({ name, avatar, size = "size-14"}) => {
                 ${size}
                 rounded-full shrink-0
                 flex items-center justify-center
-                text-white text-2xl! text-semibold!
-                bg-linear-to-b
+                text-white bg-linear-to-b
                 ${getGradient(name)}
+                @container
             `}
         >
-            {name[0].toUpperCase()}
+            <span className="text-[42cqw]! leading-none select-none font-medium!">
+                {name[0].toUpperCase()}
+            </span>
         </div>
     );
 };

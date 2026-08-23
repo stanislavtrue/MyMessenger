@@ -37,7 +37,7 @@ public class ChatRoomsService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task<List<ChatRoomWithUserWithUnreadCount>> GetByUserId(Guid userId)
+    public async Task<List<ChatRoomDto>> GetByUserId(Guid userId)
     {
         var chatIds =  await _chatMembersRepository.GetChatIdsByUserId(userId);
         var chatRooms = await _chatRoomsRepository.GetByIds(chatIds);
@@ -45,9 +45,11 @@ public class ChatRoomsService
 
         var currentMemberDetails = await _chatMembersRepository.GetByUserIdAndChatIds(chatIds, userId);
 
+        var lastMessages = await _messagesRepository.GetLastMessagesByChatIds(chatIds);
+
         var users = await  _usersRepository.GetByIds(memberInfos.Select(x => x.UserId).ToList());
 
-        var result = new List<ChatRoomWithUserWithUnreadCount>();
+        var result = new List<ChatRoomDto>();
 
         foreach (var chatRoom in chatRooms)
         {
@@ -61,11 +63,16 @@ public class ChatRoomsService
             if (user is null)
                 continue;
 
+            var lastMessageDto = lastMessages.FirstOrDefault(x => x.ChatId == chatRoom.Id);
+
+            string? lastMessage = lastMessageDto?.Text;
+            DateTimeOffset? lastMessageAt = lastMessageDto?.SentAt;
+
             var currentMember = currentMemberDetails.FirstOrDefault(cm => cm.ChatId == chatRoom.Id);
 
-            var unreadCount = await _messagesRepository.GetUnreadCount(chatRoom.Id, currentMember?.LastReadMessageId);
+            int unreadCount = currentMember?.UnreadCount ?? 0;
 
-            result.Add(new ChatRoomWithUserWithUnreadCount(chatRoom, user, unreadCount));
+            result.Add(new ChatRoomDto(chatRoom, user, lastMessage, lastMessageAt, unreadCount));
         }
 
         return result;
@@ -73,9 +80,18 @@ public class ChatRoomsService
 
     public async Task MarkAsRead(Guid chatId, Guid userId, Guid messageId)
     {
-        await _chatMembersRepository.MarkAsRead(chatId, userId, messageId);
+        var messageSentAt = await _messagesRepository.GetSentAtById(messageId);
+
+        var unreadCount = await _messagesRepository.GetUnreadCount(chatId, userId, messageSentAt);
+
+        await _chatMembersRepository.MarkAsRead(chatId, userId, messageId, unreadCount);
 
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<int> GetUnreadCount(Guid chatId, Guid userId)
+    {
+        return await _chatMembersRepository.GetUnreadCount(chatId, userId);
     }
 
     public async Task<bool> HasAccess(Guid chatId, Guid userId)

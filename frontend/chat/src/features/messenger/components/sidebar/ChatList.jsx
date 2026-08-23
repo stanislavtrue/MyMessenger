@@ -20,9 +20,6 @@ export const ChatList = ({ chats, isVisible, selectedChatId, onSelectChat }) => 
                     <ChatItem
                         key={chat.id}
                         chat={chat}
-                        lastMessageText={lastMessage?.text}
-                        lastMessageTime={lastMessage?.time}
-                        lastMessageDate={lastMessage?.date}
                         setSelectedChatId={onSelectChat}
                         selectedChatId={selectedChatId}
                         isContextActive={isContextActive}

@@ -39,11 +39,15 @@ public class ChatHub : Hub
 
         await _chatRoomsService.MarkAsRead(chatId, userId, messageId);
 
+        var unreadCount = await _chatRoomsService.GetUnreadCount(chatId, userId);
+
         await Clients.Group(chatId.ToString())
             .SendAsync("MessagesRead", new
             {
                 ChatId = chatId,
-                LastReadMessageId = messageId
+                UserId = userId,
+                LastReadMessageId = messageId,
+                UnreadCount = unreadCount
             });
     }
 

@@ -55,9 +55,10 @@ public class ExceptionHandlingMiddleware
         {
             await WriteError(context, StatusCodes.Status403Forbidden, "Forbidden", ex.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            await WriteError(context, StatusCodes.Status500InternalServerError, "InternalServerError", "Internal server error");
+            await WriteError(context, StatusCodes.Status500InternalServerError, "InternalServerError", ex.Message);
+            Console.WriteLine(ex.StackTrace);
         }
     }
 

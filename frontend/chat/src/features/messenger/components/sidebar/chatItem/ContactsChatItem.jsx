@@ -45,7 +45,7 @@ export const ContactsChatItem = ({ contact, isSelected, onSelect }) => {
             />
             <div className="flex flex-col flex-1 min-w-0">
                 <span className="truncate">{contact.user.displayName}</span>
-                <ChatStatus status={contact.user.status} />
+                <ChatStatus isOnline={contact.user.isOnline} lastSeenAt={contact.user.lastSeenAt} />
             </div>
 
         </div>

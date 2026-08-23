@@ -69,23 +69,31 @@ public class MessagesRepository : IMessagesRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<int> GetUnreadCount(Guid chatId, Guid? lastReadMessageId)
+    public async Task<List<LastMessageDto>> GetLastMessagesByChatIds(List<Guid> chatIds)
     {
-        if (lastReadMessageId is null)
-        {
-            return await _context.Messages
-                .AsNoTracking()
-                .CountAsync(m => m.ChatId == chatId);
-        }
-
-        var lastReadMessageSentAt = await _context.Messages
-            .AsNoTracking()
-            .Where(m => m.Id == lastReadMessageId)
-            .Select(m => m.SentAt)
-            .FirstOrDefaultAsync();
-
         return await _context.Messages
             .AsNoTracking()
-            .CountAsync(m => m.ChatId == chatId && m.SentAt > lastReadMessageSentAt);
+            .Where(m => chatIds.Contains(m.ChatId))
+            .GroupBy(m => m.ChatId)
+            .Select(g => g
+                .OrderByDescending(m => m.SentAt)
+                .Select(m => new LastMessageDto(
+                    m.ChatId,
+                    m.Text,
+                    m.SentAt
+                ))
+                .First())
+            .ToListAsync();
+    }
+
+    public async Task<int> GetUnreadCount(Guid chatId, Guid userId, DateTimeOffset? sentAt)
+    {
+        return await _context.Messages
+            .AsNoTracking()
+            .Where(m =>
+                m.ChatId == chatId &&
+                m.SenderId != userId &&
+                m.SentAt > sentAt)
+            .CountAsync();
     }
 }

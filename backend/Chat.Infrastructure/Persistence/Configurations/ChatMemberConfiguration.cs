@@ -22,5 +22,9 @@ public class ChatMemberConfiguration : IEntityTypeConfiguration<ChatMemberEntity
 
         builder.Property(cm => cm.LastReadMessageId)
             .IsRequired(false);
+
+        builder.Property(cm => cm.UnreadCount)
+            .IsRequired()
+            .HasDefaultValue(0);
     }
 }

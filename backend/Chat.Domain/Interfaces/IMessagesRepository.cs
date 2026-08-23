@@ -7,5 +7,6 @@ public interface IMessagesRepository
     Task<List<Message>> GetByChatId(Guid chatId);
     Task<Message> GetById(Guid messageId);
     Task<DateTimeOffset?> GetSentAtById(Guid messageId);
-    Task<int> GetUnreadCount(Guid chatId, Guid? lastReadMessageId);
+    Task<List<LastMessageDto>> GetLastMessagesByChatIds(List<Guid> chatIds);
+    Task<int> GetUnreadCount(Guid chatId, Guid userId, DateTimeOffset? sentAt);
 }

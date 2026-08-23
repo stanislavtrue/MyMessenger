@@ -1,13 +1,13 @@
 import { formatSidebarDate } from "@/features/messenger/utils/formatSidebarDate";
 
-export const ChatMeta = ({ lastMessageDate, lastMessageTime, unreadCount, isSelected }) => {
+export const ChatMeta = ({ lastMessageAt, unreadCount, isSelected }) => {
     return (
         <div className="flex flex-col items-end justify-between h-12 z-12 shrink-0 ml-auto">
             <span className={`
                 text-xs! transition-colors duration-200
                 ${isSelected  ? "text-[#FFFFFF]" : "text-[#7D7DA2]"}
             `}>
-                {formatSidebarDate(lastMessageDate, lastMessageTime)}
+                {formatSidebarDate(lastMessageAt)}
             </span>
 
             {unreadCount > 0 ? (

@@ -1,8 +1,10 @@
 namespace Chat.Domain.Models;
-public record ChatRoomWithUserWithUnreadCount
+public record ChatRoomDto
 (
     ChatRoom ChatRoom,
     User User,
+    string? LastMessage,
+    DateTimeOffset? LastMessageAt,
     int UnreadCount
 );
 

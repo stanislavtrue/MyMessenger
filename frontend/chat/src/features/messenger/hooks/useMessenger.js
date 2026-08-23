@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { mockChats } from "../mocks/mockChats";
 import { formatDate } from "@/utils/formatDate";
 import { formatTime } from "@/utils/formatTime";
 
@@ -9,7 +8,6 @@ import { useMessengerKeyboard } from "./useMessengerKeyboard";
 import { useContextMenu } from "./contextMenu/useContextMenu";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { useHighlightMessage } from "./chat/useHighlightMessage";
-import { useMockIncomingMessages } from "./chat/useMockIncomingMessages";
 import { useReply } from "./chat/useReply";
 import connection from "../services/chatHub";
 import { apiFetch } from "@/api/apiFetch";
@@ -38,8 +36,6 @@ export const useMessenger = () => {
 
     const selectedChat = chats.find(chat => chat.id === selectedChatId);
     const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
-
-    useMockIncomingMessages(setChats, selectedChatId);
 
     const closeSidebarSearch = () => {
         setIsSidebarSearchFocused(false);
@@ -96,12 +92,13 @@ export const useMessenger = () => {
 
     useEffect(() => {
         const handleReceiveMessage = (message) => {
+            const isOwn = message.senderId === currentUser.id;
             const newMessage = {
                 id: message.id,
                 text: message.text,
                 time: formatTime(message.sentAt),
                 date: formatDate(message.sentAt),
-                isOwnMessage: message.senderId == currentUser.id,
+                isOwnMessage: isOwn,
                 status: message.status,
                 replyTo: null
             };
@@ -112,6 +109,7 @@ export const useMessenger = () => {
                         ...chat,
                         lastMessage: message.text,
                         time: formatTime(message.sentAt),
+                        unreadCount: !isOwn ? (chat.unreadCount || 0) + 1 : chat.unreadCount,
                         messages: [...chat.messages, newMessage]
                     };
                 }
@@ -120,7 +118,7 @@ export const useMessenger = () => {
             }));
         };       
 
-        const handleMessagesRead = ({ chatId, lastReadMessageId }) => {
+        const handleMessagesRead = ({ chatId, userId, lastReadMessageId, unreadCount }) => {
             setChats(prevChats => prevChats.map(chat => {
                 if (chat.id !== chatId) return chat;
 
@@ -128,12 +126,11 @@ export const useMessenger = () => {
                     message => message.id === lastReadMessageId
                 );
 
-                if (lastReadIndex === -1) return chat;
-
                 return {
                     ...chat,
+                    ...(userId === currentUser.id && { unreadCount: unreadCount ?? 0 }),
                     messages: chat.messages.map((message, index) => {
-                        if (message.isOwnMessage && index <= lastReadIndex) {
+                        if (message.isOwnMessage && lastReadIndex !== -1 && index <= lastReadIndex) {
                             return {
                                 ...message,
                                 status: MESSAGE_STATUS.READ
@@ -203,13 +200,6 @@ export const useMessenger = () => {
     const markAsRead = async (chatId, messageId) => {
         try {
             await connection.invoke("MarkMessageAsRead", chatId, messageId);
-
-            setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === chatId) {
-                    return { ...chat, unreadCount: 0 };
-                }
-                return chat;
-            }));
         } catch (error) {
             console.error("Error marking message as read: ", error);
         }
@@ -313,7 +303,6 @@ export const useMessenger = () => {
             if (chat.id === chatId) {
                 return {
                     ...chat,
-                    unreadCount: 0,
                     messages: messages.map(msg => ({
                         ...msg,
                         isOwnMessage: msg.senderId === currentUser.id,

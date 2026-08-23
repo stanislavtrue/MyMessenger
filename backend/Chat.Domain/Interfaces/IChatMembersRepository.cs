@@ -9,6 +9,8 @@ public interface IChatMembersRepository
     Task<List<ChatMemberInfo>> GetOtherUsersByChatIds(List<Guid> chatIds, Guid currentUserId);
     Task<Guid?> GetLastReadMessageId(Guid chatId, Guid currentUserId);
     Task<List<ChatMember>> GetByUserIdAndChatIds(List<Guid> chatIds, Guid userId);
-    Task MarkAsRead(Guid chatId, Guid userId, Guid messageId);
+    Task MarkAsRead(Guid chatId, Guid userId, Guid messageId, int unreadCount);
+    Task IncrementUnreadCount(Guid chatId, Guid senderId);
+    Task<int> GetUnreadCount(Guid chatId, Guid userId);
     Task<bool> HasAccess(Guid chatId, Guid userId);
 }

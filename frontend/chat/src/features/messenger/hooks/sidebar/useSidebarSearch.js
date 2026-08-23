@@ -4,7 +4,7 @@ export const useSidebarSearch = (chats, sidebarSearchText, isContactsMode) => {
     const contacts = chats;
     
     const activeChats = useMemo(() => {
-        return chats.filter(chat => chat.messages && chat.messages.length > 0);
+        return chats.filter(chat => chat.lastMessage);
     }, [chats]);
 
     const searchResults = useMemo(() => {

@@ -20,7 +20,8 @@ public class ChatMembersRepository : IChatMembersRepository
             Id = member.Id,
             ChatId = member.ChatId,
             UserId = member.UserId,
-            LastReadMessageId = member.LastReadMessageId
+            LastReadMessageId = member.LastReadMessageId,
+            UnreadCount = member.UnreadCount
         };
 
         await _context.ChatMembers.AddAsync(chatMemberEntity);
@@ -81,19 +82,37 @@ public class ChatMembersRepository : IChatMembersRepository
             .ToListAsync();
            
         return memberEntities
-            .Select(e => ChatMember.Restore(e.Id, e.ChatId, e.UserId, e.LastReadMessageId))
+            .Select(e => ChatMember.Restore(e.Id, e.ChatId, e.UserId, e.LastReadMessageId, e.UnreadCount))
             .ToList();
     }
 
-    public async Task MarkAsRead(Guid chatId, Guid userId, Guid messageId)
+    public async Task MarkAsRead(Guid chatId, Guid userId, Guid messageId, int unreadCount)
     {
-        var member = await _context.ChatMembers
-            .FirstOrDefaultAsync(cm => 
-                cm.ChatId == chatId && 
-                cm.UserId == userId) ?? throw new ChatMemberNotFoundException();
-
-        member.LastReadMessageId = messageId;       
+        await _context.ChatMembers
+            .Where(cm => cm.ChatId == chatId && cm.UserId == userId)      
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(cm => cm.LastReadMessageId, messageId)
+                .SetProperty(cm => cm.UnreadCount, unreadCount));
     }
+
+    public async Task IncrementUnreadCount(Guid chatId, Guid senderId)
+    {
+        await _context.ChatMembers
+            .Where(cm => cm.ChatId == chatId && cm.UserId != senderId)
+            .ExecuteUpdateAsync(s => s.SetProperty(
+                cm => cm.UnreadCount,
+                cm => cm.UnreadCount + 1));
+    }
+
+    public async Task<int> GetUnreadCount(Guid chatId, Guid userId)
+    {
+        return await _context.ChatMembers
+            .AsNoTracking()
+            .Where(cm => cm.ChatId == chatId && cm.UserId == userId)
+            .Select(cm => cm.UnreadCount)
+            .FirstOrDefaultAsync();
+    }
+
 
     public async Task<bool> HasAccess(Guid chatId, Guid userId)
     {

@@ -45,8 +45,8 @@ public class ChatRoomsController : ControllerBase
                     isOnline,
                     chat.User.LastSeenAt
                 ),
-                null,
-                null,
+                chat.LastMessage,
+                chat.LastMessageAt,
                 chat.UnreadCount
             );
         });
