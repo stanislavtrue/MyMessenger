@@ -160,14 +160,44 @@ export const useMessenger = () => {
             }));
         };
 
+        const handleUserStartTyping = ({ chatId, userId }) => {
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id === chatId) {
+                    return {
+                        ...chat,
+                        typingUserId: userId
+                    };
+                }
+
+                return chat;
+            }));
+        };
+
+        const handleUserStopTyping = ({ chatId, userId }) => {
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id === chatId) {
+                    return {
+                        ...chat,
+                        typingUserId: null
+                    };
+                }
+                
+                return chat;
+            }));
+        };
+
         connection.on("ReceiveMessage", handleReceiveMessage);
         connection.on("MessagesRead", handleMessagesRead);
         connection.on("UserStatusChanged", handleUserStatusChanged);
+        connection.on("UserStartTyping", handleUserStartTyping);
+        connection.on("UserStopTyping", handleUserStopTyping);
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
             connection.off("MessagesRead", handleMessagesRead);
             connection.off("UserStatusChanged", handleUserStatusChanged);
+            connection.off("UserStartTyping", handleUserStartTyping);
+            connection.off("UserStopTyping", handleUserStopTyping);
         };
     }, [currentUser?.id, connection]);
 

@@ -50,7 +50,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                 `}>
                     <div className="flex flex-col ml-3! min-w-0 cursor-pointer">
                         <span className="text-white font-medium! truncate">{chat.user.displayName}</span>
-                        <ChatStatus isOnline={chat.user.isOnline} lastSeenAt={chat.user.lastSeenAt} />        
+                        <ChatStatus isOnline={chat.user.isOnline} isTyping={chat.typingUserId} lastSeenAt={chat.user.lastSeenAt} />        
                     </div>
 
                     <div className="flex items-center ml-auto! gap-0.5 mr-1!">

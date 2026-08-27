@@ -43,7 +43,7 @@ export const ChatItem = ({ chat, selectedChatId, setSelectedChatId, isContextAct
 
             <ChatAvatar user={chat.user} isSelected={isSelected} />
 
-            <ChatPreview user={chat.user} lastMessageText={chat.lastMessage} isSelected={isSelected} />
+            <ChatPreview user={chat.user} isTyping={chat.typingUserId} lastMessageText={chat.lastMessage} isSelected={isSelected} />
 
             <ChatMeta lastMessageAt={chat.lastMessageAt} unreadCount={unreadCount} isSelected={isSelected} />
         </div>

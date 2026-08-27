@@ -2,7 +2,7 @@ import { TypingIndicator } from "@/features/messenger/components/common/indicato
 import { formatLastSeen } from "@/utils/formatLastSeen";
 import { useEffect, useState } from "react";
 
-export const ChatStatus = ({ isOnline, lastSeenAt }) => {
+export const ChatStatus = ({ isOnline, isTyping, lastSeenAt }) => {
     const [statusText, setStatusText] = useState(() => formatLastSeen(lastSeenAt));
 
     useEffect(() => {
@@ -17,7 +17,7 @@ export const ChatStatus = ({ isOnline, lastSeenAt }) => {
         return () => clearInterval(interval);
     }, [isOnline, lastSeenAt]);
 
-    if (false) {
+    if (isTyping) {
         return (
             <TypingIndicator 
                 activeColor="#AA8DD2"

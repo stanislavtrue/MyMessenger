@@ -5,14 +5,17 @@ import { useState, useRef } from "react";
 import { useEmojiPickerHover } from "../../../hooks/useEmojiPickerHover";
 import EmojiPicker from "emoji-picker-react"
 import { ReplyPreview } from "./ReplyPreview";
+import connection from "@/features/messenger/services/chatHub";
 
 export const MessageInput = ({ onSendMessage }) => {
     const [message, setMessage] = useState("");
     const inputRef = useRef(null);
+    const typingTimeoutRef = useRef(null);
+    const isTypingRef = useRef(false);
 
     const { 
-        replyToMessage, replyPreview, closeReply, 
-        isEmojiPickerOpen, setIsEmojiPickerOpen 
+        replyToMessage, replyPreview, closeReply, selectedChatId, 
+        isEmojiPickerOpen, setIsEmojiPickerOpen
     } = useMessengerContext();
 
     const { handleMouseEnter, handleMouseLeave } = useEmojiPickerHover(isEmojiPickerOpen, setIsEmojiPickerOpen);
@@ -20,7 +23,37 @@ export const MessageInput = ({ onSendMessage }) => {
     const trimmedMessage = message.trim();
     const hasMessage = trimmedMessage.length > 0;
 
+    const handleInputChange = (e) => {
+        const text = e.target.value;
+        setMessage(text);
+
+        if (!selectedChatId) return;
+
+        if (!isTypingRef.current && text.trim().length > 0) {
+            isTypingRef.current = true;
+            connection.invoke("StartTyping", selectedChatId);
+        }
+
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
+        typingTimeoutRef.current = setTimeout(() => {
+            if (isTypingRef.current) {
+                isTypingRef.current = false;
+                connection.invoke("StopTyping", selectedChatId);
+            }
+        }, 2500);
+    };
+
     const handleSend = () => {
+        if (typingTimeoutRef.current)
+            clearTimeout(typingTimeoutRef.current);
+
+        isTypingRef.current = false;
+    
+        connection.invoke("StopTyping", selectedChatId);
+
         const text = trimmedMessage;
         if (!text) return;
 
@@ -84,7 +117,7 @@ export const MessageInput = ({ onSendMessage }) => {
                         ref={inputRef}
                         id="message-input"
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={handleInputChange}
                         onKeyDown={(e) => {
                             if (e.key == "Enter") handleSend();
                         }}

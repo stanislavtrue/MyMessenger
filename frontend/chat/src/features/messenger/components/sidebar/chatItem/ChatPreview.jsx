@@ -1,8 +1,6 @@
 import { TypingIndicator } from "../../common/indicators/TypingIndicator";
 
-export const ChatPreview = ({ user, lastMessageText, isSelected }) => {
-    const isTyping = user.status === "typing";
-
+export const ChatPreview = ({ user, isTyping, lastMessageText, isSelected }) => {
     return (
         <div className="flex flex-col min-w-0 flex-1 z-10">
             <span className="text-lg! truncate">

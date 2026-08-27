@@ -114,4 +114,34 @@ public class ChatHub : Hub
         
         await Groups.AddToGroupAsync(Context.ConnectionId, chatId.ToString());
     }
+
+    public async Task StartTyping(Guid chatId)
+    {
+        var userId = GetUserId();
+
+        if (!await _chatRoomsService.HasAccess(chatId, userId))
+            throw new ChatAccessDeniedException();
+
+        await Clients.OthersInGroup(chatId.ToString())
+            .SendAsync("UserStartTyping", new
+            {
+                ChatId = chatId,
+                UserId = userId
+            });
+    }
+
+    public async Task StopTyping(Guid chatId)
+    {
+        var userId = GetUserId();
+
+        if (!await _chatRoomsService.HasAccess(chatId, userId))
+            throw new ChatAccessDeniedException();
+
+        await Clients.OthersInGroup(chatId.ToString())
+            .SendAsync("UserStopTyping", new
+            {
+                ChatId = chatId,
+                UserId = userId
+            });
+    }
 }
