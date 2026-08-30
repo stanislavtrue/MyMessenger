@@ -1,7 +1,7 @@
 export const BubbleTail = ({ isOwnMessage }) => {
     const positionClassLarge = isOwnMessage ? "-right-2" : "-left-2";
     const positionClassSmall = isOwnMessage ? "-right-3.5" : "-left-3.5";
-    const bgClass = isOwnMessage ? "bg-[#7D55B5]" : "bg-[#28292B]";
+    const bgClass = isOwnMessage ? "bg-[#343E4A]" : "bg-[#28292B]";
 
     return (
         <>

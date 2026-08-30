@@ -18,9 +18,9 @@ export const SearchScreen = ({
                 <SidebarTabs />
             )}
 
-            <div className="absolute h-4 w-full bg-linear-to-b from-[#1F1F28] to-[#1F1F28]/10 z-10"/>
+            <div className="absolute h-4 w-full bg-linear-to-b from-[#1C1C1C] to-[#1C1C1C]/10 z-10"/>
 
-            <div className="flex-1 overflow-y-auto px-4! pt-18! pb-4!">
+            <div className="flex-1 overflow-y-auto px-4! pt-18! pb-4! scrollbar-thin scrollbar-thumb-[#959595]">
                 <SidebarSearchContacts
                     filteredContacts={filteredContacts}
                     selectedChatId={selectedChatId}

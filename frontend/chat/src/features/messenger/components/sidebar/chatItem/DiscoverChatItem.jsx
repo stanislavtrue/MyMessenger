@@ -8,8 +8,8 @@ export const DiscoverChatItem = ({ chat, isSelected, onSelect }) => {
                 relative flex flex-col items-center gap-2 cursor-pointer shrink-0
                 w-20 select-none overflow-hidden rounded-2xl px-2! py-3!
                 ${isSelected
-                    ? "bg-[#5D25AA]"
-                    : "hover:bg-[#282836]/50"
+                    ? "bg-[#527AFF]"
+                    : "hover:bg-[#282828]"
                 }
             `}
         >

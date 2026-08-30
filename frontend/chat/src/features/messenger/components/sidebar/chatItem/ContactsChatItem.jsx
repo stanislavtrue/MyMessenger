@@ -22,7 +22,7 @@ export const ContactsChatItem = ({ contact, isSelected, onSelect }) => {
                 w-[97%] rounded-2xl m-auto!
                 select-none overflow-hidden
                 transition-colors duration-0 
-                cursor-pointer hover:bg-[#282836]/50
+                cursor-pointer hover:bg-[#282828]
             `}
         >
             {ripples.map((ripple) => (

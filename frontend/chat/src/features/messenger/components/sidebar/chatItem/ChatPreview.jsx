@@ -9,14 +9,11 @@ export const ChatPreview = ({ user, isTyping, lastMessageText, isSelected }) => 
 
             {isTyping ? (
                 <TypingIndicator
-                    activeColor={isSelected ? "#FFFFFF" : "#52526B"}
-                    textClassName={`text-sm! ${isSelected ? "text-[#FFFFFF]" : "text-[#52526B]"} `}
+                    activeColor={isSelected ? "#FFFFFF" : "#959595"}
+                    textClassName={`text-sm! ${isSelected ? "text-[#FFFFFF]" : "text-[#959595]"} `}
                 />
             ) : (
-                <span className={`
-                    text-[#52526B] text-sm! truncate
-                    ${isSelected ? "text-[#FFFFFF]" : "text-[#52526B]"}
-                `}>
+                <span className={`truncate ${isSelected ? "text-[#FFFFFF]" : "text-[#959595]"} `}>
                     {lastMessageText}
                 </span>
             )}

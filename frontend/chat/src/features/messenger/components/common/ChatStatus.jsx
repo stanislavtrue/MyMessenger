@@ -20,15 +20,15 @@ export const ChatStatus = ({ isOnline, isTyping, lastSeenAt }) => {
     if (isTyping) {
         return (
             <TypingIndicator 
-                activeColor="#AA8DD2"
-                textClassName="text-[#AA8DD2] text-sm!"
+                activeColor="#7B9AFF"
+                textClassName="text-[#7B9AFF] text-sm!"
             />
         );
     }
     
     if (isOnline) {
-        return <span className="text-[#AA8DD2] text-sm!">online</span>;
+        return <span className="text-[#7B9AFF] text-sm!">online</span>;
     }
 
-    return <span className="text-[#52526B] text-sm!">{statusText}</span>;
+    return <span className="text-[#959595] text-sm!">{statusText}</span>;
 };

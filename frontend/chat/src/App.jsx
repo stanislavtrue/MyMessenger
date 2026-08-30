@@ -20,7 +20,7 @@ export const MessengerContent = () => {
             <div
                 className="absolute inset-0"
                 style={{
-                    background: "linear-gradient(135deg,#330033,#6600ff,#ff9900)",
+                    background: "linear-gradient(135deg,#1C1C1C,#313131,#717171)",
 
                     WebkitMaskImage: "url('/background.png')",
                     WebkitMaskRepeat: "repeat",

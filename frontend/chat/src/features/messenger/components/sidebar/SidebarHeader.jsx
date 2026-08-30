@@ -29,8 +29,8 @@ export const SidebarHeader = ({ menuRef, buttonRef, inputRef }) => {
                     }}
                     className="
                         relative flex items-center justify-center 
-                        h-11 w-11 rounded-full hover:bg-[#282836]
-                        active:scale-90 active:bg-[#52526B]
+                        h-11 w-11 rounded-full hover:bg-[#212121]
+                        active:scale-90 active:bg-[#2E2E2E]
                         transition-all duration-300
                         cursor-pointer overflow-hidden
                     "
@@ -38,7 +38,7 @@ export const SidebarHeader = ({ menuRef, buttonRef, inputRef }) => {
                     <TfiMenu
                         size={22}
                         className={`
-                            absolute text-white transition-all duration-300
+                            absolute text-[#959595] transition-all duration-300
                             ${isSearchMode
                                 ? "opacity-0 rotate-180 scale-50"
                                 : "opacity-100 rotate-0 scale-100"
@@ -49,7 +49,7 @@ export const SidebarHeader = ({ menuRef, buttonRef, inputRef }) => {
                     <ArrowLeft
                         size={26}
                         className={`
-                            absolute text-white transition-all duration-300    
+                            absolute text-[#959595] transition-all duration-300    
                             ${isSearchMode
                                 ? "opacity-100 rotate-0 scale-100"
                                 : "opacity-0 -rotate-180 scale-50"
@@ -69,13 +69,12 @@ export const SidebarHeader = ({ menuRef, buttonRef, inputRef }) => {
 
                 <div className="
                     w-full! flex flex-1 items-center group 
-                    bg-[#111111] transition-all duration-200 rounded-3xl ml-3! pl-4!
-                    focus-within:bg-[#1F1F28]
-                    hover:ring-[1.5px] hover:ring-[#7F88C0]/50 
-                    focus-within:ring-2 focus-within:ring-[#8F5EB5]
-                    focus-within:hover:ring-2 focus-within:hover:ring-[#8F5EB5]
+                    bg-[#111111] transition-all duration-300 rounded-3xl ml-3! pl-4!
+                    focus-within:bg-[#1C1C1C] hover:ring-[1.5px] hover:ring-[#959595]/50 
+                    focus-within:ring-2 focus-within:ring-[#527AFF]
+                    focus-within:hover:ring-2 focus-within:hover:ring-[#527AFF]
                 ">
-                    <SlMagnifier size={18} strokeWidth={50} className="text-[#7F88C0] transition-colors duration-200 group-focus-within:text-[#8F5EB5]" />
+                    <SlMagnifier size={18} strokeWidth={50} className="text-[#959595] transition-colors duration-200 group-focus-within:text-[#527AFF]" />
 
                     <input
                         ref={inputRef}
@@ -84,7 +83,7 @@ export const SidebarHeader = ({ menuRef, buttonRef, inputRef }) => {
                         onFocus={() => setIsSidebarSearchFocused(true)}
                         className="
                             w-full h-10! pl-3! rounded-3xl text-white 
-                            outline-none! placeholder:text-[#7F88C0]!
+                            outline-none! placeholder:text-[#959595]!
                         "
                         type="text"
                         placeholder={placeholderText}

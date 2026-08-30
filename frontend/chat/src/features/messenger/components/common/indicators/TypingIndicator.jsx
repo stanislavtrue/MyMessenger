@@ -1,6 +1,6 @@
 export const TypingIndicator = ({
     text = "typing",
-    activeColor = "#AA8DD2",
+    activeColor = "#959595",
     textClassName = "",
 }) => {
     return (

@@ -7,9 +7,7 @@ export const ContextMenuWrapper = ({ children, type, width = "w-42" }) => {
     const { contextMenu, setContextMenu, closeMenu, handleSetReaction } = useMessengerContext();
 
     const isOpen = contextMenu.visible && contextMenu.type === type;
-
     const { shouldRender, animationClass } = useContextMenuAnimation(isOpen, contextMenu.isMeasuring);
-
     const menuRef = useContextMenuPosition(contextMenu, setContextMenu, type);
 
     const isActive = shouldRender || (contextMenu.visible && contextMenu.type === type && contextMenu.isMeasuring);
@@ -19,6 +17,10 @@ export const ContextMenuWrapper = ({ children, type, width = "w-42" }) => {
 
     return (
         <>
+            {isOpen && (
+                <div onClick={closeMenu} className="fixed inset-0 z-40 bg-transparent"/>
+            )}
+            
             {type === "message" && (
                 <div
                     style={{
@@ -53,8 +55,8 @@ export const ContextMenuWrapper = ({ children, type, width = "w-42" }) => {
                 }}
                 className={`
                     fixed z-50 flex flex-col context-menu
-                    bg-[#111111]/80 backdrop-blur-md
-                    rounded-xl shadow-lg shadow-black/70
+                    bg-[#1C1C1C] backdrop-blur-md rounded-xl
+                    shadow-[0px_0px_10px_2px_rgba(0,0,0,0.5)]
                     px-1! py-1!
                     ${width} ${animationClass}
                 `}

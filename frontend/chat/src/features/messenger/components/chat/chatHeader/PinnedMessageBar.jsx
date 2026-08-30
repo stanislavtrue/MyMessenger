@@ -49,27 +49,22 @@ export const PinnedMessageBar = ({ chat }) => {
     const activeBarIndex = pinnedMessages.length <= 5 ? safeIndex : Math.floor((safeIndex / (pinnedMessages.length - 1)) * 4);
 
     return (
-        <div 
-            className="
-                relative overflow-hidden
-                flex items-center
-                h-12 bg-[#111111]
-                pl-1!
-                rounded-3xl
-            "
-        >
+        <div className="
+            relative overflow-hidden flex items-center
+            h-12 bg-[#1C1C1C] pl-1! rounded-3xl
+        ">
             <div className="
                 flex items-center justify-center size-10 
-                rounded-full active:scale-90 active:bg-[#52526B]
-                hover:bg-[#282836]/50 shrink-0 cursor-pointer
+                rounded-full active:scale-90 active:bg-[#2E2E2E]
+                hover:bg-[#212121] shrink-0 cursor-pointer
                 transition-all duration-200
             ">
-                <Pin size={24} className="text-[#7F88C0]"/>
+                <Pin size={24} className="text-[#959595]"/>
             </div>
 
             <div 
                 onClick={handleBarClick}
-                className="flex flex-1 items-center gap-2 hover:bg-[#6F26A1]/20 min-w-0 rounded-sm px-1! cursor-pointer select-none">
+                className="flex flex-1 items-center gap-2 hover:bg-[#527AFF]/20 min-w-0 rounded-sm px-1! cursor-pointer select-none">
                 {ripples.map((ripple) => (
                     <span
                         key={ripple.id}
@@ -96,7 +91,7 @@ export const PinnedMessageBar = ({ chat }) => {
                                 className={`
                                     rounded-full flex-1 transition-all duration-500 ease-in-out
                                     ${isActive
-                                        ? "bg-[#7956E3] opacity-100"
+                                        ? "bg-[#527AFF] opacity-100"
                                         : "bg-[#3A3A4E] opacity-60"
                                     }    
                                 `}
@@ -110,7 +105,7 @@ export const PinnedMessageBar = ({ chat }) => {
                         key={currentPinned.id}
                         className="flex flex-col justify-center w-full h-full"
                     >
-                        <span className="text-sm! text-[#7956E3] font-semibold! leading-tight mb-0.5!">
+                        <span className="text-sm! text-[#527AFF] font-semibold! leading-tight mb-0.5!">
                             Pinned Message #<span className="animate-slide-down">{pinnedMessages.length - safeIndex}</span>
                         </span>
                         <span className="animate-slide-down text-sm! truncate leading-tight">
@@ -124,11 +119,11 @@ export const PinnedMessageBar = ({ chat }) => {
                 onClick={() => setIsConfirmModalOpen(true)}
                 className="
                     flex items-center mr-1! justify-center size-10 
-                    rounded-full active:scale-90 active:bg-[#52526B]
-                    hover:bg-[#282836]/50 shrink-0 cursor-pointer
+                    rounded-full active:scale-90 active:bg-[#2E2E2E]
+                    hover:bg-[#212121] shrink-0 cursor-pointer
                     transition-all duration-200
                 ">
-                <X size={24} className="text-[#7F88C0]"/>
+                <X size={24} className="text-[#959595]"/>
             </div>
             <ConfirmModal
                 isOpen={isConfirmModalOpen}

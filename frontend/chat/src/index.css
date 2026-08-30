@@ -9,7 +9,7 @@ input::placeholder {
 
 @layer base {
     input, textarea, [contenteditable="true"] {
-        caret-color: #8F5EB5 !important;
+        caret-color: #527AFF !important;
     }
 }
 
@@ -53,7 +53,7 @@ body {
     position: absolute;
     border-radius: 50%;
     transform: scale(0);
-    animation: ripple-effect 2500ms ease-out;
+    animation: ripple-effect 1500ms ease-out;
     background-color: rgba(0, 0, 0, 0.1);
     pointer-events: none;
 }
@@ -86,29 +86,28 @@ body {
     opacity: 0 !important;
     transform: scale(0.9) !important;
     pointer-events: none !important;
+    transition: none !important;
 }
 
 .context-menu.open {
     opacity: 1;
-    transform: 
-        scale(1);
+    transform: scale(1);
     pointer-events: auto;
 }
 
 .context-menu.closed {
     opacity: 0;
-    transform:
-        scale(0.90);
+    transform: scale(0.90);
     pointer-events: none;
 }
 
 .message-row-highlight {
     background-color: transparent;
-    transition: background-color 100ms ease-in-out;
+    transition: background-color 350ms ease-in-out;
 }
 
 .message-row-highlight.active {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 111, 195, 0.4);
 }
 
 @keyframes toast {
@@ -152,8 +151,8 @@ body {
 }
 
 aside.EmojiPickerReact {
-    --epr-bg-color: #111111;
-    --epr-text-color: #7F88C0;
+    --epr-bg-color: #1C1C1C;
+    --epr-text-color: #959595;
     --epr-emoji-padding: 7px;
     --epr-horizontal-padding: 4px;
     --epr-emoji-size: 32px;
@@ -185,7 +184,7 @@ aside.EmojiPickerReact {
 .emoji-pop {
     transform: scale(0);
     will-change: transform, opacity;
-    animation: emojiGrow 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: emojiGrow 0.35s cubic-bezier(1, 0, 0.64, 1) forwards;
     animation-delay: calc(var(--i) * 30ms);
 }
 
@@ -299,4 +298,10 @@ aside.EmojiPickerReact {
 
 .animate-user-online-status-out {
     animation: userOnlineStatusOut 0.3s ease-out forwards;
+}
+
+@keyframes openSearchDropDown {
+    from {
+        
+    }
 }

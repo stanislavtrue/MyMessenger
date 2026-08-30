@@ -25,7 +25,7 @@ export const ContactsScreen = ({ contacts, filteredContacts, selectedChatId, han
                 <div
                     onClick={() => setIsAddContactOpen(true)} 
                     className="
-                        flex items-center justify-center bg-[#734FBA] rounded-full size-14 
+                        flex items-center justify-center bg-[#527AFF] rounded-full size-14 
                         cursor-pointer hover:bg-[#6740b6] shrink-0
                     "
                 >

@@ -40,15 +40,12 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
     }
 
     return (
-        <div className="relative flex-1 h-screen flex flex-col p-4! pl-1.5! min-w-0">
-            <div className="
-                relative flex-1 flex flex-col w-full h-full
-                bg-[#1F1F28]/60 rounded-3xl overflow-hidden
-            ">
+        <div className="relative flex-1 h-screen flex flex-col min-w-0">
+            <div className="relative flex-1 flex flex-col w-full h-full overflow-hidden">
                 <div className="absolute top-0 inset-x-0 z-30 pointer-events-none">
                     <div className="max-w-180 mx-auto! w-full">
                         <div ref={headerRef} className="bg-[#1F1F28]/10 backdrop-blur-xs pointer-events-auto">
-                            <div className="pt-3! mx-auto! transition-all duration-75 ease-out">
+                            <div className="pt-6! mx-auto! transition-all duration-75 ease-out">
                                 <ChatHeader chat={selectedChat} isMobile={isMobile} onBack={onBack} />
                             </div>
                             <div className="max-w-180 mx-auto! mt-2! transition-all duration-75 ease-out">
@@ -66,7 +63,7 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
                 
                 <div className="absolute bottom-0 inset-x-0 z-30 pointer-events-none">
                     <div ref={footerRef} className="max-w-180 mx-auto! transition-all duration-75 ease-out">
-                        <div className="pb-3! bg-linear-to-b from-[#1F1F28]/0 to-[#1F1F28]/30 rounded-3xl backdrop-blur-xs pointer-events-auto">
+                        <div className="pb-6! bg-linear-to-b from-[#1F1F28]/0 to-[#1F1F28]/30 rounded-3xl backdrop-blur-xs pointer-events-auto">
                             <MessageInput onSendMessage={onSendMessage}/>
                         </div>
                     </div>

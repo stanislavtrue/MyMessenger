@@ -10,7 +10,7 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
 
     return (
         <div className="
-            relative h-12 bg-[#111111] 
+            relative h-12 bg-[#1C1C1C] 
             flex items-center select-none
             rounded-3xl
         ">
@@ -59,8 +59,8 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                             className="
                                 flex items-center justify-center
                                 h-10 w-10 rounded-full
-                                text-[#7F88C0] hover:bg-[#282836]/50
-                                active:scale-90 active:bg-[#52526B]
+                                text-[#959595] hover:bg-[#212121]
+                                active:scale-90 active:bg-[#2E2E2E]
                                 transition-all duration-200 cursor-pointer
                             "
                         >
@@ -70,8 +70,8 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
                         <div className="
                             flex items-center justify-center
                             h-10 w-10 rounded-full
-                            text-[#7F88C0] hover:bg-[#282836]/50
-                            active:scale-90 active:bg-[#52526B]
+                            text-[#959595] hover:bg-[#212121]
+                            active:scale-90 active:bg-[#2E2E2E]
                             transition-all duration-200
                             cursor-pointer
                         ">

@@ -66,7 +66,7 @@ export const MessageList = ({ messages }) => {
 
                             {showDivider && (
                                 <div className="flex justify-center my-4! select-none pointer-events-none">
-                                    <div className="px-2! py-1! bg-[#D236E0]/20 text-sm! font-semibold! rounded-2xl">
+                                    <div className="px-2! py-1! bg-[#006FC3]/40 text-sm! font-semibold! rounded-2xl">
                                         {formatDividerDate(message.date)}
                                     </div>
                                 </div>
@@ -120,12 +120,12 @@ export const MessageList = ({ messages }) => {
                                     flex items-center gap-5 px-3! py-1.5! text-sm! font-semibold! rounded-2xl
                                     cursor-pointer transition-colors duration-0 w-full text-left
                                     ${item.isDanger
-                                        ? "text-red-500! hover:bg-[#282836]/60! hover:text-white!"
-                                        : "text-white hover:bg-[#282836]/60!"
+                                        ? "text-red-500! hover:bg-[#212121]! hover:text-white!"
+                                        : "text-white hover:bg-[#212121]!"
                                     }    
                                 `}
                             >
-                                <Icon size={18} className={item.isDanger ? "" : "text-[#7F88C0]"} />
+                                <Icon size={18} strokeWidth={item.strokeWidth || 0} className={item.isDanger ? "" : "text-[#959595]"} />
                                 <span>{currentLabel}</span>
                             </button>
                         );

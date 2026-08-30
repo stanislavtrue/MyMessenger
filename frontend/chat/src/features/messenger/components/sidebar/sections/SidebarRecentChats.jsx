@@ -8,7 +8,7 @@ export const SidebarRecentChats = ({ activeChats, selectedChatId, handleSelectCh
         <div className="flex-1 overflow-y-auto px-4! pt-20! pb-4!">
             <div 
                 ref={scrollRef} 
-                className="flex items-center p-2! bg-[#111111] rounded-3xl overflow-x-auto scrollbar-none"
+                className="flex items-center p-2! bg-[#222222] rounded-3xl overflow-x-auto scrollbar-none"
             >
                 {activeChats.slice(0, 10).map(chat => (
                     <DiscoverChatItem

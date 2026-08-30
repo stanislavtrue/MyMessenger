@@ -38,11 +38,11 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                 minWidth: isMobile ? "100%" : "280px",
                 maxWidth: isMobile ? "100%" : "650px"
             }}
-            className="relative h-screen flex flex-col p-4! pr-1.5! select-none shrink-0"
+            className="relative h-screen flex flex-col py-4! pl-4! select-none shrink-0"
         >
             <div className="
                 relative flex-1 flex flex-col w-full h-full rounded-3xl
-                bg-[#1F1F28]/60 select-none overflow-hidden
+                bg-[#1C1C1C]/80 select-none overflow-hidden
             ">
 
                 {(isSidebarMenuOpen || (contextMenu.visible && contextMenu.type === "chat")) && (
@@ -82,8 +82,8 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
                         onMouseDown={handleMouseDown}
                         className={`
                             absolute top-0 right-0 w-0.5 h-full
-                            hover:bg-[#5D25AA] cursor-col-resize transition-colors
-                            ${isResizing ? "bg-[#5D25AA]" : "bg-transparent"}
+                            hover:bg-[#959595] cursor-col-resize transition-colors
+                            ${isResizing ? "bg-[#959595]" : "bg-transparent"}
                         `}
                     />
                 )}

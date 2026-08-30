@@ -5,7 +5,7 @@ export const ChatMeta = ({ lastMessageAt, unreadCount, isSelected }) => {
         <div className="flex flex-col items-end justify-between h-12 z-12 shrink-0 ml-auto">
             <span className={`
                 text-xs! transition-colors duration-200
-                ${isSelected  ? "text-[#FFFFFF]" : "text-[#7D7DA2]"}
+                ${isSelected  ? "text-[#FFFFFF]" : "text-[#959595]"}
             `}>
                 {formatSidebarDate(lastMessageAt)}
             </span>
@@ -13,10 +13,10 @@ export const ChatMeta = ({ lastMessageAt, unreadCount, isSelected }) => {
             {unreadCount > 0 ? (
                 <div className={`
                     flex items-center justify-center
-                    min-w-6 h-6 px-1.5! text-[#FFFFFF]/80
+                    min-w-6 h-6 px-1.5!
                     rounded-full text-sm! font-semibold!
                     transition-all duration-200
-                    ${isSelected ? "bg-[#7D7DA2]/50" : "bg-[#7D7DA2]/70"}
+                    ${isSelected ? "bg-[#FFFFFF] text-[#056996]" : "bg-[#527AFF] text-[#FFFFFF]/80"}
                 `}>
                     {unreadCount}
                 </div>

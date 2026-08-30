@@ -6,7 +6,7 @@ export const SearchChatItem = ({ chat, onSelect }) => {
             onClick={onSelect}
             className="
                 relative flex items-center justify-center cursor-pointer shrink-0
-                rounded-3xl overflow-hidden bg-[#282836]/50 hover:text-[#B06EE4]
+                rounded-3xl overflow-hidden bg-[#527AFF]/10 hover:text-[#527AFF]
                 transition-colors duration-100
             "
         >

@@ -11,7 +11,7 @@ export const BubbleContainer = ({ children, isOwnMessage, isFirstMessage, isLast
                 shadow-[2px_8px_12px_rgba(0,0,0,0.8)]
                 ${radiusClass}
                 ${isOwnMessage
-                    ? "ml-auto! mr-4! bg-[#7D55B5]"
+                    ? "ml-auto! mr-4! bg-[#343E4A]"
                     : "mr-auto! ml-4! bg-[#28292B]"
                 }
             `}

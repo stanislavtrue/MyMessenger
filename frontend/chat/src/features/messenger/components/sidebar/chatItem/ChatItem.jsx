@@ -24,8 +24,8 @@ export const ChatItem = ({ chat, selectedChatId, setSelectedChatId, isContextAct
                 relative flex items-center gap-2 px-2! py-2!
                 w-[97%] rounded-2xl m-auto! select-none overflow-hidden
                 transition-colors duration-0 cursor-pointer
-                ${isSelected ? "bg-[#5D25AA]" : "hover:bg-[#282836]/50"}
-                ${isContextActive && !isSelected ? "bg-[#282836]" : ""}
+                ${isSelected ? "bg-[#056996]" : "hover:bg-[#212121]"}
+                ${isContextActive && !isSelected ? "bg-[#212121]" : ""}
             `}
         >
             {ripples.map((ripple) => (

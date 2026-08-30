@@ -33,8 +33,8 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
                 <div className={`
                     relative flex flex-1 items-center
                     ml-4! pl-4! z-50 min-w-0! w-full h-10 
-                    group bg-[#16161D] focus-within:bg-[#111111]
-                    focus-within:shadow-[0px_0px_10px_rgba(0,0,0,1)]
+                    group bg-[#111111] focus-within:bg-[#1C1C1C]
+                    focus-within:shadow-[0px_0px_10px_rgba(0,0,0,0.5)]
 
                     transition-all duration-200 ease-in-out
                     
@@ -44,7 +44,7 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
                     }
                 `}>
 
-                    <SlMagnifier size={18} strokeWidth={35} className="shrink-0 transition-colors text-[#52526B] group-focus-within:text-[#8F5EB5]"/>
+                    <SlMagnifier size={18} strokeWidth={35} className="shrink-0 transition-colors text-[#959595]/70 group-focus-within:text-[#527AFF]"/>
 
                     <input 
                         ref={inputRef}
@@ -60,16 +60,16 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
                         }}
                         type="text"
                         placeholder="Search"
-                        className="w-full pl-3! outline-none!"
+                        className="w-full pl-3! outline-none! placeholder:text-[#959595]/70!"
                     />
                         
                     {chatSearchText && filteredSearchMessages.length > 0  && (
                         <div className="flex items-center shrink-0 p-0.5!"> 
-                            <div onClick={handleNextSearch} className="flex items-center justify-center size-7 rounded-full text-[#7F88C0] hover:bg-[#282836] hover:text-white transition-colors">
+                            <div onClick={handleNextSearch} className="flex items-center justify-center size-7 rounded-full text-[#959595]/70 hover:bg-[#212121] hover:text-white transition-colors">
                                 <ChevronUp size={26} />
                             </div>
 
-                            <div onClick={handlePrevSearch} className="flex items-center justify-center size-7 rounded-full text-[#7F88C0] hover:bg-[#282836] hover:text-white transition-colors">
+                            <div onClick={handlePrevSearch} className="flex items-center justify-center size-7 rounded-full text-[#959595]/70 hover:bg-[#212121] hover:text-white transition-colors">
                                 <ChevronDown size={26} />
                             </div>
                         </div>
@@ -79,10 +79,10 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
                         onClick={closeChatSearch}
                         className="
                             flex items-center justify-center size-7 mx-3!
-                            hover:bg-[#282836] rounded-full shrink-0
+                            hover:bg-[#212121] rounded-full shrink-0
                             cursor-pointer
                         ">
-                        <X size={24} className="text-[#7F88C0]"/>
+                        <X size={24} className="text-[#959595]/70"/>
                     </div>
 
                     {isDropdownVisible && <SearchDropdown chat={chat} />}
@@ -91,9 +91,10 @@ export const ChatSearchBar = ({ chat, isVisible }) => {
 
                 <div className="
                     flex items-center justify-center size-10 mr-1!
-                    hover:bg-[#282836] rounded-full cursor-pointer
+                    hover:bg-[#212121] rounded-full cursor-pointer
+                    transition-all active:scale-90 active:bg-[#2E2E2E] duration-200
                 ">
-                    <Calendar size={22} className="text-[#7F88C0]" />
+                    <Calendar size={22} className="text-[#959595]" />
                 </div>
             </div>
         </div>

@@ -71,7 +71,7 @@ export const MessageInput = ({ onSendMessage }) => {
         <div className="flex relative items-end gap-2">
             <div className="
                 flex-1 flex flex-col min-w-0 
-                bg-[#111111] rounded-3xl
+                bg-[#1C1C1C] rounded-3xl
                 transition-all duration-300
             ">
                 <ReplyPreview
@@ -87,7 +87,7 @@ export const MessageInput = ({ onSendMessage }) => {
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                     >
-                        <Smile size={26} className={`cursor-pointer transition-colors ${isEmojiPickerOpen ? "text-[#8F5EB5]" : "text-[#7F88C0]"}`}/>
+                        <Smile size={26} className={`cursor-pointer transition-colors ${isEmojiPickerOpen ? "text-[#527AFF]" : "text-[#959595]"}`}/>
 
                         <div className={`
                             absolute bottom-10 left-0 z-50
@@ -124,7 +124,7 @@ export const MessageInput = ({ onSendMessage }) => {
                         className="
                             pl-3! w-full h-full
                             bg-transparent outline-none!
-                            text-xl placeholder-[#7F88C0]/80!
+                            text-xl placeholder-[#959595]/80!
                         "
                         type="text"
                         placeholder="Message"
@@ -135,21 +135,21 @@ export const MessageInput = ({ onSendMessage }) => {
             <div 
                 onClick={hasMessage ? handleSend : null}
                 className="
-                    size-12 rounded-full bg-[#111111]
+                    size-12 rounded-full bg-[#1C1C1C]
                     flex items-center justify-center
-                    cursor-pointer hover:bg-[#8F5EB5]
+                    cursor-pointer hover:bg-[#527AFF]
                     group shrink-0 transition-colors
                 "
             >
                 {hasMessage ? (
                     <MdSend 
                         size={24} 
-                        className={`text-[#7F88C0] transition-colors group-hover:text-white ${hasMessage ? "animate-pulse-send" : ""}`}
+                        className={`text-[#959595] transition-colors group-hover:text-white ${hasMessage ? "animate-pulse-send" : ""}`}
                     />
                 ) : (
                     <Mic 
                         size={24} 
-                        className={`text-[#7F88C0] transition-colors group-hover:text-white ${hasMessage ? "" : "animate-pulse-send"}`}
+                        className={`text-[#959595] transition-colors group-hover:text-white ${hasMessage ? "" : "animate-pulse-send"}`}
                     />
                 )}
             </div>

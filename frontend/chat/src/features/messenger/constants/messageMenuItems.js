@@ -7,6 +7,7 @@ export const MESSAGE_CONTEXT_MENU = [
         id: "reply",
         label: () => "Reply",
         icon: SlActionUndo,
+        strokeWidth: 25,
         action: (message, context) => {
             context.openReply(message);
             document.getElementById("message-input")?.focus();
@@ -16,6 +17,7 @@ export const MESSAGE_CONTEXT_MENU = [
         id: "copy",
         label: () => "Copy Text",
         icon: MdOutlineContentCopy,
+        strokeWidth: 0,
         action: async (message, context) => {
             if (!message?.text) return;
             try {
@@ -33,6 +35,7 @@ export const MESSAGE_CONTEXT_MENU = [
             return pinnedMessages.some(msg => msg.id === message?.id) ? "Unpin" : "Pin";
         },
         icon: Pin,
+        strokeWidth: 2,
         action: (message, context) => {
             const pinnedMessages = context.selectedChat?.pinnedMessages || [];
             const isCurrentPinned = pinnedMessages.some(msg => msg.id === message.id);
@@ -48,11 +51,13 @@ export const MESSAGE_CONTEXT_MENU = [
         id: "forward",
         label: () => "Forward",
         icon: SlActionRedo,
+        strokeWidth: 25
     },
     {
         id: "delete",
         label: () => "Delete",
         icon: Trash,
+        strokeWidth: 2,
         isDanger: true,
         action: (message, context) => {
             context.handleDeleteMessage(context.selectedChatId, message.id);
