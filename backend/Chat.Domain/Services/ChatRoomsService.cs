@@ -78,6 +78,11 @@ public class ChatRoomsService
         return result;
     }
 
+    public async Task<List<ChatMember>> GetChatMembers(Guid chatId)
+    {
+        return await _chatMembersRepository.GetMembersByChatId(chatId);
+    }
+
     public async Task MarkAsRead(Guid chatId, Guid userId, Guid messageId)
     {
         var messageSentAt = await _messagesRepository.GetSentAtById(messageId);

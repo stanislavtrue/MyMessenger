@@ -38,6 +38,18 @@ public class ChatMembersRepository : IChatMembersRepository
         return chatRoomIds;
     }
 
+    public async Task<List<ChatMember>> GetMembersByChatId(Guid chatId)
+    {
+        var chatMemberEntities = await _context.ChatMembers
+            .AsNoTracking()
+            .Where(cm => cm.ChatId == chatId)
+            .ToListAsync();
+
+        return chatMemberEntities
+            .Select(e => ChatMember.Restore(e.Id, e.ChatId, e.UserId, e.LastReadMessageId, e.UnreadCount))
+            .ToList();
+    }
+
     public async Task<Guid?> GetOtherUserId(Guid chatId, Guid currentUserId)
     {
         var otherUserId = await _context.ChatMembers

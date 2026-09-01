@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { formatDate } from "@/utils/formatDate";
 import { formatTime } from "@/utils/formatTime";
 
@@ -107,9 +107,6 @@ export const useMessenger = () => {
                 if (chat.id === message.chatId) {
                     return {
                         ...chat,
-                        lastMessage: message.text,
-                        time: formatTime(message.sentAt),
-                        unreadCount: !isOwn ? (chat.unreadCount || 0) + 1 : chat.unreadCount,
                         messages: [...chat.messages, newMessage]
                     };
                 }
@@ -117,6 +114,31 @@ export const useMessenger = () => {
                 return chat;
             }));
         };       
+
+        const handleChatUpdated = ({ chatId, lastMessage, lastMessageAt, unreadCount }) => {
+            setChats((prevChats) => {
+                const chatIndex = prevChats.findIndex((chat) => chat.id === chatId);
+
+                if (chatIndex === -1) 
+                    return prevChats;
+
+                const existingChat = prevChats[chatIndex];
+
+                const updatedChat = {
+                    ...existingChat,
+                    lastMessage: lastMessage,
+                    lastMessageAt: lastMessageAt,
+                    unreadCount: unreadCount !== undefined ? unreadCount : existingChat.unreadCount
+                };
+
+                const newChat = [
+                    updatedChat,
+                    ...prevChats.filter((chat) => chat.id !== chatId)
+                ];
+
+                return newChat;
+            });
+        };
 
         const handleMessagesRead = ({ chatId, userId, lastReadMessageId, unreadCount }) => {
             setChats(prevChats => prevChats.map(chat => {
@@ -187,6 +209,7 @@ export const useMessenger = () => {
         };
 
         connection.on("ReceiveMessage", handleReceiveMessage);
+        connection.on("ChatUpdated", handleChatUpdated);
         connection.on("MessagesRead", handleMessagesRead);
         connection.on("UserStatusChanged", handleUserStatusChanged);
         connection.on("UserStartTyping", handleUserStartTyping);
@@ -194,6 +217,7 @@ export const useMessenger = () => {
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
+            connection.off("ChatUpdated", handleChatUpdated);
             connection.off("MessagesRead", handleMessagesRead);
             connection.off("UserStatusChanged", handleUserStatusChanged);
             connection.off("UserStartTyping", handleUserStartTyping);

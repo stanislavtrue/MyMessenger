@@ -55,6 +55,8 @@ public class ChatHub : Hub
     {
         var userId = GetUserId();
 
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+
         var isFirstConnection =  await _userStatusTracker.AddConnectionAsync(userId, Context.ConnectionId);
 
         if (isFirstConnection)
@@ -103,6 +105,20 @@ public class ChatHub : Hub
 
         await Clients.Group(chatId.ToString())
             .SendAsync("ReceiveMessage", message);
+
+        var chatMembers = await _chatRoomsService.GetChatMembers(chatId);
+
+        foreach (var chatMember in chatMembers)
+        {
+            await Clients.Group($"user_{chatMember.UserId}")
+                .SendAsync("ChatUpdated", new
+                {
+                    ChatId = chatId,
+                    LastMessage = message.Text,
+                    LastMessageAt = message.SentAt,
+                    UnreadCount = chatMember.UnreadCount
+                });
+        }
     }
 
     public async Task JoinChat(Guid chatId)

@@ -5,6 +5,7 @@ public interface IChatMembersRepository
 {
     Task Add(ChatMember member);
     Task<List<Guid>> GetChatIdsByUserId(Guid userId);
+    Task<List<ChatMember>> GetMembersByChatId(Guid chatId);
     Task<Guid?> GetOtherUserId(Guid chatId, Guid currentUserId);
     Task<List<ChatMemberInfo>> GetOtherUsersByChatIds(List<Guid> chatIds, Guid currentUserId);
     Task<Guid?> GetLastReadMessageId(Guid chatId, Guid currentUserId);
