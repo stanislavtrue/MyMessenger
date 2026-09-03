@@ -8,5 +8,6 @@ public record MessageDto
     Guid SenderId,
     string Text,
     DateTimeOffset SentAt,
-    MessageStatus Status
+    MessageStatus Status,
+    List<ReactionDto> Reactions
 );

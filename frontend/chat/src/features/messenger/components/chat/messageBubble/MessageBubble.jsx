@@ -34,13 +34,14 @@ export const MessageBubble = ({ message, isFirstMessage, isLastMessage }) => {
                     {message.reactions && message.reactions.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-1! max-w-full">
                             {message.reactions.map((reaction, idx) => {
-                                const reactionUser = reaction.userId === currentUser.id ? currentUser : selectedChat.user;
-
                                 return (
                                     <ActiveReactionBadge
-                                        key={reaction.userId}
+                                        key={reaction.emoji}
                                         reaction={reaction.emoji}
-                                        user={reactionUser}
+                                        count={reaction.count}
+                                        isOwnReaction={reaction.isOwn}
+                                        currentUser={currentUser}
+                                        companion={selectedChat.user}
                                         isOwnMessage={message.isOwnMessage}
                                         onClick={(e) => {
                                             e.stopPropagation();

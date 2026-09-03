@@ -121,6 +121,26 @@ public class ChatHub : Hub
         }
     }
 
+    public async Task SetReaction(Guid chatId, Guid messageId, string emoji)
+    {
+        var userId = GetUserId();
+
+        if (!await _chatRoomsService.HasAccess(chatId, userId))
+            throw new ChatAccessDeniedException();
+
+        await _messagesService.SetReaction(messageId, userId, emoji);
+
+        var updatedReactions = await _messagesService.GetMessageReactions(messageId, userId);
+
+        await Clients.Group(chatId.ToString())
+            .SendAsync("ReactionUpdated", new
+            {
+                ChatId = chatId,
+                MessageId = messageId,
+                Reactions = updatedReactions
+            });
+    }
+
     public async Task JoinChat(Guid chatId)
     {
         var userId = GetUserId();

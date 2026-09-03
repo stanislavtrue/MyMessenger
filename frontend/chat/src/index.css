@@ -300,8 +300,21 @@ aside.EmojiPickerReact {
     animation: userOnlineStatusOut 0.3s ease-out forwards;
 }
 
-@keyframes openSearchDropDown {
-    from {
-        
+@keyframes reactionSet {
+    0% {
+        transform: scale(0);
+        opacity: 0;
     }
+    70% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.reaction-set {
+    animation: reactionSet 0.5s ease-in-out forwards;
 }

@@ -43,6 +43,10 @@ public class ExceptionHandlingMiddleware
         {
             await WriteError(context, StatusCodes.Status404NotFound, "ChatNotFound", ex.Message);
         }
+        catch (ReactionNotFoundException ex)
+        {
+            await WriteError(context, StatusCodes.Status404NotFound, "ReactionNotFound", ex.Message);
+        }
         catch (ChatMemberNotFoundException ex)
         {
             await WriteError(context, StatusCodes.Status404NotFound, "ChatMemberNotFound", ex.Message);

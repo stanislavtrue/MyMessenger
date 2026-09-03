@@ -208,12 +208,33 @@ export const useMessenger = () => {
             }));
         };
 
+        const handleReactionUpdated = ({ chatId, messageId, reactions }) => {
+            setChats(prevChats => prevChats.map((chat) => {
+                if (chat.id !== chatId)
+                    return chat;
+
+                return {
+                    ...chat,
+                    messages: chat.messages.map((msg) => {
+                        if (msg.id !== messageId)
+                            return msg;
+
+                        return {
+                            ...msg,
+                            reactions: reactions
+                        };
+                    })
+                };
+            }));
+        };
+
         connection.on("ReceiveMessage", handleReceiveMessage);
         connection.on("ChatUpdated", handleChatUpdated);
         connection.on("MessagesRead", handleMessagesRead);
         connection.on("UserStatusChanged", handleUserStatusChanged);
         connection.on("UserStartTyping", handleUserStartTyping);
         connection.on("UserStopTyping", handleUserStopTyping);
+        connection.on("ReactionUpdated", handleReactionUpdated);
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
@@ -222,6 +243,7 @@ export const useMessenger = () => {
             connection.off("UserStatusChanged", handleUserStatusChanged);
             connection.off("UserStartTyping", handleUserStartTyping);
             connection.off("UserStopTyping", handleUserStopTyping);
+            connection.off("ReactionUpdated", handleReactionUpdated);
         };
     }, [currentUser?.id, connection]);
 
@@ -283,7 +305,10 @@ export const useMessenger = () => {
         closeAddContact();
     };
 
-    const handleSetReaction = (messageId, emoji) => {
+    const handleSetReaction = async (messageId, emoji) => {
+        if (!selectedChat || !connection)
+            return;
+
         setChats((prevChats) =>
             prevChats.map((chat) => {
                 if (chat.id !== selectedChatId) return chat;
@@ -293,9 +318,7 @@ export const useMessenger = () => {
 
                     const currentReactions = msg.reactions || [];
 
-                    const existingReactionIndex = currentReactions.findIndex(
-                        (r) => r.userId === currentUser.id
-                    );
+                    const existingReactionIndex = currentReactions.findIndex(r => r.isOwn);
 
                     let updatedReactions = [...currentReactions];
 
@@ -303,25 +326,58 @@ export const useMessenger = () => {
                         const existingReaction = currentReactions[existingReactionIndex];
 
                         if (existingReaction.emoji === emoji) {
-                            updatedReactions = updatedReactions.filter(
-                                (r) => r.userId !== currentUser.id
-                            );
+                            if (existingReaction.count === 1){
+                                updatedReactions.splice(existingReactionIndex, 1);
+                            } else {
+                                updatedReactions[existingReactionIndex] = {
+                                    ...existingReaction,
+                                    count: existingReaction.count - 1,
+                                    isOwn: false
+                                };
+                            }
                         } else {
                             updatedReactions[existingReactionIndex] = {
-                                emoji,
-                                userId: currentUser.id
+                                ...existingReaction,
+                                count: existingReaction.count - 1,
+                                isOwn: false
                             };
+
+                            const targetIndex = updatedReactions.findIndex(r => r.emoji === emoji);
+
+                            if (targetIndex !== -1) {
+                                updatedReactions[targetIndex] = {
+                                    ...updatedReactions[targetIndex],
+                                    count: updatedReactions[targetIndex].count + 1,
+                                    isOwn: true
+                                };
+                            } else {
+                                updatedReactions.push({
+                                    emoji,
+                                    count: 1,
+                                    isOwn: true
+                                });
+                            }
                         }
                     } else {
-                        updatedReactions.push({
-                            emoji,
-                            userId: currentUser.id
-                        });
+                        const targetIndex = updatedReactions.findIndex(r => r.emoji === emoji);
+                        if (targetIndex !== -1) {
+                            updatedReactions[targetIndex] = {
+                                ...updatedReactions[targetIndex],
+                                count: updatedReactions[targetIndex].count + 1,
+                                isOwn: true
+                            };
+                        } else {
+                            updatedReactions.push({
+                                emoji,
+                                count: 1,
+                                isOwn: true
+                            });
+                        }
                     }
 
                     return {
                         ...msg,
-                        reactions: updatedReactions
+                        reactions: updatedReactions.filter(r => r.count > 0)
                     };
                 });
 
@@ -331,6 +387,12 @@ export const useMessenger = () => {
                 };
             })
         );
+
+        try {
+            await connection.invoke("SetReaction", selectedChatId, messageId, emoji);
+        } catch (error) {
+            console.error("Failed to set reaction via SignalR", error);
+        }
     };
 
     const handleSelectChat = async (chatId) => {

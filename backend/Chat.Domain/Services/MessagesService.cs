@@ -7,12 +7,14 @@ public class MessagesService
 {
     private readonly IMessagesRepository _messagesRepository;
     private readonly IChatMembersRepository _chatMemberRepository;
+    private readonly IMessageReactionsRepository _messageReactionsRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public MessagesService(IMessagesRepository messagesRepository, IChatMembersRepository chatMembersRepository, IUnitOfWork unitOfWOrk)
+    public MessagesService(IMessagesRepository messagesRepository, IChatMembersRepository chatMembersRepository, IMessageReactionsRepository messageReactionsRepository, IUnitOfWork unitOfWOrk)
     {
         _messagesRepository = messagesRepository;
         _chatMemberRepository = chatMembersRepository;
+        _messageReactionsRepository = messageReactionsRepository;
         _unitOfWork = unitOfWOrk;
     }
 
@@ -44,7 +46,15 @@ public class MessagesService
     {
         var messages = await _messagesRepository.GetByChatId(chatId);
 
-    var recipientLastReadMessageId = await _chatMemberRepository.GetLastReadMessageId(chatId, currentUserId);
+        var messageIds = messages.Select(m => m.Id).ToList();
+
+        var reactions = await _messageReactionsRepository.GetByMessageIds(messageIds);
+
+        var reactionsByMessage = reactions
+            .GroupBy(mr => mr.MessageId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var recipientLastReadMessageId = await _chatMemberRepository.GetLastReadMessageId(chatId, currentUserId);
 
         DateTimeOffset? recipientLastReadMessageSentAt = null;
 
@@ -56,15 +66,74 @@ public class MessagesService
                 recipientLastReadMessageSentAt = await _messagesRepository.GetSentAtById(recipientLastReadMessageId.Value);
         }
 
-        return messages.Select(m => new MessageDto
-        (
-            m.Id,
-            m.ChatId,
-            m.SenderId,
-            m.Text,
-            m.SentAt,
-            CalculateMessageStatus(m, currentUserId, recipientLastReadMessageSentAt)
-        )).ToList();
+        return messages.Select(m =>
+        {
+            var messageReactions = reactionsByMessage.GetValueOrDefault(m.Id) ?? new List<MessageReaction>();
+
+            var reactionDtos = messageReactions
+                .GroupBy(mr => mr.Emoji)
+                .Select(g => new ReactionDto(
+                    Emoji: g.Key,
+                    Count: g.Count(),
+                    IsOwn: g.Any(r => r.UserId == currentUserId)
+                ))
+                .ToList();
+
+            return new MessageDto
+            (
+                m.Id,
+                m.ChatId,
+                m.SenderId,
+                m.Text,
+                m.SentAt,
+                CalculateMessageStatus(m, currentUserId, recipientLastReadMessageSentAt),
+                reactionDtos
+            );
+        }).ToList();
+    }
+
+    public async Task SetReaction(Guid messageId, Guid userId, string emoji)
+    {
+        var existingReaction = await _messageReactionsRepository.GetByMessageIdAndUserId(messageId, userId);
+        
+        if (existingReaction is null)
+        {
+            var reaction = MessageReaction.Create(messageId, userId, emoji);
+
+            await _messageReactionsRepository.Add(reaction);
+        }
+        else if (existingReaction.Emoji == emoji)
+        {
+            await _messageReactionsRepository.Remove(existingReaction.Id);
+        }
+        else
+        {
+            var newReaction = MessageReaction.Restore(
+                existingReaction.Id,
+                messageId,
+                userId,
+                emoji,
+                DateTimeOffset.UtcNow
+            );
+
+            await _messageReactionsRepository.Update(newReaction);
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<List<ReactionDto>> GetMessageReactions(Guid messageId, Guid currentUserId)
+    {
+        var messageReactions = await _messageReactionsRepository.GetByMessageId(messageId);
+
+        return messageReactions
+            .GroupBy(mr => mr.Emoji)
+            .Select(g => new ReactionDto(
+                Emoji: g.Key,
+                Count: g.Count(),
+                IsOwn: g.Any(r => r.UserId == currentUserId)
+            ))
+            .ToList();
     }
 
     private MessageStatus CalculateMessageStatus(Message message, Guid currentUserId, DateTimeOffset? recipientLastReadMessageSentAt)

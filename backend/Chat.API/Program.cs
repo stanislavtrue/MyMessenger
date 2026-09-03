@@ -51,10 +51,11 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 /* Repositories */
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<IRefreshTokensRepository, RefreshTokensRepository>();
 builder.Services.AddScoped<IMessagesRepository, MessagesRepository>();
 builder.Services.AddScoped<IChatRoomsRepository, ChatRoomsRepository>();
 builder.Services.AddScoped<IChatMembersRepository, ChatMembersRepository>();
+builder.Services.AddScoped<IRefreshTokensRepository, RefreshTokensRepository>();
+builder.Services.AddScoped<IMessageReactionsRepository, MessageReactionsRepository>();
 
 /* Infrastructure services */
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
