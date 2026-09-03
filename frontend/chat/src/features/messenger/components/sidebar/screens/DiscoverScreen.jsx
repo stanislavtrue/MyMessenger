@@ -6,7 +6,7 @@ export const DiscoverScreen = ({ activeChats, selectedChatId, handleSelectChat }
         <div className="relative flex flex-col flex-1 min-h-0">
             <SidebarTabs />
 
-            <div className="absolute h-4 w-full bg-linear-to-b from-[#1C1C1C] to-[#1C1C1C]/10 z-10"/>
+            <div className="absolute h-px w-full bg-[#2C2C2C] z-10"/>
 
             <SidebarRecentChats
                 activeChats={activeChats}

@@ -71,8 +71,8 @@ export const MessageInput = ({ onSendMessage }) => {
         <div className="flex relative items-end gap-2">
             <div className="
                 flex-1 flex flex-col min-w-0 
-                bg-[#1C1C1C] rounded-3xl
-                transition-all duration-300
+                bg-[#1C1C1C]/50 rounded-3xl border-b! border-t! border-[#2C2C2C]
+                transition-all duration-300 backdrop-blur-xl
             ">
                 <ReplyPreview
                     replyPreview={replyPreview}
@@ -135,10 +135,11 @@ export const MessageInput = ({ onSendMessage }) => {
             <div 
                 onClick={hasMessage ? handleSend : null}
                 className="
-                    size-12 rounded-full bg-[#1C1C1C]
+                    size-12 rounded-full bg-[#1C1C1C]/50
+                    border-b! border-t! border-[#2C2C2C]
                     flex items-center justify-center
                     cursor-pointer hover:bg-[#527AFF]
-                    group shrink-0 transition-colors
+                    group shrink-0 transition-colors backdrop-blur-xl!
                 "
             >
                 {hasMessage ? (

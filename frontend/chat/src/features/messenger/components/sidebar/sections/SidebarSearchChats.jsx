@@ -10,8 +10,8 @@ export const SidebarSearchChats = ({ filteredChats, handleSelectChat }) => {
                 ref={scrollRef}
                 className="
                     flex gap-2 py-2! px-2! overflow-x-auto 
-                    scrollbar-none bg-[#222222] rounded-full shrink-0
-                    shadow-[0px_0px_5px_rgba(0,0,0,0.5)]
+                    scrollbar-none bg-[#202020] rounded-full shrink-0
+                    border-t! border-b! border-[#2C2C2C]
                 "
             >
                 {filteredChats.slice(0, 10).map((chat, idx) => (

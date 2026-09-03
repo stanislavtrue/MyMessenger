@@ -10,8 +10,8 @@ export const ChatHeader = ({ chat, isMobile, onBack }) => {
 
     return (
         <div className="
-            relative h-12 bg-[#1C1C1C] 
-            flex items-center select-none
+            relative h-12 bg-[#1C1C1C]/50 border-b! border-t! border-[#2C2C2C]
+            flex items-center select-none backdrop-blur-xl
             rounded-3xl
         ">
             {isMobile && (

@@ -42,7 +42,8 @@ export const Sidebar = ({ sidebarWidth, setSidebarWidth, chats, isMobile, select
         >
             <div className="
                 relative flex-1 flex flex-col w-full h-full rounded-3xl
-                bg-[#1C1C1C]/80 select-none overflow-hidden
+                bg-[#1C1C1C]/50 select-none overflow-hidden
+                border-r! border-l! border-[#2C2C2C] backdrop-blur-xl
             ">
 
                 {(isSidebarMenuOpen || (contextMenu.visible && contextMenu.type === "chat")) && (

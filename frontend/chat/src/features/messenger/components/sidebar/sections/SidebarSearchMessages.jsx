@@ -8,7 +8,7 @@ export const SidebarSearchMessages = ({ filteredMessages, handleSelectChat }) =>
 
     return (
         filteredMessages.length > 0 && (
-            <div className="flex flex-col py-2! bg-[#222222] rounded-3xl"> 
+            <div className="flex flex-col py-2! bg-[#202020] rounded-3xl"> 
                 <span className="text-md! pl-6! pt-2! pb-2! font-semibold! text-[#527AFF]">Messages</span>
                 {filteredMessages.map((msg, idx) => (
                     <div

@@ -51,7 +51,8 @@ export const PinnedMessageBar = ({ chat }) => {
     return (
         <div className="
             relative overflow-hidden flex items-center
-            h-12 bg-[#1C1C1C] pl-1! rounded-3xl
+            border-t! border-b! border-[#2C2C2C] backdrop-blur-xl
+            h-12 bg-[#1C1C1C]/50 pl-1! rounded-3xl
         ">
             <div className="
                 flex items-center justify-center size-10 

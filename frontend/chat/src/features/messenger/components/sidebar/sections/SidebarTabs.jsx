@@ -13,8 +13,8 @@ export const SidebarTabs = () => {
                 ref={scrollRef}
                 className="
                     flex gap-2 py-1! px-1! overflow-x-auto 
-                    scrollbar-none bg-[#222222] rounded-full shrink-0
-                    shadow-[0px_0px_5px_rgba(0,0,0,0.5)]
+                    scrollbar-none bg-[#202020] rounded-full shrink-0
+                    border-t! border-b! border-[#2C2C2C]
                 "
             >
                 {tabs.map((tab) => {

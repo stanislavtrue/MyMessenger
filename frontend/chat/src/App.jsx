@@ -16,11 +16,11 @@ export const MessengerContent = () => {
     }
 
     return (
-        <div className="h-screen flex overflow-hidden relative" >
+        <div className="h-screen flex overflow-hidden relative bg-[#111111]" >
             <div
                 className="absolute inset-0"
                 style={{
-                    background: "linear-gradient(135deg,#1C1C1C,#313131,#717171)",
+                    background: "linear-gradient(135deg,#717171,#313131,#515151)",
 
                     WebkitMaskImage: "url('/background.png')",
                     WebkitMaskRepeat: "repeat",
