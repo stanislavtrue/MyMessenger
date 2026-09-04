@@ -21,7 +21,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
                 rounded-2xl bg-[#1C1C1C] backdrop-blur-xs
                 shadow-black/60 shadow-lg
                 font-semibold! text-[#FFFFFF]/90 origin-top-left
-                transition-all duration-150 ease-in-out
+                transition-all duration-150
 
                 ${isOpenState
                     ? "opacity-100 translate-x-1 translate-y-1 scale-100 pointer-events-auto"

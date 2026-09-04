@@ -65,7 +65,7 @@ export const PinnedMessageBar = ({ chat }) => {
 
             <div 
                 onClick={handleBarClick}
-                className="flex flex-1 items-center gap-2 hover:bg-[#527AFF]/20 min-w-0 rounded-sm px-1! cursor-pointer select-none">
+                className="relative flex flex-1 items-center gap-2 hover:bg-[#527AFF]/20 min-w-0 rounded-sm px-1! cursor-pointer select-none">
                 {ripples.map((ripple) => (
                     <span
                         key={ripple.id}

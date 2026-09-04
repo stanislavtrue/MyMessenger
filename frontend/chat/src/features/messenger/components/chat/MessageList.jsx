@@ -7,6 +7,7 @@ import { useReadMessages } from "../../hooks/chat/useReadMessages";
 import { formatDividerDate } from "../../utils/formatDividerDate";
 import { ContextMenuWrapper } from "../common/ContextMenuWrapper";
 import { MessageBubble } from "./messageBubble/MessageBubble";
+import { MessageItem } from "./MessageItem";
 
 export const MessageList = ({ messages }) => {
     const messengerContext = useMessengerContext();
@@ -29,10 +30,6 @@ export const MessageList = ({ messages }) => {
     
     return (
         <div className="relative flex flex-col w-full flex-1">
-            {contextMenu.visible && contextMenu.type === "message" && (
-                <div onClick={closeMenu} className="fixed inset-0 z-40"/>
-            )}
-
             <div ref={messagesContainerRef} className="w-full flex flex-col mt-auto! justify-end">
 
                 {messages.map((message, index) => {
@@ -52,49 +49,22 @@ export const MessageList = ({ messages }) => {
                         nextMessage.date !== message.date;
                         
                     const isTargetMessage = contextMenu.visible && contextMenu.type === "message" && contextMenu.messageData?.id === message.id;
-                    const isHighlighed = isTargetMessage || highlightMsgId === message.id;
+                    const isHighlighted = isTargetMessage || highlightMsgId === message.id;
 
                     const spacingClass = isLastMessage ? "mb-3!" : "mb-1.5!";
 
                     return (
-                        <div 
-                            key={message.id || index} 
-                            id={`msg-${message.id}`}
-                            data-message-id={message.id}
-                            data-is-own={message.isOwnMessage}
-                            className="w-full flex flex-col">
-
-                            {showDivider && (
-                                <div className="flex justify-center my-4! select-none pointer-events-none">
-                                    <div className="px-2! py-1! bg-[#006FC3]/40 text-sm! font-semibold! rounded-2xl">
-                                        {formatDividerDate(message.date)}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div 
-                                onDoubleClick={() => handleQuickReply(message)} 
-                                className={`
-                                    w-full flex items-center 
-                                    transition-colors duration-300 ease-in-out
-                                    message-row-highlight ${spacingClass} 
-                                    ${isHighlighed ? "active" : ""}`}
-                            >
-                                <div className="w-full max-w-180 px-4! mx-auto!">
-
-                                    <div 
-                                        onContextMenu={(e) => showMenu(e, message, "message")}
-                                        className="w-full flex flex-col"
-                                    >
-                                        <MessageBubble
-                                            message={message}
-                                            isFirstMessage={isFirstMessage}
-                                            isLastMessage={isLastMessage}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <MessageItem 
+                            key={message.id || index}
+                            message={message}
+                            isFirstMessage={isFirstMessage}
+                            isLastMessage={isLastMessage}
+                            isHighlighted={isHighlighted}
+                            showDivider={showDivider}
+                            showMenu={showMenu}
+                            handleQuickReply={handleQuickReply}
+                            spacingClass={spacingClass}
+                        />
                     );
                 })}
             

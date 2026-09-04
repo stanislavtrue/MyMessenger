@@ -13,12 +13,9 @@ export const useContextMenuAnimation = (isOpen, isMeasuring) => {
 
         if (isOpen && !isMeasuring) {
             setShouldRender(true);
-            setAnimationClass("closed");
 
             const raf = requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    setAnimationClass("open");
-                });
+                setAnimationClass("open");
             });
             return () => cancelAnimationFrame(raf);
         } 
@@ -28,7 +25,7 @@ export const useContextMenuAnimation = (isOpen, isMeasuring) => {
 
             const timer = setTimeout(() => {
                 setShouldRender(false);
-            }, 150);
+            }, 100);
 
             return () => clearTimeout(timer);
         }

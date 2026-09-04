@@ -11,7 +11,7 @@ export const MessengerContent = () => {
 
     if (isLoadingUser) {
         return (
-            <MessengerSceleton />
+            <MessengerSceleton sidebarWidth={sidebarWidth} />
         );
     }
 

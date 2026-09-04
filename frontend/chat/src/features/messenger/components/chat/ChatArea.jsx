@@ -44,7 +44,7 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
             <div className="relative flex-1 flex flex-col w-full h-full overflow-hidden">
                 <div className="absolute top-0 inset-x-0 z-30 pointer-events-none">
                     <div className="max-w-180 mx-auto! w-full">
-                        <div ref={headerRef} className="bg-linear-to-t from-[#09090b]/0 to-[#09090b] pointer-events-auto">
+                        <div ref={headerRef} className="bg-linear-to-t from-[#111111]/0 to-[#111111] pointer-events-auto">
                             <div className="pt-6! mx-auto! transition-all duration-75 ease-out">
                                 <ChatHeader chat={selectedChat} isMobile={isMobile} onBack={onBack} />
                             </div>
@@ -63,7 +63,7 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
                 
                 <div className="absolute bottom-0 inset-x-0 z-30 pointer-events-none">
                     <div ref={footerRef} className="max-w-180 mx-auto! transition-all duration-75 ease-out">
-                        <div className="pb-6! bg-linear-to-b from-[#09090b]/0 to-[#09090b] rounded-3xl pointer-events-auto">
+                        <div className="pb-6! bg-linear-to-b from-[#111111]/0 to-[#111111] rounded-3xl pointer-events-auto">
                             <MessageInput onSendMessage={onSendMessage}/>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 import { SlMagnifier } from "react-icons/sl";
 import { TfiMenu } from "react-icons/tfi"
 
-export const MessengerSceleton = ({}) => {
+export const MessengerSceleton = ({ sidebarWidth }) => {
     const ChatItemSkeleton = () => (
         <div className="relative flex items-center gap-3 px-2! py-2! w-[97%] m-auto!">
             <div className="w-14 h-14 rounded-full bg-[#111111] animate-pulse" />
@@ -16,11 +16,11 @@ export const MessengerSceleton = ({}) => {
     );
 
     return (
-        <div className="h-screen flex relative" >
+        <div className="h-screen flex relative bg-[#111111]" >
             <div
                 className="absolute inset-0"
                 style={{
-                    background: "linear-gradient(135deg,#330033,#6600ff,#ff9900)",
+                    background: "linear-gradient(135deg,#717171,#313131,#515151)",
 
                     WebkitMaskImage: "url('/background.png')",
                     WebkitMaskRepeat: "repeat",
@@ -34,18 +34,24 @@ export const MessengerSceleton = ({}) => {
                 }}
             />
 
-            <div className="p-4! h-screen w-162.5">
-                <div className="h-full w-full flex flex-col bg-[#1F1F28]/60 rounded-3xl">
+            <div 
+                style={{width: `${sidebarWidth}%`}} 
+                className="p-4! h-screen"
+            >
+                <div className="
+                    h-full w-full flex flex-col bg-[#1C1C1C]/50 rounded-3xl
+                    border-l! border-r! border-[#2C2C2C] backdrop-blur-xl
+                ">
                     <div className="mx-4! pt-2! pb-3! text-center">
                         <div className="flex items-center relative">
                             <div className="relative flex items-center justify-center h-11 w-11 ">
-                                <TfiMenu size={22} className="absolute text-white"/>
+                                <TfiMenu size={22} className="absolute text-[#959595]"/>
                             </div>
                             <div className="w-full flex flex-1 items-center bg-[#111111] rounded-3xl ml-3! pl-4!">
-                                <SlMagnifier size={18} strokeWidth={50} className="text-[#7F88C0]" />
+                                <SlMagnifier size={18} strokeWidth={50} className="text-[#959595]" />
 
                                 <div className="w-full flex items-center h-10! pl-3! rounded-3xl text-white">
-                                    <span className="text-[#7F88C0] select-none">Search</span>
+                                    <span className="text-[#959595] select-none">Search</span>
                                 </div>
                             </div>
                         </div>

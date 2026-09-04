@@ -23,7 +23,7 @@ export const ChatList = ({ chats, isVisible, selectedChatId, onSelectChat }) => 
                         setSelectedChatId={onSelectChat}
                         selectedChatId={selectedChatId}
                         isContextActive={isContextActive}
-                        onContextMenu={(e) => showMenu(e, chat, "chat")}
+                        showMenu={showMenu}
                     />
                 );
             })}

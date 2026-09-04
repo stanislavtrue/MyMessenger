@@ -3,7 +3,7 @@ import { ChatAvatar } from "./ChatAvatar";
 import { ChatPreview } from "./ChatPreview";
 import { ChatMeta } from "./ChatMeta";
 
-export const ChatItem = ({ chat, selectedChatId, setSelectedChatId, isContextActive, onContextMenu }) => {
+export const ChatItem = ({ chat, selectedChatId, setSelectedChatId, isContextActive, showMenu }) => {
     const { ripples, createRipple } = useRipple();
     const isSelected = selectedChatId === chat.id;
     const unreadCount = chat.unreadCount || 0;
@@ -16,10 +16,15 @@ export const ChatItem = ({ chat, selectedChatId, setSelectedChatId, isContextAct
         }, 80);
     };
 
+    const handleContextMenu = (e) => {
+        createRipple(e);
+        showMenu(e, chat, "chat");
+    }
+
     return (
         <div 
             onClick={handleClick}
-            onContextMenu={onContextMenu}
+            onContextMenu={handleContextMenu}
             className={`
                 relative flex items-center gap-2 px-2! py-2!
                 w-[97%] rounded-2xl m-auto! select-none overflow-hidden
