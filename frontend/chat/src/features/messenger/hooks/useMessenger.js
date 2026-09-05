@@ -1,7 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
-import { formatDate } from "@/utils/formatDate";
-import { formatTime } from "@/utils/formatTime";
-
+import { useState } from "react"
 import { useChatSearch } from "./chat/useChatSearch";
 import { useToast } from "../../../hooks/useToast";
 import { useMessengerKeyboard } from "./useMessengerKeyboard";
@@ -9,34 +6,54 @@ import { useContextMenu } from "./contextMenu/useContextMenu";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { useHighlightMessage } from "./chat/useHighlightMessage";
 import { useReply } from "./chat/useReply";
-import connection from "../services/chatHub";
-import { apiFetch } from "@/api/apiFetch";
-import { MESSAGE_STATUS } from "../constants/messageBubbleStatus";
+import { useChatHub } from "./chat/useChatHub";
+import { useChatMessages } from "./chat/useChatMessages";
+import { useAuthUser } from "./useAuthUser";
+import { useChats } from "./chat/useChats";
 
 export const useMessenger = () => {
+    // --- Chat state --------------------------------------------------------------------------
     const [chats, setChats] = useState([]);
     const [selectedChatId, setSelectedChatId] = useState(null);
+
+    // --- Sidebar state -----------------------------------------------------------------------
     const [sidebarWidth, setSidebarWidth] = useState(33);
     const [isSidebarMenuOpen, setIsSidebarMenuOpen] = useState(false);
+
+    // --- Sidebar search ----------------------------------------------------------------------
     const [isSidebarSearchFocused, setIsSidebarSearchFocused] = useState(false);
-    const [isChatSearchFocused, setIsChatSearchFocused] = useState(false);
-    const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
     const [sidebarSearchText, setSidebarSearchText] = useState("");
     const [isContactsMode, setIsContactsMode] = useState(false);
+
+    // --- Chat Search -------------------------------------------------------------------------
+    const [isChatSearchFocused, setIsChatSearchFocused] = useState(false);
+
+    // --- UI state ----------------------------------------------------------------------------
+    const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isAddContactOpen, setIsAddContactOpen] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [isLoadingUser, setIsLoadingUser] = useState(true);
 
+    // --- Derived state -----------------------------------------------------------------------
     const windowWidth = useWindowWidth();
+    const selectedChat = chats.find(chat => chat.id === selectedChatId);
+
+    // --- Current User ------------------------------------------------------------------------
+    const { currentUser, isLoadingUser } = useAuthUser();
+
+    const { isLoadingChats, handleAddContact: addContact } = useChats({ setChats })
+
+    // --- UI hooks ----------------------------------------------------------------------------
     const { toast, showToast } = useToast();
+
     const { replyToMessage, replyPreview, openReply, closeReply, setReplyToMessage } = useReply()
+
     const { highlightMsgId, setHighlightMsgId, triggerHighlight } = useHighlightMessage();
+
     const { contextMenu, setContextMenu, showMenu, closeMenu } = useContextMenu();
 
-    const selectedChat = chats.find(chat => chat.id === selectedChatId);
     const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
 
+    // --- UI handlers --------------------------------------------------------------------------
     const closeSidebarSearch = () => {
         setIsSidebarSearchFocused(false);
         setIsContactsMode(false);
@@ -44,497 +61,39 @@ export const useMessenger = () => {
     };
 
     const closeConfirmModal = () => setIsConfirmModalOpen(false);
+    
     const closeAddContact = () => setIsAddContactOpen(false);
 
-    useEffect(() => {
-        const getCurrentUser = async () => {
-            try {
-                const response = await apiFetch("http://localhost:5079/api/auth/me");
+    const { markAsRead, handleSendMessage, handleSetReaction } = useChatHub({
+        currentUser,
+        setChats,
+        selectedChatId,
+        closeReply
+    });
 
-                if (!response.ok) {
-                    console.log(response.statusText);
-                    return;
-                }
-
-                const user = await response.json();
-
-                setCurrentUser({
-                    id: user.id,
-                    displayName: user.displayName,
-                    username: user.username,
-                    avatar: user.avatarUrl,
-                    isOnline: user.isOnline,
-                    lastSeenAt: user.lastSeenAt
-                });
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsLoadingUser(false);
-            }
-        };
-
-        getCurrentUser();
-    }, [])
-
-    useEffect(() => {
-        const  startConnection = async () => {
-            try {
-                if (connection.state === "Disconnected") {
-                    await connection.start();
-                }
-            } catch (error) {
-                console.error("SignalR connection error: ", error);
-            }
-        };
-
-        startConnection();
-    }, []);
-
-    useEffect(() => {
-        const handleReceiveMessage = (message) => {
-            const isOwn = message.senderId === currentUser.id;
-            const newMessage = {
-                id: message.id,
-                text: message.text,
-                time: formatTime(message.sentAt),
-                date: formatDate(message.sentAt),
-                isOwnMessage: isOwn,
-                status: message.status,
-                replyTo: null
-            };
-
-            setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === message.chatId) {
-                    return {
-                        ...chat,
-                        messages: [...chat.messages, newMessage]
-                    };
-                }
-
-                return chat;
-            }));
-        };       
-
-        const handleChatUpdated = ({ chatId, lastMessage, lastMessageAt, unreadCount }) => {
-            setChats((prevChats) => {
-                const chatIndex = prevChats.findIndex((chat) => chat.id === chatId);
-
-                if (chatIndex === -1) 
-                    return prevChats;
-
-                const existingChat = prevChats[chatIndex];
-
-                const updatedChat = {
-                    ...existingChat,
-                    lastMessage: lastMessage,
-                    lastMessageAt: lastMessageAt,
-                    unreadCount: unreadCount !== undefined ? unreadCount : existingChat.unreadCount
-                };
-
-                const newChat = [
-                    updatedChat,
-                    ...prevChats.filter((chat) => chat.id !== chatId)
-                ];
-
-                return newChat;
-            });
-        };
-
-        const handleMessagesRead = ({ chatId, userId, lastReadMessageId, unreadCount }) => {
-            setChats(prevChats => prevChats.map(chat => {
-                if (chat.id !== chatId) return chat;
-
-                const lastReadIndex = chat.messages.findIndex(
-                    message => message.id === lastReadMessageId
-                );
-
-                return {
-                    ...chat,
-                    ...(userId === currentUser.id && { unreadCount: unreadCount ?? 0 }),
-                    messages: chat.messages.map((message, index) => {
-                        if (message.isOwnMessage && lastReadIndex !== -1 && index <= lastReadIndex) {
-                            return {
-                                ...message,
-                                status: MESSAGE_STATUS.READ
-                            };
-                        }
-
-                        return message;
-                    })
-                };
-            }));
-        };
-
-        const handleUserStatusChanged = ({ userId, isOnline, lastSeenAt }) => {
-            setChats(prevChats => prevChats.map(chat => {
-                if (chat.user.id === userId) {
-                    return {
-                        ...chat,
-                        user: {
-                            ...chat.user,
-                            isOnline: isOnline,
-                            lastSeenAt: lastSeenAt
-                        }
-                    };
-                }
-
-                return chat;
-            }));
-        };
-
-        const handleUserStartTyping = ({ chatId, userId }) => {
-            setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === chatId) {
-                    return {
-                        ...chat,
-                        typingUserId: userId
-                    };
-                }
-
-                return chat;
-            }));
-        };
-
-        const handleUserStopTyping = ({ chatId, userId }) => {
-            setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === chatId) {
-                    return {
-                        ...chat,
-                        typingUserId: null
-                    };
-                }
-                
-                return chat;
-            }));
-        };
-
-        const handleReactionUpdated = ({ chatId, messageId, reactions }) => {
-            setChats(prevChats => prevChats.map((chat) => {
-                if (chat.id !== chatId)
-                    return chat;
-
-                return {
-                    ...chat,
-                    messages: chat.messages.map((msg) => {
-                        if (msg.id !== messageId)
-                            return msg;
-
-                        return {
-                            ...msg,
-                            reactions: reactions
-                        };
-                    })
-                };
-            }));
-        };
-
-        connection.on("ReceiveMessage", handleReceiveMessage);
-        connection.on("ChatUpdated", handleChatUpdated);
-        connection.on("MessagesRead", handleMessagesRead);
-        connection.on("UserStatusChanged", handleUserStatusChanged);
-        connection.on("UserStartTyping", handleUserStartTyping);
-        connection.on("UserStopTyping", handleUserStopTyping);
-        connection.on("ReactionUpdated", handleReactionUpdated);
-
-        return () => {
-            connection.off("ReceiveMessage", handleReceiveMessage);
-            connection.off("ChatUpdated", handleChatUpdated);
-            connection.off("MessagesRead", handleMessagesRead);
-            connection.off("UserStatusChanged", handleUserStatusChanged);
-            connection.off("UserStartTyping", handleUserStartTyping);
-            connection.off("UserStopTyping", handleUserStopTyping);
-            connection.off("ReactionUpdated", handleReactionUpdated);
-        };
-    }, [currentUser?.id, connection]);
-
-    useEffect(() => {
-        const getChats = async () => {
-            const response = await apiFetch("http://localhost:5079/api/chatrooms")
-
-            if (!response.ok) {
-                console.log(response.statusText);
-                return;
-            }
-            
-            const chats = await response.json();
-
-            const formattedChats = chats.map(chat => ({
-                ...chat,
-                messages: [],
-            }))
-
-            console.log("Formatted chats:", formattedChats)
-            console.log("Chats state:", chats);
-
-            setChats(formattedChats);
-        }
-
-        getChats();
-
-    }, []);
-
-    const markAsRead = async (chatId, messageId) => {
-        try {
-            await connection.invoke("MarkMessageAsRead", chatId, messageId);
-        } catch (error) {
-            console.error("Error marking message as read: ", error);
-        }
-    };
+    const { isLoadingMessages, fetchMessages, handlePinMessage, handleUnpinMessage, handleDeleteMessage } = useChatMessages({
+        setChats,
+        currentUserId: currentUser?.id,
+        closeReply,
+        replyToMessage
+    })
 
     const handleAddContact = ({ firstName, lastName, username }) => {
-        const newChatId = Date.now();
-
-        const displayName = `${firstName} ${lastName}`.trim();
-
-        const newChat = {
-            id:newChatId,
-            user: {
-                id: `user_${username.toLowerCase()}`,
-                displayName: displayName,
-                username: username.replace("@", "").toLowerCase(),
-                avatar: null,
-                status: "offline",
-            },
-            lastMessage: "",
-            time: "",
-            unreadCount: 0,
-            messages: [],
-        };
-
-        setChats(prevChats => [newChat, ...prevChats]);
+        addContact(firstName, lastName, username);
         closeAddContact();
-    };
-
-    const handleSetReaction = async (messageId, emoji) => {
-        if (!selectedChat || !connection)
-            return;
-
-        setChats((prevChats) =>
-            prevChats.map((chat) => {
-                if (chat.id !== selectedChatId) return chat;
-
-                const updatedMessages = chat.messages.map((msg) => {
-                    if (msg.id !== messageId) return msg;
-
-                    const currentReactions = msg.reactions || [];
-
-                    const existingReactionIndex = currentReactions.findIndex(r => r.isOwn);
-
-                    let updatedReactions = [...currentReactions];
-
-                    if (existingReactionIndex !== -1) {
-                        const existingReaction = currentReactions[existingReactionIndex];
-
-                        if (existingReaction.emoji === emoji) {
-                            if (existingReaction.count === 1){
-                                updatedReactions.splice(existingReactionIndex, 1);
-                            } else {
-                                updatedReactions[existingReactionIndex] = {
-                                    ...existingReaction,
-                                    count: existingReaction.count - 1,
-                                    isOwn: false
-                                };
-                            }
-                        } else {
-                            updatedReactions[existingReactionIndex] = {
-                                ...existingReaction,
-                                count: existingReaction.count - 1,
-                                isOwn: false
-                            };
-
-                            const targetIndex = updatedReactions.findIndex(r => r.emoji === emoji);
-
-                            if (targetIndex !== -1) {
-                                updatedReactions[targetIndex] = {
-                                    ...updatedReactions[targetIndex],
-                                    count: updatedReactions[targetIndex].count + 1,
-                                    isOwn: true
-                                };
-                            } else {
-                                updatedReactions.push({
-                                    emoji,
-                                    count: 1,
-                                    isOwn: true
-                                });
-                            }
-                        }
-                    } else {
-                        const targetIndex = updatedReactions.findIndex(r => r.emoji === emoji);
-                        if (targetIndex !== -1) {
-                            updatedReactions[targetIndex] = {
-                                ...updatedReactions[targetIndex],
-                                count: updatedReactions[targetIndex].count + 1,
-                                isOwn: true
-                            };
-                        } else {
-                            updatedReactions.push({
-                                emoji,
-                                count: 1,
-                                isOwn: true
-                            });
-                        }
-                    }
-
-                    return {
-                        ...msg,
-                        reactions: updatedReactions.filter(r => r.count > 0)
-                    };
-                });
-
-                return {
-                    ...chat,
-                    messages: updatedMessages,
-                };
-            })
-        );
-
-        try {
-            await connection.invoke("SetReaction", selectedChatId, messageId, emoji);
-        } catch (error) {
-            console.error("Failed to set reaction via SignalR", error);
-        }
     };
 
     const handleSelectChat = async (chatId) => {
         closeMenu();
         setSelectedChatId(chatId);
 
-        const response = await apiFetch(`http://localhost:5079/api/messages/${chatId}`)
-
-        if (!response.ok) {
-            console.log(response.statusText);
-            return;
-        }
-
-        const messages = await response.json();
-
-        console.log(messages);
-
         setIsChatSearchFocused(false);
         if (chatSearch?.setChatSearchText) {
             chatSearch.setChatSearchText("");
         }
 
-        setChats(prevChats => prevChats.map(chat => {
-            if (chat.id === chatId) {
-                return {
-                    ...chat,
-                    messages: messages.map(msg => ({
-                        ...msg,
-                        isOwnMessage: msg.senderId === currentUser.id,
-                        time: formatTime(msg.sentAt),
-                        date: formatDate(msg.sentAt),
-                    }))
-                };
-            }
-            
-            return chat;
-        }));
+        await fetchMessages(chatId);
     };
-
-    useEffect(() => {
-        if (!selectedChatId) return;
-
-        const joinChat = async () => {
-            try {
-                if (connection.state !== "Connected") {
-                    console.log("SignalR isn't connected yet");
-                    return;
-                }
-
-                await connection.invoke("JoinChat", selectedChatId);
-            } catch (error) {
-                console.log("JoinChat error: ", error);
-            }
-        };
-
-        joinChat();
-    }, [selectedChatId]);
-
-    const handlePinMessage = (chatId, message) => {
-        setChats(prevChats => prevChats.map(chat => {
-            if (chat.id === chatId) {
-                const pinnedMessages = chat.pinnedMessages || [];
-
-                if (pinnedMessages.some(msg => msg.id === message.id)) return chat;
-
-                const updatedMessages = chat.messages.map(msg => 
-                    msg.id === message.id ? { ...msg, isPinned: true } : msg
-                );
-
-                return {
-                    ...chat,
-                    messages: updatedMessages,
-                    pinnedMessages: [...pinnedMessages, { ...message, isPinned: true }] 
-                };
-            }
-
-            return chat;
-        }));
-    };
-
-    const handleUnpinMessage = (chatId, messageId) => {
-        setChats(prevChats => prevChats.map(chat => {
-            if (chat.id === chatId) {
-                const pinnedMessages = chat.pinnedMessages || [];
-
-                const updatedMessages = chat.messages.map(msg =>
-                    msg.id === messageId ? { ...msg, isPinned: false } : msg
-                );
-
-                return {
-                    ...chat,
-                    messages: updatedMessages,
-                    pinnedMessages: pinnedMessages.filter(msg => msg.id !== messageId) 
-                };
-            }
-
-            return chat;
-        }));
-    };
-
-    const handleDeleteMessage = (chatId, messageId) => {
-        setChats(prevChats => 
-            prevChats.map(chat => {
-                if (chat.id === chatId) {
-                    const updatedMessages = chat.messages.filter(msg => msg.id !== messageId);
-                    const nextLastMessage = updatedMessages.at(-1);
-
-                    if (replyToMessage?.id === messageId) {
-                        closeReply();
-                    }
-
-                    const pinnedMessages = chat.pinnedMessages || [];
-
-                    return {
-                        ...chat,
-                        lastMessage: nextLastMessage ? nextLastMessage.text : "No messages yet",
-                        time: nextLastMessage ? nextLastMessage.time : "",
-                        messages: updatedMessages,
-                        pinnedMessages: pinnedMessages.filter(msg => msg.id !== messageId)
-                    };
-                }
-
-                return chat;
-            })
-        );
-    };
-
-    const handleSendMessage = async (text) => {
-        if (!text.trim() || !selectedChatId) return;
-
-        try {
-            await connection.invoke(
-                "SendMessage",
-                selectedChatId,
-                text.trim()
-            );
-
-            closeReply();
-        } catch (error) {
-            console.log("Failed to send message: ", error);
-        }
-    }
    
     useMessengerKeyboard({
         contextMenuVisible: contextMenu.visible,
@@ -559,62 +118,86 @@ export const useMessenger = () => {
     });
 
     return {
+        // CurrentUser
         currentUser,
         isLoadingUser,
-        markAsRead,
+        
+        // Chats
         chats,
         selectedChat,
         selectedChatId,
-        sidebarWidth,
-        windowWidth,
-        isSidebarMenuOpen,
-        setIsSidebarMenuOpen,
-        isSidebarSearchFocused,
-        sidebarSearchText,
-        setSidebarSearchText,
-        isContactsMode,
-        setIsContactsMode,
-        closeSidebarSearch,
-        setIsSidebarSearchFocused,
-        isChatSearchFocused,
-        setIsChatSearchFocused,
-        ...chatSearch,
-
-        isAddContactOpen,
-        setIsAddContactOpen,
-        closeAddContact,
-        handleAddContact,
-
-        contextMenu,
-        setContextMenu,
-        showMenu,
-        closeMenu,
-
-        highlightMsgId,
-        setHighlightMsgId,
-        triggerHighlight,
-
-        setSidebarWidth,
+        isLoadingChats,
         setSelectedChatId: handleSelectChat,
+
+        // Chat messages
+        isLoadingMessages,
+        markAsRead,
         handleSendMessage,
         handleDeleteMessage,
         handlePinMessage,
         handleUnpinMessage,
 
+        // Reactions
+        handleSetReaction,
+
+        // Chat search
+        isChatSearchFocused,
+        setIsChatSearchFocused,
+        ...chatSearch,
+
+        // Reply
         replyToMessage,
         setReplyToMessage,
         replyPreview,
         openReply,
         closeReply,
 
+        // Highlight
+        highlightMsgId,
+        setHighlightMsgId,
+        triggerHighlight,
+
+        // Sidebar
+        sidebarWidth,
+        setSidebarWidth,
+        isSidebarMenuOpen,
+        setIsSidebarMenuOpen,
+
+        // Sidebar search
+        isSidebarSearchFocused,
+        setIsSidebarSearchFocused,
+        sidebarSearchText,
+        setSidebarSearchText,
+        isContactsMode,
+        setIsContactsMode,
+        closeSidebarSearch,
+
+        // Emoji picker
         isEmojiPickerOpen,
         setIsEmojiPickerOpen,
-        handleSetReaction,
 
+        // Context menu
+        contextMenu,
+        setContextMenu,
+        showMenu,
+        closeMenu,
+
+        // Modals
         isConfirmModalOpen,
         setIsConfirmModalOpen,
         closeConfirmModal,
 
+        isAddContactOpen,
+        setIsAddContactOpen,
+        closeAddContact,
+
+        // Contacts
+        handleAddContact,
+
+        // Layout
+        windowWidth,
+
+        // Toast
         toast,
         showToast,
     };
