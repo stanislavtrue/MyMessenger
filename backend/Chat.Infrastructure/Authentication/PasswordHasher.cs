@@ -1,4 +1,4 @@
-using Chat.Domain.Interfaces;
+using Chat.Application.Interfaces;
 
 namespace Chat.Infrastructure.Authentication;
 public class PasswordHasher : IPasswordHasher

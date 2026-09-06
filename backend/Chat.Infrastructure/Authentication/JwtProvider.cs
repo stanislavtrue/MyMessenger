@@ -3,8 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Chat.Domain.Interfaces;
 using Chat.Domain.Models;
+using Chat.Application.Interfaces;
 using System.Security.Cryptography;
 
 namespace Chat.Infrastructure.Authentication;

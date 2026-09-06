@@ -1,5 +1,5 @@
-using Chat.Domain.Interfaces;
-using Chat.Domain.Services;
+using Chat.Application.Interfaces;
+using Chat.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 

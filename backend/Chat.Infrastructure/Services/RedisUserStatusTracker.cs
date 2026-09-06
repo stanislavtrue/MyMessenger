@@ -1,4 +1,4 @@
-using Chat.Domain.Interfaces;
+using Chat.Application.Interfaces;
 using StackExchange.Redis;
 
 namespace Chat.Infrastructure.Services;

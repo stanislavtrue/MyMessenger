@@ -1,11 +1,11 @@
 using Chat.API.Extensions;
 using Chat.API.Hubs;
 using Chat.API.Middlewares;
-using Chat.Domain.Interfaces;
-using Chat.Domain.Services;
+using Chat.Application.Interfaces;
+using Chat.Application.Services;
 using Chat.Infrastructure.Authentication;
-using Chat.Infrastructure.Persistence;
-using Chat.Infrastructure.Persistence.Repositories;
+using Chat.Persistence;
+using Chat.Persistence.Repositories;
 using Chat.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;

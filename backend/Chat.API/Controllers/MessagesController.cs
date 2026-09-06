@@ -1,5 +1,5 @@
 using Chat.API.Contracts.Chats;
-using Chat.Domain.Services;
+using Chat.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

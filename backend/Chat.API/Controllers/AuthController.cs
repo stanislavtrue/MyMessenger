@@ -1,7 +1,7 @@
 using Chat.API.Contracts.Auth;
-using Chat.API.DTOs;
-using Chat.Domain.Interfaces;
-using Chat.Domain.Services;
+using Chat.API.Responses;
+using Chat.Application.Interfaces;
+using Chat.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
