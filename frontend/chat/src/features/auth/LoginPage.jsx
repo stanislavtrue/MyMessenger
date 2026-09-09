@@ -62,6 +62,7 @@ export default function LoginPage() {
                 className="
                     relative flex flex-col pb-4! pt-4!
                     bg-[#1C1C1C] rounded-3xl select-none w-100
+                    border-r! border-l! border-[#2C2C2C]
                     shadow-[0px_0px_5px_rgba(0,0,0,0.8)]
                 "
             >

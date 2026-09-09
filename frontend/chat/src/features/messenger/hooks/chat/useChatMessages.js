@@ -18,6 +18,8 @@ export const useChatMessages = ({ setChats, currentUserId, closeReply, replyToMe
 
             const messages = await response.json();
 
+            console.log(messages);
+
             setChats(prevChats => prevChats.map(chat => {
                 if (chat.id === chatId) {
                     return {
@@ -25,6 +27,7 @@ export const useChatMessages = ({ setChats, currentUserId, closeReply, replyToMe
                         messages: messages.map(msg => ({
                             ...msg,
                             isOwnMessage: msg.senderId === currentUserId,
+                            isDeleted: msg.isDeleted,
                             time: formatTime(msg.sentAt),
                             date: formatDate(msg.sentAt),
                         }))

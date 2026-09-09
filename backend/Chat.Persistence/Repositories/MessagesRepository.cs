@@ -22,34 +22,31 @@ public class MessagesRepository : IMessagesRepository
             ChatId = message.ChatId,
             SenderId = message.SenderId,
             Text = message.Text,
-            SentAt = message.SentAt
+            SentAt = message.SentAt,
+            DeletedAt = message.DeletedAt
         };
 
         await _context.Messages.AddAsync(messageEntity);
     }
 
-    public async Task<List<Message>> GetByChatId(Guid chatId)
+    public async Task<List<Message>> GetByChatId(Guid chatId, Guid currentUserId, CancellationToken cancellationToken = default)
     {
         var messageEntities = await _context.Messages
             .AsNoTracking()
             .Where(m => m.ChatId == chatId)
+            .Where(m => !_context.UserDeletedMessages
+                .Any(udm => udm.MessageId == m.Id && udm.UserId == currentUserId))
             .OrderBy(m => m.SentAt)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
-        var messages = new List<Message>();
-
-        foreach (var messageEntity in messageEntities)
-        {
-            messages.Add(Message.Restore(
-                messageEntity.Id,
-                messageEntity.ChatId,
-                messageEntity.SenderId,
-                messageEntity.Text,
-                messageEntity.SentAt
-            ));
-        }
-
-        return messages;
+        return messageEntities.Select(m => Message.Restore(
+            m.Id,
+            m.ChatId,
+            m.SenderId,
+            m.Text,
+            m.SentAt,
+            m.DeletedAt
+        )).ToList();
     }
 
     public async Task<Message> GetById(Guid messageId)
@@ -58,7 +55,7 @@ public class MessagesRepository : IMessagesRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == messageId) ?? throw new MessageNotFoundException();
 
-        return Message.Restore(messageEntity.Id, messageEntity.ChatId, messageEntity.SenderId, messageEntity.Text, messageEntity.SentAt);
+        return Message.Restore(messageEntity.Id, messageEntity.ChatId, messageEntity.SenderId, messageEntity.Text, messageEntity.SentAt, messageEntity.DeletedAt);
     }
 
     public async Task<DateTimeOffset?> GetSentAtById(Guid messageId)
@@ -70,11 +67,14 @@ public class MessagesRepository : IMessagesRepository
             .FirstOrDefaultAsync();
     }
 
-    public async Task<List<LastMessageDto>> GetLastMessagesByChatIds(List<Guid> chatIds)
+    public async Task<List<LastMessageDto>> GetLastMessagesByChatIds(List<Guid> chatIds, Guid currentUserId, CancellationToken cancellationToken = default)
     {
         return await _context.Messages
             .AsNoTracking()
             .Where(m => chatIds.Contains(m.ChatId))
+            .Where(m => m.DeletedAt == null)
+            .Where(m => !_context.UserDeletedMessages
+                .Any(udm => udm.MessageId == m.Id && udm.UserId == currentUserId))
             .GroupBy(m => m.ChatId)
             .Select(g => g
                 .OrderByDescending(m => m.SentAt)
@@ -84,7 +84,53 @@ public class MessagesRepository : IMessagesRepository
                     m.SentAt
                 ))
                 .First())
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Dictionary<Guid, LastMessageDto>> GetLastMessagesByUserIds(Guid chatId, List<Guid> userIds, CancellationToken cancellationToken = default)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .Where(u => userIds.Contains(u.Id))
+            .Select(u => new
+            {
+                UserId = u.Id,
+                LastMessage = _context.Messages
+                    .Where(m => m.ChatId == chatId)
+                    .Where(m => m.DeletedAt == null)
+                    .Where(m => !_context.UserDeletedMessages
+                        .Any(udm => 
+                            udm.MessageId == m.Id && 
+                            udm.UserId == u.Id))
+                    .OrderByDescending(m => m.SentAt)
+                    .Select(m => new LastMessageDto(
+                        m.ChatId,
+                        m.Text,
+                        m.SentAt
+                    ))
+                    .FirstOrDefault()
+            })
+            .ToDictionaryAsync(
+                x => x.UserId,
+                x => x.LastMessage ?? new LastMessageDto(chatId, null, null),
+                cancellationToken);
+    }
+
+    public async Task<LastMessageDto?> GetLastMessageByUserId(Guid chatId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Messages
+            .AsNoTracking()
+            .Where(m => m.ChatId == chatId)
+            .Where(m => m.DeletedAt == null)
+            .Where(m => !_context.UserDeletedMessages
+                .Any(udm => udm.MessageId == m.Id && udm.UserId == userId))
+            .OrderByDescending(m => m.SentAt)
+            .Select(m => new LastMessageDto(
+                m.ChatId,
+                m.Text,
+                m.SentAt
+            ))
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<int> GetUnreadCount(Guid chatId, Guid userId, DateTimeOffset? sentAt)
@@ -95,6 +141,38 @@ public class MessagesRepository : IMessagesRepository
                 m.ChatId == chatId &&
                 m.SenderId != userId &&
                 m.SentAt > sentAt)
+            .Where(m => m.DeletedAt == null)
+            .Where(m => !_context.UserDeletedMessages
+                .Any(udm => udm.MessageId == m.Id && udm.UserId == userId))
             .CountAsync();
+    }
+
+    public async Task DeleteForUser(Guid userId, Guid messageId, CancellationToken cancellationToken = default)
+    {
+        var alreadyDeleted = await _context.UserDeletedMessages
+            .AnyAsync(udm => udm.UserId == userId && udm.MessageId == messageId, cancellationToken);
+
+        if (!alreadyDeleted)
+        {
+            var udm = UserDeletedMessage.Create(userId, messageId);
+
+            var entity = new UserDeletedMessageEntity
+            {
+                Id = udm.Id,
+                UserId = udm.UserId,
+                MessageId = udm.MessageId,
+                DeletedAt = udm.DeletedAt
+            };
+
+            await _context.UserDeletedMessages.AddAsync(entity, cancellationToken);
+        }
+    }
+
+    public async Task DeleteForEveryone(Message message, CancellationToken cancellationToken = default)
+    {
+        var messageEntity = await _context.Messages
+            .FirstOrDefaultAsync(m => m.Id == message.Id, cancellationToken) ?? throw new MessageNotFoundException();
+
+        messageEntity.DeletedAt = message.DeletedAt;
     }
 }

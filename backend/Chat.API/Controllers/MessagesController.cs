@@ -16,19 +16,26 @@ public class MessagesController : ControllerBase
         _chatRoomService = chatRoomsService;
     }
 
-    [Authorize]
-    [HttpGet("{chatId}")]
-    public async Task<IActionResult> Messages(Guid chatId)
+    private Guid GetUserId()
     {
         var userIdClaim = User.FindFirst("userId")?.Value;
 
         if (!Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
+            throw new UserNotFoundException();
+
+        return userId;
+    }
+
+    [Authorize]
+    [HttpGet("{chatId}")]
+    public async Task<IActionResult> Messages(Guid chatId, CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
 
         if (!await _chatRoomService.HasAccess(chatId, userId))
             throw new ChatAccessDeniedException();
 
-        var response = await _messagesService.GetByChatId(userId, chatId);
+        var response = await _messagesService.GetByChatId(userId, chatId, cancellationToken);
 
         return Ok(response);
     }
@@ -37,16 +44,32 @@ public class MessagesController : ControllerBase
     [HttpPost("{chatId}/read")]
     public async Task<IActionResult> MarkAsRead([FromRoute] Guid chatId, [FromBody] MarkAsReadRequest request)
     {
-        var userIdClaim = User.FindFirst("userId")?.Value;
-
-        if (!Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
-
-        if (!await _chatRoomService.HasAccess(chatId, userId))
-            throw new ChatAccessDeniedException();
+        var userId = GetUserId();
 
         await _chatRoomService.MarkAsRead(chatId, userId, request.MessageId);
 
         return Ok();
+    }
+
+    [Authorize]
+    [HttpDelete("{messageId}/for-me")]
+    public async Task<IActionResult> DeleteForUser(Guid messageId, CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+
+        await _messagesService.DeleteForUser(messageId, userId, cancellationToken);
+
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpDelete("{messageId}/for-everyone")]
+    public async Task<IActionResult> DeleteForEveryone(Guid messageId, CancellationToken cancellationToken)
+    {
+        var userId = GetUserId();
+
+        await _messagesService.DeleteForEveryone(messageId, userId, cancellationToken);
+
+        return NoContent();
     }
 }   

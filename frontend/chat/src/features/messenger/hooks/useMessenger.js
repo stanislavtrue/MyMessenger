@@ -64,7 +64,7 @@ export const useMessenger = () => {
     
     const closeAddContact = () => setIsAddContactOpen(false);
 
-    const { markAsRead, handleSendMessage, handleSetReaction } = useChatHub({
+    const { markAsRead, handleSendMessage, handleSetReaction, handleDeleteMessageForEveryone, handleDeleteMessageForUser } = useChatHub({
         currentUser,
         setChats,
         selectedChatId,
@@ -136,6 +136,8 @@ export const useMessenger = () => {
         handleDeleteMessage,
         handlePinMessage,
         handleUnpinMessage,
+        handleDeleteMessageForEveryone,
+        handleDeleteMessageForUser,
 
         // Reactions
         handleSetReaction,

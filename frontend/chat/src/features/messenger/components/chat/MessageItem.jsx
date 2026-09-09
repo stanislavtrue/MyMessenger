@@ -3,6 +3,8 @@ import { formatDividerDate } from "../../utils/formatDividerDate";
 import { MessageBubble } from "./messageBubble/MessageBubble";
 
 export const MessageItem = memo(({ message, isFirstMessage, isLastMessage, isHighlighted, showDivider, showMenu, handleQuickReply, spacingClass }) => {
+    const isDeleted = message.isDeleted;
+
     return (
         <div 
             id={`msg-${message.id}`}
@@ -18,27 +20,29 @@ export const MessageItem = memo(({ message, isFirstMessage, isLastMessage, isHig
                 </div>
             )}
 
-            <div 
-                onDoubleClick={() => handleQuickReply(message)} 
-                className={`
-                    w-full flex items-center 
-                    transition-colors duration-500 ease-in
-                    message-row-highlight ${spacingClass} 
-                    ${isHighlighted ? "active" : ""}`}
-            >
-                <div className="w-full max-w-180 px-4! mx-auto!">
-                    <div 
-                        onContextMenu={(e) => showMenu(e, message, "message")}
-                        className="w-full flex flex-col"
-                    >
-                        <MessageBubble
-                            message={message}
-                            isFirstMessage={isFirstMessage}
-                            isLastMessage={isLastMessage}
-                        />
+            {!isDeleted && (
+                <div 
+                    onDoubleClick={() => handleQuickReply(message)} 
+                    className={`
+                        w-full flex items-center 
+                        transition-colors duration-500 ease-in
+                        message-row-highlight ${spacingClass} 
+                        ${isHighlighted ? "active" : ""}`}
+                >
+                    <div className="w-full max-w-180 px-4! mx-auto!">
+                        <div 
+                            onContextMenu={(e) => showMenu(e, message, "message")}
+                            className="w-full flex flex-col"
+                        >
+                            <MessageBubble
+                                message={message}
+                                isFirstMessage={isFirstMessage}
+                                isLastMessage={isLastMessage}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }, (prevProps, nextProps) => {

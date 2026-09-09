@@ -37,9 +37,7 @@ public class ChatHub : Hub
         if (!await _chatRoomsService.HasAccess(chatId, userId))
             throw new ChatAccessDeniedException();
 
-        await _chatRoomsService.MarkAsRead(chatId, userId, messageId);
-
-        var unreadCount = await _chatRoomsService.GetUnreadCount(chatId, userId);
+        var unreadCount = await _chatRoomsService.MarkAsRead(chatId, userId, messageId);
 
         await Clients.Group(chatId.ToString())
             .SendAsync("MessagesRead", new
@@ -178,6 +176,75 @@ public class ChatHub : Hub
             {
                 ChatId = chatId,
                 UserId = userId
+            });
+    }
+    
+    public async Task DeleteMessageForEveryone(Guid messageId)
+    {
+        var userId = GetUserId();
+
+        var message = await _messagesService.GetById(messageId);
+
+        var chatId = message.ChatId;
+
+        await _messagesService.DeleteForEveryone(messageId, userId);
+
+        await Clients.Group(chatId.ToString())
+            .SendAsync("MessageDeletedForEveryone", new
+            {
+                ChatId = chatId,
+                MessageId = messageId
+            });
+
+        var chatMembers = await _chatRoomsService.GetChatMembers(chatId);
+        var memberIds = chatMembers.Select(cm => cm.UserId).ToList();
+
+        var lastMessages = await _messagesService.GetLastMessagesByUserIds(chatId, memberIds);
+
+        foreach (var chatMember in chatMembers)
+        {
+            var lastMessage = lastMessages.GetValueOrDefault(chatMember.UserId);
+
+            var unreadCount = await _chatRoomsService.RecalculateUnreadCount(chatId, chatMember.UserId);
+
+            await Clients.Group($"user_{chatMember.UserId}")
+                .SendAsync("ChatUpdated", new
+                {
+                    ChatId = chatId,
+                    LastMessage = lastMessage?.Text,
+                    LastMessageAt = lastMessage?.SentAt,
+                    UnreadCount = unreadCount
+                });
+        }
+    }
+
+    public async Task DeleteMessageForUser(Guid messageId)
+    {
+        var userId = GetUserId();
+
+        var message = await _messagesService.GetById(messageId);
+
+        var chatId = message.ChatId;
+
+        await _messagesService.DeleteForUser(messageId, userId);
+
+        await Clients.Group($"user_{userId}")
+            .SendAsync("MessageDeletedForUser", new
+            {
+                ChatId = chatId,
+                MessageId = messageId
+            });
+
+        var lastMessage = await _messagesService.GetLastMessageByUserId(chatId, userId);
+        var unreadCount = await _chatRoomsService.RecalculateUnreadCount(chatId, userId);
+
+        await Clients.Group($"user_{userId}")
+            .SendAsync("ChatUpdated", new
+            {
+                ChatId = chatId,
+                LastMessage = lastMessage?.Text,
+                LastMessageAt = lastMessage?.SentAt,
+                UnreadCount = unreadCount
             });
     }
 }

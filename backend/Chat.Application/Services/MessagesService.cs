@@ -11,12 +11,12 @@ public class MessagesService
     private readonly IMessageReactionsRepository _messageReactionsRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public MessagesService(IMessagesRepository messagesRepository, IChatMembersRepository chatMembersRepository, IMessageReactionsRepository messageReactionsRepository, IUnitOfWork unitOfWOrk)
+    public MessagesService(IMessagesRepository messagesRepository, IChatMembersRepository chatMembersRepository, IMessageReactionsRepository messageReactionsRepository, IUnitOfWork unitOfWork)
     {
         _messagesRepository = messagesRepository;
         _chatMemberRepository = chatMembersRepository;
         _messageReactionsRepository = messageReactionsRepository;
-        _unitOfWork = unitOfWOrk;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Message> Send(Guid chatId, Guid senderId, string text)
@@ -43,9 +43,9 @@ public class MessagesService
         return await _messagesRepository.GetById(messageId);
     }
 
-    public async Task<List<MessageDto>> GetByChatId(Guid currentUserId, Guid chatId)
+    public async Task<List<MessageDto>> GetByChatId(Guid currentUserId, Guid chatId, CancellationToken cancellationToken)
     {
-        var messages = await _messagesRepository.GetByChatId(chatId);
+        var messages = await _messagesRepository.GetByChatId(chatId, currentUserId, cancellationToken);
 
         var messageIds = messages.Select(m => m.Id).ToList();
 
@@ -55,7 +55,7 @@ public class MessagesService
             .GroupBy(mr => mr.MessageId)
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        var recipientLastReadMessageId = await _chatMemberRepository.GetLastReadMessageId(chatId, currentUserId);
+        var recipientLastReadMessageId = await _chatMemberRepository.GetOtherUserLastReadMessageId(chatId, currentUserId);
 
         DateTimeOffset? recipientLastReadMessageSentAt = null;
 
@@ -85,12 +85,23 @@ public class MessagesService
                 m.Id,
                 m.ChatId,
                 m.SenderId,
-                m.Text,
+                m.IsDeleted ? "Deleted" : m.Text,
                 m.SentAt,
+                m.IsDeleted,
                 CalculateMessageStatus(m, currentUserId, recipientLastReadMessageSentAt),
                 reactionDtos
             );
         }).ToList();
+    }
+
+    public async Task<Dictionary<Guid, LastMessageDto>> GetLastMessagesByUserIds(Guid chatId, List<Guid> userIds, CancellationToken cancellationToken = default)
+    {
+        return await _messagesRepository.GetLastMessagesByUserIds(chatId, userIds, cancellationToken);
+    }
+
+    public async Task<LastMessageDto?> GetLastMessageByUserId(Guid chatId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _messagesRepository.GetLastMessageByUserId(chatId, userId, cancellationToken);
     }
 
     public async Task SetReaction(Guid messageId, Guid userId, string emoji)
@@ -148,5 +159,34 @@ public class MessagesService
         return message.SentAt <= recipientLastReadMessageSentAt.Value 
             ? MessageStatus.Read 
             : MessageStatus.Sent;
+    }
+
+    public async Task DeleteForEveryone(Guid messageId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var message = await _messagesRepository.GetById(messageId);
+
+        if (!await _chatMemberRepository.HasAccess(message.ChatId, userId))
+            throw new ChatAccessDeniedException();
+
+        if (message.IsDeleted)
+            return;
+
+        message.Delete(DateTimeOffset.UtcNow);
+
+        await _messagesRepository.DeleteForEveryone(message, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task DeleteForUser(Guid messageId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var message = await _messagesRepository.GetById(messageId);
+
+        if (!await _chatMemberRepository.HasAccess(message.ChatId, userId))
+            throw new ChatAccessDeniedException();
+
+        await _messagesRepository.DeleteForUser(userId, messageId, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync();
     }
 }

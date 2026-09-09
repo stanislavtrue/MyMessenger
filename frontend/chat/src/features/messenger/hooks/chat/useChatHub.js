@@ -23,6 +23,7 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
     useEffect(() => {
         const handleReceiveMessage = (message) => {
             const isOwn = message.senderId === currentUser.id;
+
             const newMessage = {
                 id: message.id,
                 text: message.text,
@@ -34,14 +35,16 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
             };
 
             setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === message.chatId) {
-                    return {
-                        ...chat,
-                        messages: [...chat.messages, newMessage]
-                    };
-                }
+                if (chat.id !== message.chatId) 
+                    return chat;
 
-                return chat;
+                if (chat.messages.some(msg => msg.id === message.id))
+                    return chat;
+
+                return {
+                    ...chat,
+                    messages: [...chat.messages, newMessage]
+                };
             }));
         };       
 
@@ -158,6 +161,45 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
             }));
         };
 
+        const handleMessageDeletedForEveryone = ({ chatId, messageId }) => {
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id !== chatId)
+                    return chat;
+
+                const updatedMessages = chat.messages.map(msg => {
+                    if (msg.id !== messageId)
+                        return msg;
+
+                    return {
+                        ...msg,
+                        text: null,
+                        isDeleted: true
+                    };
+                });
+
+                return {
+                    ...chat,
+                    messages: updatedMessages,
+                    pinnedMessages: (chat.pinnedMessages || []).filter(msg => msg.id !== messageId)
+                };
+            }));
+        };
+
+        const handleMessageDeletedForUser = ({ chatId, messageId }) => {
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id !== chatId)
+                    return chat;
+
+                const updatedMessages = chat.messages.filter(msg => msg.id !== messageId);
+
+                return {
+                    ...chat,
+                    messages: updatedMessages,
+                    pinnedMessages: (chat.pinnedMessages || []).filter(msg => msg.id !== messageId)
+                };
+            }));
+        };
+
         connection.on("ReceiveMessage", handleReceiveMessage);
         connection.on("ChatUpdated", handleChatUpdated);
         connection.on("MessagesRead", handleMessagesRead);
@@ -165,6 +207,8 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
         connection.on("UserStartTyping", handleUserStartTyping);
         connection.on("UserStopTyping", handleUserStopTyping);
         connection.on("ReactionUpdated", handleReactionUpdated);
+        connection.on("MessageDeletedForEveryone", handleMessageDeletedForEveryone);
+        connection.on("MessageDeletedForUser", handleMessageDeletedForUser);
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
@@ -174,6 +218,8 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
             connection.off("UserStartTyping", handleUserStartTyping);
             connection.off("UserStopTyping", handleUserStopTyping);
             connection.off("ReactionUpdated", handleReactionUpdated);
+            connection.off("MessageDeletedForEveryone", handleMessageDeletedForEveryone);
+            connection.off("MessageDeletedForUser", handleMessageDeletedForUser);
         };
     }, [currentUser?.id, connection]);
 
@@ -241,9 +287,33 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
         }
     }, [selectedChatId, setChats]);
 
+    const handleDeleteMessageForEveryone = useCallback(async (messageId) => {
+        if (!connection)
+            return;
+
+        try {
+            await connection.invoke("DeleteMessageForEveryone", messageId);
+        } catch (error) {
+            console.error("Failed to delete message for everyone: ", error);
+        }
+    }, []);
+
+    const handleDeleteMessageForUser = useCallback(async (messageId) => {
+        if (!connection)
+            return;
+
+        try {
+            await connection.invoke("DeleteMessageForUser", messageId);
+        } catch (error) {
+            console.error("Failed to delete message for user: ", error);
+        }
+    }, []);
+
     return {
         markAsRead,
         handleSendMessage,
-        handleSetReaction
+        handleSetReaction,
+        handleDeleteMessageForEveryone,
+        handleDeleteMessageForUser
     };
 };

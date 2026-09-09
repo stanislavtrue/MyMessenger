@@ -47,9 +47,8 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
             <form 
                 onSubmit={handleSubmit}
                 className={`
-                    flex flex-col pb-4! pt-2! gap-4
-                    bg-[#1E1E22] rounded-3xl select-none w-100
-                    shadow-[0px_0px_5px_rgba(0,0,0,0.8)]
+                    flex flex-col pb-4! pt-2! gap-4 bg-[#1C1C1C] rounded-3xl select-none w-100
+                    shadow-[0px_0px_5px_rgba(0,0,0,0.8)] border-r! border-l! border-[#2C2C2C]
                     ${isClosing ? "animate-modal-out" : "animate-modal-in"}
                 `}
             >
@@ -58,11 +57,11 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
                         onClick={handleCancel}
                         className="
                             size-10 flex items-center justify-center mr-4! rounded-full
-                            hover:bg-[#282836]/50 active:scale-90 active:bg-[#52526B]
+                            hover:bg-[#212121] active:scale-90 active:bg-[#2E2E2E]
                             transition-all duration-200
                         "
                     >
-                        <X size={24} className="shrink-0 text-white/60"/>
+                        <X size={24} className="shrink-0 text-[#959595]"/>
                     </div>
                     <span className="text-xl! font-medium!">Add Contact</span>
 
@@ -71,8 +70,8 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
                         disabled={!isFormValid}
                         className="
                             flex ml-auto! items-center justify-center w-18 h-10
-                            bg-[#734FBA]! rounded-2xl font-medium! not-disabled:hover:bg-[#6845ad]!
-                            disabled:opacity-30 not-disabled:cursor-pointer transition-colors duration-300
+                            bg-[#527AFF]! rounded-2xl font-medium! not-disabled:hover:bg-[#406DFF]!
+                            disabled:opacity-30 not-disabled:cursor-pointer transition-all duration-300
                         "
                     >
                         ADD
@@ -81,7 +80,7 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
 
                 <div className="flex items-center w-full px-4!">
                     <div className="
-                        size-25 bg-linear-to-b from-[#BF91FF] to-[#6632AF] rounded-full shrink-0
+                        size-25 bg-linear-to-b from-[#527AFF] to-[#003BFF] rounded-full shrink-0
                         flex items-center justify-center text-4xl! font-semibold!
                     ">
                         {getInitials()}
@@ -96,8 +95,8 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
                                 placeholder=" "
                                 className="
                                     h-10 w-full rounded-xl outline-none! ring-[1.5px]! ring-white/10
-                                    px-4! group-hover:ring-[#B06EE4] group-hover:placeholder-[#B06EE4]!
-                                    group-focus-within:ring-[#B06EE4] group-focus-within:placeholder-[#B06EE4]!
+                                    px-4! group-hover:ring-[#527AFF] group-hover:placeholder-[#527AFF]!
+                                    group-focus-within:ring-[#527AFF] group-focus-within:placeholder-[#527AFF]!
                                     group-focus-within:ring-2! peer
                                     transition-all duration-200
                                 "
@@ -105,11 +104,11 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
                             <label 
                                 htmlFor="firstName" 
                                 className="
-                                    absolute left-4 origin-left transform text-white/50 group-hover:text-[#B06EE4]
-                                    group-focus-within:text-[#B06EE4] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
-                                    group-focus-within:text-xs! group-focus-within:bg-[#1E1E22] group-focus-within:px-1! group-focus-within:font-medium!
+                                    absolute left-4 origin-left transform text-[#959595] group-hover:text-[#527AFF]
+                                    group-focus-within:text-[#527AFF] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
+                                    group-focus-within:text-xs! group-focus-within:bg-[#1C1C1C] group-focus-within:px-1! group-focus-within:font-medium!
                                     duration-200 cursor-text not-peer-placeholder-shown:-translate-y-5 not-peer-placeholder-shown:-translate-x-2
-                                    not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1E1E22]
+                                    not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1C1C1C]
                                 "
                             >
                                 First name (required)
@@ -124,8 +123,8 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
                                 placeholder=" "
                                 className="
                                     h-10 w-full rounded-xl outline-none! ring-[1.5px]! ring-white/10
-                                    px-4! group-hover:ring-[#B06EE4] group-hover:placeholder-[#B06EE4]!
-                                    group-focus-within:ring-[#B06EE4] group-focus-within:placeholder-[#B06EE4]!
+                                    px-4! group-hover:ring-[#527AFF] group-hover:placeholder-[#527AFF]!
+                                    group-focus-within:ring-[#527AFF] group-focus-within:placeholder-[#527AFF]!
                                     group-focus-within:ring-2! peer
                                     transition-all duration-200
                                 "
@@ -133,11 +132,11 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
                             <label 
                                 htmlFor="lastName" 
                                 className="
-                                    absolute left-4 origin-left transform text-white/50 group-hover:text-[#B06EE4]
-                                    group-focus-within:text-[#B06EE4] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
-                                    group-focus-within:text-xs! group-focus-within:bg-[#1E1E22] group-focus-within:px-1! group-focus-within:font-medium!
+                                    absolute left-4 origin-left transform text-[#959595] group-hover:text-[#527AFF]
+                                    group-focus-within:text-[#527AFF] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
+                                    group-focus-within:text-xs! group-focus-within:bg-[#1C1C1C] group-focus-within:px-1! group-focus-within:font-medium!
                                     duration-200 cursor-text not-peer-placeholder-shown:-translate-y-5 not-peer-placeholder-shown:-translate-x-2
-                                    not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1E1E22]
+                                    not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1C1C1C]
                                 "
                             >
                                 Last name (required)
@@ -164,19 +163,19 @@ export const AddContactModal = ({ isOpen, onClose, onAdd }) => {
                         placeholder=" "
                         className="
                             h-10 w-full rounded-xl outline-none! ring-[1.5px]! ring-white/10
-                            pr-4! pl-7! group-hover:ring-[#B06EE4] group-hover:placeholder-[#B06EE4]!
-                            group-focus-within:ring-2! group-focus-within:ring-[#B06EE4] group-focus-within:placeholder-[#B06EE4]!
+                            pr-4! pl-7! group-hover:ring-[#527AFF] group-hover:placeholder-[#527AFF]!
+                            group-focus-within:ring-2! group-focus-within:ring-[#527AFF] group-focus-within:placeholder-[#527AFF]!
                             transition-all duration-200 peer
                         "
                     />
                     <label 
                         htmlFor="username"
                         className="
-                            absolute left-8 top-1.5 origin-left transform text-white/50 group-hover:text-[#B06EE4]
-                            group-focus-within:text-[#B06EE4] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
-                            group-focus-within:text-xs! group-focus-within:bg-[#1E1E22] group-focus-within:px-1! group-focus-within:font-medium!
+                            absolute left-8 top-1.5 origin-left transform text-[#959595] group-hover:text-[#527AFF]
+                            group-focus-within:text-[#527AFF] group-focus-within:-translate-y-5 group-focus-within:-translate-x-2
+                            group-focus-within:text-xs! group-focus-within:bg-[#1C1C1C] group-focus-within:px-1! group-focus-within:font-medium!
                             duration-200 cursor-text not-peer-placeholder-shown:-translate-y-5 not-peer-placeholder-shown:-translate-x-2
-                            not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1E1E22]
+                            not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1C1C1C]
                         "
                     >
                         Username

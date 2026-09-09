@@ -8,6 +8,7 @@ public record MessageDto
     Guid SenderId,
     string Text,
     DateTimeOffset SentAt,
+    bool IsDeleted,
     MessageStatus Status,
     List<ReactionDto> Reactions
 );

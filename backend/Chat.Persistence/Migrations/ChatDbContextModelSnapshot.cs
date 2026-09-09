@@ -17,12 +17,12 @@ namespace Chat.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatMemberEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.ChatMemberEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +51,7 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("ChatMembers");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.ChatRoomEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,7 +70,7 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("ChatRooms");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.MessageEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.MessageEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,6 +81,9 @@ namespace Chat.Infrastructure.Migrations
 
                     b.Property<Guid?>("ChatRoomEntityId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uuid");
@@ -100,7 +103,7 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.MessageReactionEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.MessageReactionEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -130,7 +133,7 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("MessageReactions");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.RefreshTokenEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.RefreshTokenEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -162,7 +165,32 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.UserEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.UserDeletedMessageEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId");
+
+                    b.HasIndex("UserId", "MessageId")
+                        .IsUnique();
+
+                    b.ToTable("UserDeletedMessages");
+                });
+
+            modelBuilder.Entity("Chat.Persistence.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -205,15 +233,15 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatMemberEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.ChatMemberEntity", b =>
                 {
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", "ChatRoom")
+                    b.HasOne("Chat.Persistence.Entities.ChatRoomEntity", "ChatRoom")
                         .WithMany("Members")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.UserEntity", "User")
+                    b.HasOne("Chat.Persistence.Entities.UserEntity", "User")
                         .WithMany("ChatMembers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -224,22 +252,22 @@ namespace Chat.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.MessageEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.MessageEntity", b =>
                 {
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", null)
+                    b.HasOne("Chat.Persistence.Entities.ChatRoomEntity", null)
                         .WithMany("Messages")
                         .HasForeignKey("ChatRoomEntityId");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.MessageReactionEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.MessageReactionEntity", b =>
                 {
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.MessageEntity", "Message")
+                    b.HasOne("Chat.Persistence.Entities.MessageEntity", "Message")
                         .WithMany("Reactions")
                         .HasForeignKey("MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.UserEntity", "User")
+                    b.HasOne("Chat.Persistence.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -250,9 +278,9 @@ namespace Chat.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.RefreshTokenEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.RefreshTokenEntity", b =>
                 {
-                    b.HasOne("Chat.Infrastructure.Persistence.Entities.UserEntity", "User")
+                    b.HasOne("Chat.Persistence.Entities.UserEntity", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -261,19 +289,38 @@ namespace Chat.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.ChatRoomEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.UserDeletedMessageEntity", b =>
+                {
+                    b.HasOne("Chat.Persistence.Entities.MessageEntity", "Message")
+                        .WithMany()
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Chat.Persistence.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Chat.Persistence.Entities.ChatRoomEntity", b =>
                 {
                     b.Navigation("Members");
 
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.MessageEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.MessageEntity", b =>
                 {
                     b.Navigation("Reactions");
                 });
 
-            modelBuilder.Entity("Chat.Infrastructure.Persistence.Entities.UserEntity", b =>
+            modelBuilder.Entity("Chat.Persistence.Entities.UserEntity", b =>
                 {
                     b.Navigation("ChatMembers");
 

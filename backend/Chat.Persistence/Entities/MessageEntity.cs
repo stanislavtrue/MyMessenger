@@ -6,5 +6,6 @@ public class MessageEntity
     public Guid SenderId { get; set; }
     public string Text { get; set; } = string.Empty;
     public DateTimeOffset SentAt { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; } = null;
     public List<MessageReactionEntity> Reactions { get; set; } = new();
 }

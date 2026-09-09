@@ -60,7 +60,7 @@ export const MESSAGE_CONTEXT_MENU = [
         strokeWidth: 2,
         isDanger: true,
         action: (message, context) => {
-            context.handleDeleteMessage(context.selectedChatId, message.id);
+            context.setDeletingMessage(message);
         }
     }
 ]

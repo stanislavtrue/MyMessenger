@@ -46,7 +46,7 @@ public class ChatRoomsService
 
         var currentMemberDetails = await _chatMembersRepository.GetByUserIdAndChatIds(chatIds, userId);
 
-        var lastMessages = await _messagesRepository.GetLastMessagesByChatIds(chatIds);
+        var lastMessages = await _messagesRepository.GetLastMessagesByChatIds(chatIds, userId);
 
         var users = await  _usersRepository.GetByIds(memberInfos.Select(x => x.UserId).ToList());
 
@@ -84,8 +84,11 @@ public class ChatRoomsService
         return await _chatMembersRepository.GetMembersByChatId(chatId);
     }
 
-    public async Task MarkAsRead(Guid chatId, Guid userId, Guid messageId)
+    public async Task<int> MarkAsRead(Guid chatId, Guid userId, Guid messageId)
     {
+        if (!await _chatMembersRepository.HasAccess(chatId, userId))
+            throw new ChatAccessDeniedException();
+
         var messageSentAt = await _messagesRepository.GetSentAtById(messageId);
 
         var unreadCount = await _messagesRepository.GetUnreadCount(chatId, userId, messageSentAt);
@@ -93,6 +96,26 @@ public class ChatRoomsService
         await _chatMembersRepository.MarkAsRead(chatId, userId, messageId, unreadCount);
 
         await _unitOfWork.SaveChangesAsync();
+
+        return unreadCount;
+    }
+
+    public async Task<int> RecalculateUnreadCount(Guid chatId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var lastReadMessageId = await _chatMembersRepository.GetLastReadMessageId(chatId, userId);
+
+        DateTimeOffset? sentAt = null;
+
+        if (lastReadMessageId.HasValue)
+        {
+            sentAt = await _messagesRepository.GetSentAtById(lastReadMessageId.Value);
+        }
+
+        var unreadCount = await _messagesRepository.GetUnreadCount(chatId, userId, sentAt);
+
+        await _chatMembersRepository.MarkUnreadCount(chatId, userId, unreadCount);
+
+        return unreadCount;
     }
 
     public async Task<int> GetUnreadCount(Guid chatId, Guid userId)

@@ -62,11 +62,20 @@ public class ChatMembersRepository : IChatMembersRepository
         return otherUserId;
     }
 
-    public async Task<Guid?> GetLastReadMessageId(Guid chatId, Guid currentUserId)
+    public async Task<Guid?> GetOtherUserLastReadMessageId(Guid chatId, Guid currentUserId)
     {
         return await _context.ChatMembers
             .AsNoTracking()
             .Where(cm => cm.ChatId == chatId && cm.UserId != currentUserId)
+            .Select(cm => cm.LastReadMessageId)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Guid?> GetLastReadMessageId(Guid chatId, Guid currentUserId)
+    {
+        return await _context.ChatMembers
+            .AsNoTracking()
+            .Where(cm => cm.ChatId == chatId && cm.UserId == currentUserId)
             .Select(cm => cm.LastReadMessageId)
             .FirstOrDefaultAsync();
     }
@@ -105,6 +114,14 @@ public class ChatMembersRepository : IChatMembersRepository
             .Where(cm => cm.ChatId == chatId && cm.UserId == userId)      
             .ExecuteUpdateAsync(s => s
                 .SetProperty(cm => cm.LastReadMessageId, messageId)
+                .SetProperty(cm => cm.UnreadCount, unreadCount));
+    }
+
+    public async Task MarkUnreadCount(Guid chatId, Guid userId, int unreadCount)
+    {
+        await _context.ChatMembers
+            .Where(cm => cm.ChatId == chatId && cm.UserId == userId)
+            .ExecuteUpdateAsync(s => s
                 .SetProperty(cm => cm.UnreadCount, unreadCount));
     }
 
