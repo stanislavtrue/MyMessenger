@@ -247,4 +247,35 @@ public class ChatHub : Hub
                 UnreadCount = unreadCount
             });
     }
+
+    public async Task PinMessage(Guid chatId, Guid messageId)
+    {
+        var userId = GetUserId();
+
+        var pinnedMessageDto = await _messagesService.PinMessage(messageId, userId, Context.ConnectionAborted);
+
+        if (pinnedMessageDto is null)
+            return;
+
+        await Clients.Group(chatId.ToString())
+            .SendAsync("MessagePinned", new
+            {
+                ChatId = pinnedMessageDto.ChatId,
+                PinnedMessage = pinnedMessageDto
+            });
+    }
+
+    public async Task UnpinMessage(Guid chatId, Guid messageId)
+    {
+        var userId = GetUserId();
+
+        await _messagesService.UnpinMessage(messageId, userId, Context.ConnectionAborted);
+
+        await Clients.Group(chatId.ToString())
+            .SendAsync("MessageUnpinned", new
+            {
+                ChatId = chatId,
+                MessageId = messageId
+            });
+    }
 }

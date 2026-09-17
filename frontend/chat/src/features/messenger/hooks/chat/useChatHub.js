@@ -180,7 +180,7 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
                 return {
                     ...chat,
                     messages: updatedMessages,
-                    pinnedMessages: (chat.pinnedMessages || []).filter(msg => msg.id !== messageId)
+                    pinnedMessages: (chat.pinnedMessages || []).filter(pm => pm.messageId !== messageId)
                 };
             }));
         };
@@ -195,7 +195,37 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
                 return {
                     ...chat,
                     messages: updatedMessages,
-                    pinnedMessages: (chat.pinnedMessages || []).filter(msg => msg.id !== messageId)
+                    pinnedMessages: (chat.pinnedMessages || []).filter(pm => pm.messageId !== messageId)
+                };
+            }));
+        };
+
+        const handleMessagePinned = ({ chatId, pinnedMessage }) => {
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id !== chatId)
+                    return chat;
+
+                const currentPinned = chat.pinnedMessages || [];
+
+                const isAlreadyPinned = currentPinned.some(pm => pm.messageId === pinnedMessage.MessageId)
+                if (isAlreadyPinned)
+                    return chat;
+
+                return {
+                    ...chat,
+                    pinnedMessages: [pinnedMessage, ...currentPinned]
+                };
+            }));
+        };
+
+        const handleMessageUnpinned = ({ chatId, messageId }) => {
+            setChats(prevChats => prevChats.map(chat => {
+                if (chat.id !== chatId)
+                    return chat;
+
+                return {
+                    ...chat,
+                    pinnedMessages: (chat.pinnedMessages || []).filter(pm => pm.messageId !== messageId)
                 };
             }));
         };
@@ -209,6 +239,8 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
         connection.on("ReactionUpdated", handleReactionUpdated);
         connection.on("MessageDeletedForEveryone", handleMessageDeletedForEveryone);
         connection.on("MessageDeletedForUser", handleMessageDeletedForUser);
+        connection.on("MessagePinned", handleMessagePinned);
+        connection.on("MessageUnpinned", handleMessageUnpinned);
 
         return () => {
             connection.off("ReceiveMessage", handleReceiveMessage);
@@ -220,6 +252,8 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
             connection.off("ReactionUpdated", handleReactionUpdated);
             connection.off("MessageDeletedForEveryone", handleMessageDeletedForEveryone);
             connection.off("MessageDeletedForUser", handleMessageDeletedForUser);
+            connection.off("MessagePinned", handleMessagePinned);
+            connection.off("MessageUnpinned", handleMessageUnpinned);
         };
     }, [currentUser?.id, connection]);
 
@@ -309,11 +343,35 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
         }
     }, []);
 
+    const handlePinMessage = useCallback(async (chatId, messageId) => {
+        if (!selectedChatId || !connection)
+            return;
+
+        try {
+            await connection.invoke("PinMessage", chatId, messageId);
+        } catch (error) {
+            console.log("Failed to pin message: ", error);
+        }
+    }, [selectedChatId])
+
+    const handleUnpinMessage = useCallback(async (chatId, messageId) => {
+        if (!selectedChatId || !connection)
+            return;
+
+        try {
+            await connection.invoke("UnpinMessage", chatId, messageId);
+        } catch (error) {
+            console.log("Failed to unpin message: ", error);
+        }
+    }, [selectedChatId])
+
     return {
         markAsRead,
         handleSendMessage,
         handleSetReaction,
         handleDeleteMessageForEveryone,
-        handleDeleteMessageForUser
+        handleDeleteMessageForUser,
+        handlePinMessage,
+        handleUnpinMessage
     };
 };

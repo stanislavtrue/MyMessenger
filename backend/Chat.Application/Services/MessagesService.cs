@@ -9,13 +9,15 @@ public class MessagesService
     private readonly IMessagesRepository _messagesRepository;
     private readonly IChatMembersRepository _chatMemberRepository;
     private readonly IMessageReactionsRepository _messageReactionsRepository;
+    private readonly IPinnedMessagesRepository _pinnedMessagesRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public MessagesService(IMessagesRepository messagesRepository, IChatMembersRepository chatMembersRepository, IMessageReactionsRepository messageReactionsRepository, IUnitOfWork unitOfWork)
+    public MessagesService(IMessagesRepository messagesRepository, IChatMembersRepository chatMembersRepository, IMessageReactionsRepository messageReactionsRepository, IPinnedMessagesRepository pinnedMessagesRepository, IUnitOfWork unitOfWork)
     {
         _messagesRepository = messagesRepository;
         _chatMemberRepository = chatMembersRepository;
         _messageReactionsRepository = messageReactionsRepository;
+        _pinnedMessagesRepository = pinnedMessagesRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -175,6 +177,8 @@ public class MessagesService
 
         await _messagesRepository.DeleteForEveryone(message, cancellationToken);
 
+        await _pinnedMessagesRepository.UnpinMessage(messageId, cancellationToken);
+
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -188,5 +192,55 @@ public class MessagesService
         await _messagesRepository.DeleteForUser(userId, messageId, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<PinnedMessageDto?> PinMessage(Guid messageId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var message = await _messagesRepository.GetById(messageId);
+
+        if (!await _chatMemberRepository.HasAccess(message.ChatId, userId))
+            throw new ChatAccessDeniedException();
+        
+        if (message.IsDeleted)
+            return null;
+
+        var isPinned = await _pinnedMessagesRepository.IsPinned(messageId, cancellationToken);
+
+        if (isPinned)
+            return null;
+
+        var pinnedMessage = PinnedMessage.Create(messageId, userId);
+
+        await _pinnedMessagesRepository.PinMessage(pinnedMessage, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync();
+
+        return new PinnedMessageDto(
+            pinnedMessage.MessageId,
+            message.ChatId,
+            pinnedMessage.PinnedByUserId,
+            message.Text,
+            pinnedMessage.PinnedAt
+        );
+    }
+
+    public async Task UnpinMessage(Guid messageId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var message = await _messagesRepository.GetById(messageId);
+
+        if (!await _chatMemberRepository.HasAccess(message.ChatId, userId))
+            throw new ChatAccessDeniedException();
+
+        await _pinnedMessagesRepository.UnpinMessage(messageId, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<List<PinnedMessage>> GetPinnedMessagesByChatId(Guid chatId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        if (!await _chatMemberRepository.HasAccess(chatId, userId))
+            throw new ChatAccessDeniedException();
+
+        return await _pinnedMessagesRepository.GetByChatId(chatId, userId, cancellationToken);
     }
 }

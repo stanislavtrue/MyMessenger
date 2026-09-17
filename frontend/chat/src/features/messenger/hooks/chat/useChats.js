@@ -21,6 +21,8 @@ export const useChats = ({ setChats }) => {
                     messages: [],
                 }))
 
+                console.log(formattedChats);
+
                 setChats(formattedChats);
             } catch (error) {
                 console.error("Error fetching chats: ", error);

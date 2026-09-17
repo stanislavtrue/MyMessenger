@@ -8,6 +8,7 @@ public interface IMessagesRepository
     Task<List<Message>> GetByChatId(Guid chatId, Guid currentUserId, CancellationToken cancellationToken = default);
     Task<Message> GetById(Guid messageId);
     Task<DateTimeOffset?> GetSentAtById(Guid messageId);
+    Task<Guid> GetChatIdById(Guid messageId);
     Task<List<LastMessageDto>> GetLastMessagesByChatIds(List<Guid> chatIds, Guid currentUserId, CancellationToken cancellationToken = default);
     Task<Dictionary<Guid, LastMessageDto>> GetLastMessagesByUserIds(Guid chatId, List<Guid> userIds, CancellationToken cancellationToken = default);
     Task<LastMessageDto?> GetLastMessageByUserId(Guid chatId, Guid userId, CancellationToken cancellationToken = default);

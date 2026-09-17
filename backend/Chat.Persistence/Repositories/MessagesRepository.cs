@@ -67,6 +67,15 @@ public class MessagesRepository : IMessagesRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<Guid> GetChatIdById(Guid messageId)
+    {
+        return await _context.Messages
+            .AsNoTracking()
+            .Where(m => m.Id == messageId)
+            .Select(m => (Guid?)m.ChatId)
+            .FirstOrDefaultAsync() ?? throw new MessageNotFoundException();;
+    }
+
     public async Task<List<LastMessageDto>> GetLastMessagesByChatIds(List<Guid> chatIds, Guid currentUserId, CancellationToken cancellationToken = default)
     {
         return await _context.Messages

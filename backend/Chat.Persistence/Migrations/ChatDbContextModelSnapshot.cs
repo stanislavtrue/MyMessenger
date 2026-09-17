@@ -133,6 +133,31 @@ namespace Chat.Infrastructure.Migrations
                     b.ToTable("MessageReactions");
                 });
 
+            modelBuilder.Entity("Chat.Persistence.Entities.PinnedMessageEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("PinnedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PinnedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId")
+                        .IsUnique();
+
+                    b.HasIndex("PinnedByUserId");
+
+                    b.ToTable("PinnedMessages");
+                });
+
             modelBuilder.Entity("Chat.Persistence.Entities.RefreshTokenEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -276,6 +301,25 @@ namespace Chat.Infrastructure.Migrations
                     b.Navigation("Message");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Chat.Persistence.Entities.PinnedMessageEntity", b =>
+                {
+                    b.HasOne("Chat.Persistence.Entities.MessageEntity", "Message")
+                        .WithOne()
+                        .HasForeignKey("Chat.Persistence.Entities.PinnedMessageEntity", "MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Chat.Persistence.Entities.UserEntity", "PinnedByUser")
+                        .WithMany()
+                        .HasForeignKey("PinnedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+
+                    b.Navigation("PinnedByUser");
                 });
 
             modelBuilder.Entity("Chat.Persistence.Entities.RefreshTokenEntity", b =>

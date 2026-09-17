@@ -23,7 +23,7 @@ export const PinnedMessageBar = ({ chat }) => {
     const currentPinned = pinnedMessages[safeIndex];
 
     const handleConfirmUnpin = () => {
-        handleUnpinMessage(chat.id, currentPinned.id);
+        handleUnpinMessage(chat.id, currentPinned.messageId);
         closeConfirmModal();
     };
 
@@ -32,14 +32,14 @@ export const PinnedMessageBar = ({ chat }) => {
 
         if (e.target.closest('.unpin-btn')) return;
 
-        const element = document.getElementById(`msg-${currentPinned.id}`);
+        const element = document.getElementById(`msg-${currentPinned.messageId}`);
         if (element) {
             element.scrollIntoView({
                 behavior: "smooth",
                 block: "center"
             });
 
-            triggerHighlight(currentPinned.id);
+            triggerHighlight(currentPinned.messageId);
         }
 
         setCurrentIndex((prevIndex) => (prevIndex === 0 ? pinnedMessages.length - 1 : prevIndex - 1));
@@ -65,7 +65,7 @@ export const PinnedMessageBar = ({ chat }) => {
 
             <div 
                 onClick={handleBarClick}
-                className="relative flex flex-1 items-center gap-2 hover:bg-[#527AFF]/20 min-w-0 rounded-sm px-1! cursor-pointer select-none">
+                className="relative overflow-hidden flex flex-1 items-center gap-2 hover:bg-[#527AFF]/10 min-w-0 rounded-sm px-1! cursor-pointer select-none">
                 {ripples.map((ripple) => (
                     <span
                         key={ripple.id}
@@ -81,7 +81,7 @@ export const PinnedMessageBar = ({ chat }) => {
 
                 <div className="
                     flex flex-col gap-0.5
-                    w-0.5 h-10
+                    w-0.75 h-10
                     justify-center shrink-0
                 ">
                     {Array.from({ length: totalBars }).map((_, idx) => {
@@ -93,7 +93,7 @@ export const PinnedMessageBar = ({ chat }) => {
                                     rounded-full flex-1 transition-all duration-500 ease-in-out
                                     ${isActive
                                         ? "bg-[#527AFF] opacity-100"
-                                        : "bg-[#3A3A4E] opacity-60"
+                                        : "bg-[#527AFF] opacity-20"
                                     }    
                                 `}
                             />

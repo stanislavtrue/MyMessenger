@@ -6,7 +6,7 @@ export const MESSAGE_CONTEXT_MENU = [
     {
         id: "reply",
         label: () => "Reply",
-        icon: SlActionUndo,
+        icon: () => SlActionUndo,
         strokeWidth: 25,
         action: (message, context) => {
             context.openReply(message);
@@ -16,7 +16,7 @@ export const MESSAGE_CONTEXT_MENU = [
     {
         id: "copy",
         label: () => "Copy Text",
-        icon: MdOutlineContentCopy,
+        icon: () => MdOutlineContentCopy,
         strokeWidth: 0,
         action: async (message, context) => {
             if (!message?.text) return;
@@ -30,33 +30,29 @@ export const MESSAGE_CONTEXT_MENU = [
     },
     {
         id: "pin",
-        label: (message, context) => {
-            const pinnedMessages = context.selectedChat?.pinnedMessages || [];
-            return pinnedMessages.some(msg => msg.id === message?.id) ? "Unpin" : "Pin";
+        label: (message) => {
+            return message?.isPinned ? "Unpin" : "Pin";
         },
-        icon: Pin,
+        icon: (message) => message?.isPinned ? PinOff : Pin,
         strokeWidth: 2,
         action: (message, context) => {
-            const pinnedMessages = context.selectedChat?.pinnedMessages || [];
-            const isCurrentPinned = pinnedMessages.some(msg => msg.id === message.id);
-
-            if (isCurrentPinned) {
-                context.handleUnpinMessage(context.selectedChatId, message.id);
+            if (message?.isPinned) {
+                context.handleUnpinMessage(context.selectedChatId, message?.id);
             } else {
-                context.handlePinMessage(context.selectedChatId, message);
+                context.handlePinMessage(context.selectedChatId, message?.id);
             }
         }
     },
     {
         id: "forward",
         label: () => "Forward",
-        icon: SlActionRedo,
+        icon: () => SlActionRedo,
         strokeWidth: 25
     },
     {
         id: "delete",
         label: () => "Delete",
-        icon: Trash,
+        icon: () => Trash,
         strokeWidth: 2,
         isDanger: true,
         action: (message, context) => {

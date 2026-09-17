@@ -85,36 +85,10 @@ export const useChatMessages = ({ setChats, currentUserId, closeReply, replyToMe
         }));
     }, [setChats]);
 
-    const handleDeleteMessage = useCallback((chatId, messageId) => {
-        setChats(prevChats => prevChats.map(chat => {
-                if (chat.id === chatId) {
-                    const updatedMessages = chat.messages.filter(msg => msg.id !== messageId);
-                    const nextLastMessage = updatedMessages.at(-1);
-
-                    if (replyToMessage?.id === messageId) {
-                        closeReply();
-                    }
-
-                    const pinnedMessages = chat.pinnedMessages || [];
-
-                    return {
-                        ...chat,
-                        lastMessage: nextLastMessage ? nextLastMessage.text : "No messages yet",
-                        time: nextLastMessage ? nextLastMessage.time : "",
-                        messages: updatedMessages,
-                        pinnedMessages: pinnedMessages.filter(msg => msg.id !== messageId)
-                    };
-                }
-
-                return chat;
-            }));
-    }, [setChats, replyToMessage, closeReply]);
-
     return {
         isLoadingMessages,
         fetchMessages,
         handlePinMessage,
         handleUnpinMessage,
-        handleDeleteMessage
     };
 };

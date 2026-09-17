@@ -51,7 +51,7 @@ export const useMessenger = () => {
 
     const { contextMenu, setContextMenu, showMenu, closeMenu } = useContextMenu();
 
-    const chatSearch = useChatSearch(selectedChat, isChatSearchFocused, setIsChatSearchFocused);
+    const chatSearch = useChatSearch(selectedChat, setIsChatSearchFocused);
 
     // --- UI handlers --------------------------------------------------------------------------
     const closeSidebarSearch = () => {
@@ -64,14 +64,14 @@ export const useMessenger = () => {
     
     const closeAddContact = () => setIsAddContactOpen(false);
 
-    const { markAsRead, handleSendMessage, handleSetReaction, handleDeleteMessageForEveryone, handleDeleteMessageForUser } = useChatHub({
+    const { markAsRead, handleSendMessage, handleSetReaction, handleDeleteMessageForEveryone, handleDeleteMessageForUser, handlePinMessage, handleUnpinMessage } = useChatHub({
         currentUser,
         setChats,
         selectedChatId,
         closeReply
     });
 
-    const { isLoadingMessages, fetchMessages, handlePinMessage, handleUnpinMessage, handleDeleteMessage } = useChatMessages({
+    const { isLoadingMessages, fetchMessages } = useChatMessages({
         setChats,
         currentUserId: currentUser?.id,
         closeReply,
@@ -133,7 +133,6 @@ export const useMessenger = () => {
         isLoadingMessages,
         markAsRead,
         handleSendMessage,
-        handleDeleteMessage,
         handlePinMessage,
         handleUnpinMessage,
         handleDeleteMessageForEveryone,

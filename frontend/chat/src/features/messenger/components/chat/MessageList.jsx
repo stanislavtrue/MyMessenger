@@ -8,7 +8,7 @@ import { ContextMenuWrapper } from "../common/ContextMenuWrapper";
 import { MessageItem } from "./MessageItem";
 import { DeleteMessageModal } from "../modals/DeleteMessageModal";
 
-export const MessageList = ({ messages }) => {
+export const MessageList = ({ messages, chat }) => {
     const messengerContext = useMessengerContext();
     const { 
         contextMenu, showMenu, closeMenu, openReply, chatSearchText, filteredSearchMessages, 
@@ -41,6 +41,11 @@ export const MessageList = ({ messages }) => {
 
         setDeletingMessage(null);
     };
+
+    const pinnedMessageIds = useMemo(() => {
+        const pinnedList = chat?.pinnedMessages || [];
+        return new Set(pinnedList.map(pm => pm.messageId));
+    }, [chat?.pinnedMessages]);
 
     const enrichedContext = {
         ...messengerContext,
@@ -85,10 +90,15 @@ export const MessageList = ({ messages }) => {
                     const spacingClass = 
                         isLastMessage ? "mb-3!" : "mb-1.5!";
 
+                    const enrichedMessage = {
+                        ...message,
+                        isPinned: pinnedMessageIds.has(message.id)
+                    }
+
                     return (
                         <MessageItem 
                             key={message.id || index}
-                            message={message}
+                            message={enrichedMessage}
                             isFirstMessage={isFirstMessage}
                             isLastMessage={isLastMessage}
                             isHighlighted={isHighlighted}
@@ -106,7 +116,7 @@ export const MessageList = ({ messages }) => {
 
             <ContextMenuWrapper type="message">
                 {MESSAGE_CONTEXT_MENU.map((item) => {
-                    const Icon = item.icon;
+                    const Icon = item.icon(contextMenu.messageData);
                     const currentLabel = item.label(contextMenu.messageData, enrichedContext);
 
                     return (

@@ -7,5 +7,6 @@ public record class ChatRoomResponse
     UserResponse? User,
     string? LastMessage,
     DateTimeOffset? LastMessageAt,
-    int UnreadCount
+    int UnreadCount,
+    List<PinnedMessageResponse> PinnedMessages
 );

@@ -33,6 +33,14 @@ public class ChatRoomsController : ControllerBase
         {
             var isOnline = await _userStatusTracker.IsUserOnlineAsync(chat.User.Id);
 
+            var pinnedMessagesResponse = chat.PinnedMessages
+                .Select(pm => new PinnedMessageResponse(
+                    pm.MessageId,
+                    pm.PinnedByUserId,
+                    pm.Text,
+                    pm.PinnedAt
+                )).ToList();
+
             return new ChatRoomResponse(
                 chat.ChatRoom.Id,
                 chat.ChatRoom.Name,
@@ -47,7 +55,8 @@ public class ChatRoomsController : ControllerBase
                 ),
                 chat.LastMessage,
                 chat.LastMessageAt,
-                chat.UnreadCount
+                chat.UnreadCount,
+                pinnedMessagesResponse
             );
         });
 

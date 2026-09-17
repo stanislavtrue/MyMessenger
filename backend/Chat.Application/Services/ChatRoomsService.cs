@@ -9,6 +9,7 @@ public class ChatRoomsService
     private readonly IChatMembersRepository _chatMembersRepository;
     private readonly IUsersRepository _usersRepository;
     private readonly IMessagesRepository _messagesRepository;
+    private readonly IPinnedMessagesRepository _pinnedMessagesRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public ChatRoomsService(
@@ -16,12 +17,14 @@ public class ChatRoomsService
         IChatMembersRepository chatMembersRepository, 
         IUsersRepository usersRepository, 
         IMessagesRepository messagesRepository,
+        IPinnedMessagesRepository pinnedMessagesRepository,
         IUnitOfWork unitOfWOrk)
     {
         _chatRoomsRepository = chatRoomsRepository;
         _chatMembersRepository = chatMembersRepository;
         _usersRepository = usersRepository;
         _messagesRepository = messagesRepository;
+        _pinnedMessagesRepository = pinnedMessagesRepository;
         _unitOfWork = unitOfWOrk;
     }
 
@@ -48,6 +51,12 @@ public class ChatRoomsService
 
         var lastMessages = await _messagesRepository.GetLastMessagesByChatIds(chatIds, userId);
 
+        var pinnedMessages = await _pinnedMessagesRepository.GetByChatIds(chatIds, userId);
+
+        var pinnedMessagesByChat = pinnedMessages
+            .GroupBy(pm => pm.ChatId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         var users = await  _usersRepository.GetByIds(memberInfos.Select(x => x.UserId).ToList());
 
         var result = new List<ChatRoomDto>();
@@ -73,7 +82,10 @@ public class ChatRoomsService
 
             int unreadCount = currentMember?.UnreadCount ?? 0;
 
-            result.Add(new ChatRoomDto(chatRoom, user, lastMessage, lastMessageAt, unreadCount));
+            var chatPinnedMessages = pinnedMessagesByChat.GetValueOrDefault(chatRoom.Id)
+                ?? new List<PinnedMessageDto>();
+
+            result.Add(new ChatRoomDto(chatRoom, user, lastMessage, lastMessageAt, unreadCount, chatPinnedMessages));
         }
 
         return result;

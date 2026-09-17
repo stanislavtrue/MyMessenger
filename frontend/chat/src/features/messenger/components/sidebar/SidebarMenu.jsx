@@ -44,7 +44,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
 
             </div>
 
-            <div className="h-px! w-full bg-[#52526B] my-1!" />
+            <div className="h-px! w-full bg-[#2C2C2C] my-1!" />
 
             <div className="
                 flex items-center gap-4
@@ -57,7 +57,7 @@ export const SidebarMenu = ({ isOpen, menuRef, onContactsClick }) => {
 
             </div>
 
-            <div className="h-px! w-full bg-[#52526B] my-1!" />
+            <div className="h-px! w-full bg-[#2C2C2C] my-1!" />
                         
             <div className="
                 flex items-center gap-4.5

@@ -7,6 +7,7 @@ public record ChatRoomDto
     User User,
     string? LastMessage,
     DateTimeOffset? LastMessageAt,
-    int UnreadCount
+    int UnreadCount,
+    List<PinnedMessageDto> PinnedMessages
 );
 

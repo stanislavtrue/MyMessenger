@@ -9,6 +9,7 @@ public class ChatDbContext : DbContext
     public DbSet<ChatRoomEntity> ChatRooms => Set<ChatRoomEntity>();
     public DbSet<ChatMemberEntity> ChatMembers => Set<ChatMemberEntity>();
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>(); 
+    public DbSet<PinnedMessageEntity> PinnedMessages => Set<PinnedMessageEntity>();
     public DbSet<MessageReactionEntity> MessageReactions => Set<MessageReactionEntity>();
     public DbSet<UserDeletedMessageEntity> UserDeletedMessages => Set<UserDeletedMessageEntity>();
     public ChatDbContext(DbContextOptions<ChatDbContext> opitons) : base(opitons)

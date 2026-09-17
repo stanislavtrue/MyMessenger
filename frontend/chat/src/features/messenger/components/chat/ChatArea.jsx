@@ -57,7 +57,7 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
                 
                 <div className="w-full h-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#282836] scrollbar-track-transparent">
                     <div style={{ paddingTop: padding.top, paddingBottom: padding.bottom }} className="w-full min-h-full flex flex-col transition-all duration-75 ease-out">
-                        <MessageList messages={selectedChat.messages}/>
+                        <MessageList messages={selectedChat.messages} chat={selectedChat} />
                     </div>
                 </div>
                 
