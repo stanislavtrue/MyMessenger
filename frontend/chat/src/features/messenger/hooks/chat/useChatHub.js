@@ -5,7 +5,7 @@ import { MESSAGE_STATUS } from "../../constants/messageBubbleStatus";
 import { formatTime } from "@/utils/formatTime";
 import { formatDate } from "@/utils/formatDate";
 
-export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }) => {
+export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply, replyToMessage }) => {
     useEffect(() => {
         const  startConnection = async () => {
             try {
@@ -31,7 +31,7 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
                 date: formatDate(message.sentAt),
                 isOwnMessage: isOwn,
                 status: message.status,
-                replyTo: null
+                replyTo: message.replyTo
             };
 
             setChats(prevChats => prevChats.map(chat => {
@@ -167,14 +167,22 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
                     return chat;
 
                 const updatedMessages = chat.messages.map(msg => {
-                    if (msg.id !== messageId)
-                        return msg;
+                    if (msg.id === messageId) {
+                        return {
+                            ...msg,
+                            text: null,
+                            isDeleted: true
+                        };
+                    }
 
-                    return {
-                        ...msg,
-                        text: null,
-                        isDeleted: true
-                    };
+                    if (msg.replyTo && msg.replyTo.id === messageId) {
+                        return {
+                            ...msg,
+                            replyTo: null
+                        };
+                    }
+
+                    return msg;
                 });
 
                 return {
@@ -190,7 +198,24 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
                 if (chat.id !== chatId)
                     return chat;
 
-                const updatedMessages = chat.messages.filter(msg => msg.id !== messageId);
+                const updatedMessages = chat.messages.map(msg => {
+                    if (msg.id === messageId) {
+                        return {
+                            ...msg,
+                            text: null,
+                            isDeleted: true
+                        };
+                    }
+
+                    if (msg.replyTo && msg.replyTo.id === messageId) {
+                        return {
+                            ...msg,
+                            replyTo: null
+                        };
+                    }
+
+                    return msg;
+                });
 
                 return {
                     ...chat,
@@ -285,13 +310,15 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply }
     const handleSendMessage = useCallback(async (text) => {
         if (!text.trim() || !selectedChatId) return;
 
+        const replyToMessageId = replyToMessage?.id || null;
+
         try {
-            await connection.invoke("SendMessage", selectedChatId, text.trim());
             closeReply();
+            await connection.invoke("SendMessage", selectedChatId, text.trim(), replyToMessageId);
         } catch (error) {
             console.log("Failed to send message: ", error);
         }
-    }, [selectedChatId, closeReply])
+    }, [selectedChatId, replyToMessage, closeReply])
 
     const handleSetReaction = useCallback(async (messageId, emoji) => {
         if (!selectedChatId || !connection)

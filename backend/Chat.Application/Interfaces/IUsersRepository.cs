@@ -8,4 +8,5 @@ public interface IUsersRepository
     Task<User> GetById(Guid id);
     Task<List<User>> GetByIds(List<Guid> ids);
     Task UpdateLastSeen(Guid userId, DateTimeOffset lastSeenAt);
+    Task<string> GetDisplayName(Guid id);
 }

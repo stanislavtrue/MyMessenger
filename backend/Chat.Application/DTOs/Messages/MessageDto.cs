@@ -10,5 +10,6 @@ public record MessageDto
     DateTimeOffset SentAt,
     bool IsDeleted,
     MessageStatus Status,
-    List<ReactionDto> Reactions
+    List<ReactionDto> Reactions,
+    ReplyMessageDto? ReplyTo
 );

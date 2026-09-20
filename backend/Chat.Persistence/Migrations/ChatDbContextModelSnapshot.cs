@@ -85,6 +85,9 @@ namespace Chat.Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("ReplyToMessageId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uuid");
 
@@ -99,6 +102,8 @@ namespace Chat.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChatRoomEntityId");
+
+                    b.HasIndex("ReplyToMessageId");
 
                     b.ToTable("Messages");
                 });
@@ -282,6 +287,13 @@ namespace Chat.Infrastructure.Migrations
                     b.HasOne("Chat.Persistence.Entities.ChatRoomEntity", null)
                         .WithMany("Messages")
                         .HasForeignKey("ChatRoomEntityId");
+
+                    b.HasOne("Chat.Persistence.Entities.MessageEntity", "ReplyToMessage")
+                        .WithMany()
+                        .HasForeignKey("ReplyToMessageId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ReplyToMessage");
                 });
 
             modelBuilder.Entity("Chat.Persistence.Entities.MessageReactionEntity", b =>

@@ -7,5 +7,7 @@ public class MessageEntity
     public string Text { get; set; } = string.Empty;
     public DateTimeOffset SentAt { get; set; }
     public DateTimeOffset? DeletedAt { get; set; } = null;
+    public Guid? ReplyToMessageId { get; set; } = null;
+    public MessageEntity? ReplyToMessage { get; set; } = null;
     public List<MessageReactionEntity> Reactions { get; set; } = new();
 }

@@ -6,6 +6,7 @@ public interface IMessagesRepository
 {
     Task Add(Message message);
     Task<List<Message>> GetByChatId(Guid chatId, Guid currentUserId, CancellationToken cancellationToken = default);
+    Task<Dictionary<Guid, ReplyMessageDto>> GetReplyPreviews(List<Guid> replyToIds, Guid currentUserId, CancellationToken cancellationToken = default);
     Task<Message> GetById(Guid messageId);
     Task<DateTimeOffset?> GetSentAtById(Guid messageId);
     Task<Guid> GetChatIdById(Guid messageId);

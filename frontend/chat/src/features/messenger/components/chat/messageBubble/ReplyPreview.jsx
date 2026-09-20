@@ -11,8 +11,8 @@ export const ReplyPreview = ({ message }) => {
             className={`
                 relative overflow-hidden flex flex-col my-1! justify-between h-10 w-full text-sm! rounded-sm cursor-pointer select-none
                 ${message.isOwnMessage
-                    ? "bg-white/10 border-white! border-l-4! hover:bg-white/5"
-                    : "bg-[#8F5EB5]/20 border-[#8F5EB5]! border-l-4! hover:bg-[#8F5EB5]/15"
+                    ? "bg-white/5 border-white! border-l-3! hover:bg-white/10"
+                    : "bg-[#527AFF]/10 border-[#527AFF]! border-l-3! hover:bg-[#527AFF]/15"
                 }
             `}
         >

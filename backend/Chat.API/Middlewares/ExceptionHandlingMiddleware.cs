@@ -59,6 +59,10 @@ public class ExceptionHandlingMiddleware
         {
             await WriteError(context, StatusCodes.Status403Forbidden, "Forbidden", ex.Message);
         }
+        catch (InvalidReplyMessageException ex)
+        {
+            await WriteError(context, StatusCodes.Status400BadRequest, "InvalidReplyTarget", ex.Message);
+        }
         catch (Exception ex)
         {
             await WriteError(context, StatusCodes.Status500InternalServerError, "InternalServerError", ex.Message);

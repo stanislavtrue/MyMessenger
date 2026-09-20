@@ -92,17 +92,17 @@ public class ChatHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task SendMessage(Guid chatId, string text)
+    public async Task SendMessage(Guid chatId, string text, Guid? replyToMessageId = null)
     {
         var userId = GetUserId();
 
         if (!await _chatRoomsService.HasAccess(chatId, userId))
             throw new ChatAccessDeniedException();
 
-        var message = await _messagesService.Send(chatId, userId, text);
+        var messageDto = await _messagesService.Send(chatId, userId, text, replyToMessageId);
 
         await Clients.Group(chatId.ToString())
-            .SendAsync("ReceiveMessage", message);
+            .SendAsync("ReceiveMessage", messageDto);
 
         var chatMembers = await _chatRoomsService.GetChatMembers(chatId);
 
@@ -112,8 +112,8 @@ public class ChatHub : Hub
                 .SendAsync("ChatUpdated", new
                 {
                     ChatId = chatId,
-                    LastMessage = message.Text,
-                    LastMessageAt = message.SentAt,
+                    LastMessage = messageDto.Text,
+                    LastMessageAt = messageDto.SentAt,
                     UnreadCount = chatMember.UnreadCount
                 });
         }

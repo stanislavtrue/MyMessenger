@@ -23,7 +23,8 @@ public class MessagesRepository : IMessagesRepository
             SenderId = message.SenderId,
             Text = message.Text,
             SentAt = message.SentAt,
-            DeletedAt = message.DeletedAt
+            DeletedAt = message.DeletedAt,
+            ReplyToMessageId = message.ReplyToMessageId
         };
 
         await _context.Messages.AddAsync(messageEntity);
@@ -45,8 +46,41 @@ public class MessagesRepository : IMessagesRepository
             m.SenderId,
             m.Text,
             m.SentAt,
-            m.DeletedAt
+            m.DeletedAt,
+            m.ReplyToMessageId
         )).ToList();
+    }
+
+    public async Task<Dictionary<Guid, ReplyMessageDto>> GetReplyPreviews(List<Guid> replyToIds, Guid currentUserId, CancellationToken cancellationToken = default)
+    {
+        var distinctIds = replyToIds.Distinct().ToList();
+        if (!distinctIds.Any())
+            return new Dictionary<Guid, ReplyMessageDto>();
+
+        return await (
+            from message in _context.Messages.AsNoTracking()
+            join user in _context.Users.AsNoTracking() on message.SenderId equals user.Id
+            where distinctIds.Contains(message.Id)
+            where message.DeletedAt == null
+            where !_context.UserDeletedMessages
+                .Any(udm => udm.MessageId == message.Id && udm.UserId == currentUserId)
+            select new
+            {
+                message.Id,
+                SenderName = user.DisplayName,
+                message.Text,
+                IsDeleted = message.DeletedAt.HasValue
+            }
+        ).ToDictionaryAsync(
+            x => x.Id,
+            x => new ReplyMessageDto(
+                x.Id,
+                x.SenderName,
+                x.Text,
+                x.IsDeleted
+            ),
+            cancellationToken
+        );
     }
 
     public async Task<Message> GetById(Guid messageId)
@@ -55,7 +89,14 @@ public class MessagesRepository : IMessagesRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == messageId) ?? throw new MessageNotFoundException();
 
-        return Message.Restore(messageEntity.Id, messageEntity.ChatId, messageEntity.SenderId, messageEntity.Text, messageEntity.SentAt, messageEntity.DeletedAt);
+        return Message.Restore(
+            messageEntity.Id, 
+            messageEntity.ChatId, 
+            messageEntity.SenderId, 
+            messageEntity.Text, 
+            messageEntity.SentAt, 
+            messageEntity.DeletedAt,
+            messageEntity.ReplyToMessageId);
     }
 
     public async Task<DateTimeOffset?> GetSentAtById(Guid messageId)

@@ -70,4 +70,13 @@ public class UsersRepository : IUsersRepository
             .Where(u => u.Id == userId)
             .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastSeenAt, lastSeenAt));
     }
+
+    public async Task<string> GetDisplayName(Guid id)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .Where(u => u.Id == id)
+            .Select(u => u.DisplayName)
+            .FirstOrDefaultAsync() ?? throw new UserNotFoundException();
+    }
 }

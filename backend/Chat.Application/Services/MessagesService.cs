@@ -6,14 +6,22 @@ using Chat.Application.DTOs;
 namespace Chat.Application.Services;
 public class MessagesService
 {
+    private readonly IUsersRepository _usersRepository;
     private readonly IMessagesRepository _messagesRepository;
     private readonly IChatMembersRepository _chatMemberRepository;
     private readonly IMessageReactionsRepository _messageReactionsRepository;
     private readonly IPinnedMessagesRepository _pinnedMessagesRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public MessagesService(IMessagesRepository messagesRepository, IChatMembersRepository chatMembersRepository, IMessageReactionsRepository messageReactionsRepository, IPinnedMessagesRepository pinnedMessagesRepository, IUnitOfWork unitOfWork)
+    public MessagesService(
+        IUsersRepository usersRepository,
+        IMessagesRepository messagesRepository, 
+        IChatMembersRepository chatMembersRepository, 
+        IMessageReactionsRepository messageReactionsRepository, 
+        IPinnedMessagesRepository pinnedMessagesRepository, 
+        IUnitOfWork unitOfWork)
     {
+        _usersRepository = usersRepository;
         _messagesRepository = messagesRepository;
         _chatMemberRepository = chatMembersRepository;
         _messageReactionsRepository = messageReactionsRepository;
@@ -21,13 +29,30 @@ public class MessagesService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Message> Send(Guid chatId, Guid senderId, string text)
+    public async Task<MessageDto> Send(Guid chatId, Guid senderId, string text, Guid? replyToMessageId = null)
     {
-        var message = Message.Create(
-            chatId,
-            senderId,
-            text
-        );
+        ReplyMessageDto? replyMessageDto = null;
+
+        if (replyToMessageId.HasValue)
+        {
+            var parentMessage = await _messagesRepository.GetById(replyToMessageId.Value);
+
+            if (parentMessage.ChatId != chatId)
+            {
+                throw new InvalidReplyMessageException();
+            }
+
+            var senderName = await _usersRepository.GetDisplayName(parentMessage.SenderId);
+
+            replyMessageDto = new ReplyMessageDto(
+                parentMessage.Id,
+                senderName,
+                parentMessage.Text,
+                parentMessage.IsDeleted
+            );
+        }
+
+        var message = Message.Create(chatId, senderId, text, replyToMessageId);
 
         await _messagesRepository.Add(message);
         
@@ -37,7 +62,17 @@ public class MessagesService
 
         await _chatMemberRepository.IncrementUnreadCount(chatId, senderId);
 
-        return message;
+        return new MessageDto(
+            message.Id,
+            message.ChatId,
+            message.SenderId,
+            message.Text,
+            message.SentAt,
+            message.IsDeleted,
+            Status: MessageStatus.Sent,
+            Reactions: new List<ReactionDto>(),
+            replyMessageDto
+        );
     }
 
     public async Task<Message> GetById(Guid messageId)
@@ -50,6 +85,13 @@ public class MessagesService
         var messages = await _messagesRepository.GetByChatId(chatId, currentUserId, cancellationToken);
 
         var messageIds = messages.Select(m => m.Id).ToList();
+
+        var replyToIds = messages
+            .Where(m => m.ReplyToMessageId.HasValue)
+            .Select(m => m.ReplyToMessageId!.Value)
+            .ToList();
+
+        var replyPreviews = await _messagesRepository.GetReplyPreviews(replyToIds, currentUserId, cancellationToken);
 
         var reactions = await _messageReactionsRepository.GetByMessageIds(messageIds);
 
@@ -82,6 +124,12 @@ public class MessagesService
                 ))
                 .ToList();
 
+            ReplyMessageDto? replyToMessageDto = null;
+            if (m.ReplyToMessageId.HasValue)
+            {
+                replyPreviews.TryGetValue(m.ReplyToMessageId.Value, out replyToMessageDto);
+            }
+
             return new MessageDto
             (
                 m.Id,
@@ -91,7 +139,8 @@ public class MessagesService
                 m.SentAt,
                 m.IsDeleted,
                 CalculateMessageStatus(m, currentUserId, recipientLastReadMessageSentAt),
-                reactionDtos
+                reactionDtos,
+                replyToMessageDto
             );
         }).ToList();
     }

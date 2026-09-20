@@ -68,7 +68,8 @@ export const useMessenger = () => {
         currentUser,
         setChats,
         selectedChatId,
-        closeReply
+        closeReply,
+        replyToMessage
     });
 
     const { isLoadingMessages, fetchMessages } = useChatMessages({

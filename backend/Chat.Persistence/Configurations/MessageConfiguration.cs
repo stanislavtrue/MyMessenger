@@ -21,5 +21,12 @@ public class MessageConfiguration : IEntityTypeConfiguration<MessageEntity>
 
         builder.Property(m => m.SentAt)
             .IsRequired();
+
+        builder.HasIndex(m => m.ReplyToMessageId);
+
+        builder.HasOne(m => m.ReplyToMessage)
+            .WithMany()
+            .HasForeignKey(m => m.ReplyToMessageId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
