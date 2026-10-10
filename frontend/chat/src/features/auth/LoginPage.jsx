@@ -1,42 +1,116 @@
 import { useState } from "react";
-import connection from "../messenger/services/chatHub";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeClosed, EyeOff } from "lucide-react";
+import { ChevronRight, Eye, EyeClosed, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
     const [showPassword, setShowPassword] = useState(false);
+
+    const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [fieldErrors, setFieldErrors] = useState({
+        email: "",
+        password: ""
+    });
+
+    const [touched, setTouched] = useState({
+        email: false,
+        password: false
+    });
+
+    const handleFieldChanged = (field, value, setter) => {
+        setter(value);
+
+        setTouched((prev) => ({
+            ...prev,
+            [field]: true
+        }));
+
+        setError("");
+
+        setFieldErrors((prev) => ({
+            ...prev,
+            [field]: ""
+        }));
+    }
+
+    const fieldOrder = ["email", "password"];
+
+    const getFirstError = (errors) =>
+        fieldOrder
+            .map((field) => errors[field])
+            .find((message) => Boolean(message)) ?? "";
+    
 
     const navigate = useNavigate();
 
+    const validateEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
 
-        const response = await fetch("http://localhost:5079/api/auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                email: email,
-                password: password
-            })
-        });
+        const errors = {
+            email: "",
+            password: ""
+        }
 
-        const data = await response.json();
+        if (!email) {
+            errors.email = "Email is required";
+        } else if (!validateEmail(email)) {
+            errors.email = "Invalid email format";
+        }
 
-        if (response.ok === false) {
-            console.log(response.statusText)
+        if (!password) {
+            errors.password = "Password is required";
+        }
+
+        setFieldErrors(errors);
+
+        if (Object.values(errors).some(Boolean)) {
             return;
         }
-        
-        const accessToken = data.accessToken
 
-        localStorage.setItem("accessToken", accessToken);
+        setIsSubmitting(true);
 
-        navigate("/test");
+        try {
+            const response = await fetch("http://localhost:5079/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setFieldErrors({ password: true });
+                setError(response.status === 401 
+                    ? "Invalid email or password." 
+                    : "Login failed. Please try again.");
+                return;
+            }
+            
+            const accessToken = data.accessToken
+
+            localStorage.setItem("accessToken", accessToken);
+
+            navigate("/test");
+        } catch {
+            setError("An error occurred while logging in.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -61,7 +135,7 @@ export default function LoginPage() {
                 onSubmit={handleSubmit}
                 className="
                     relative flex flex-col pb-4! pt-4!
-                    bg-[#1C1C1C] rounded-3xl select-none w-100
+                    bg-[#171717] rounded-3xl select-none w-100
                     border-r! border-l! border-[#2C2C2C]
                     shadow-[0px_0px_5px_rgba(0,0,0,0.8)]
                 "
@@ -81,27 +155,33 @@ export default function LoginPage() {
                 <div className="flex flex-col w-full gap-6 px-4! pt-6!">
                     <div className="relative flex items-center justify-center w-full group">
                         <input 
-                            type="text"
+                            type="email"
                             id="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => handleFieldChanged("email", e.target.value, setEmail)}
+                            autoComplete="email"
                             placeholder=" "
-                            className="
-                                h-12 w-full rounded-2xl outline-none! ring-[1.5px]! ring-white/10
-                                px-4! group-hover:ring-[#527AFF] group-hover:placeholder-[#527AFF]!
-                                group-focus-within:ring-[#527AFF] group-focus-within:placeholder-[#527AFF]!
-                                group-focus-within:ring-2! peer transition-all duration-200
-                            "
+                            className={`
+                                h-12 w-full rounded-2xl outline-none! ring-[1.5px]!
+                                px-4! peer transition-all duration-200
+                                ${fieldErrors.email
+                                    ? "ring-red-500 group-hover:ring-red-500 group-focus-within:ring-red-500 group-focus-within:ring-2!"
+                                    : "ring-white/10 group-hover:ring-[#527AFF] group-hover:placeholder-[#527AFF]! group-focus-within:ring-[#527AFF] group-focus-within:placeholder-[#527AFF]! group-focus-within:ring-2!"
+                                }
+                            `}
                         />
                         <label 
                             htmlFor="email" 
-                            className="
-                                absolute left-4 origin-left transform text-[#959595] group-hover:text-[#527AFF]
-                                group-focus-within:text-[#527AFF] group-focus-within:-translate-y-6 group-focus-within:-translate-x-2
-                                group-focus-within:text-xs! group-focus-within:bg-[#1C1C1C] group-focus-within:px-1! group-focus-within:font-medium!
+                            className={`
+                                absolute left-4 origin-left transform group-focus-within:-translate-y-6 group-focus-within:-translate-x-2
+                                group-focus-within:text-xs! group-focus-within:bg-[#171717] group-focus-within:px-1! group-focus-within:font-medium!
                                 duration-200 cursor-text not-peer-placeholder-shown:-translate-y-6 not-peer-placeholder-shown:-translate-x-2
-                                not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1C1C1C]
-                            "
+                                not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#171717]
+                                ${fieldErrors.email
+                                    ? "text-red-400 group-hover:text-red-500 group-focus-within:text-red-500"
+                                    : "text-[#959595] group-hover:text-[#527AFF] group-focus-within:text-[#527AFF]"
+                                }
+                            `}
                         >
                             Email
                         </label>
@@ -111,48 +191,85 @@ export default function LoginPage() {
                             type={showPassword ? "text" : "password"}
                             id="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => handleFieldChanged("password", e.target.value, setPassword)}
                             placeholder=" "
                             className={`
-                                h-12 w-full rounded-2xl outline-none! ring-[1.5px]! ring-white/10
-                                pl-4! pr-12! group-hover:ring-[#527AFF] group-hover:placeholder-[#527AFF]!
-                                group-focus-within:ring-[#527AFF] group-focus-within:placeholder-[#527AFF]!
-                                group-focus-within:ring-2! peer transition-all duration-200
+                                h-12 w-full rounded-2xl outline-none! ring-[1.5px]!
+                                pl-4! pr-12! peer transition-all duration-200
+                                ${fieldErrors.password
+                                    ? "ring-red-500 group-hover:ring-red-500 group-focus-within:ring-red-500 group-focus-within:ring-2!"
+                                    : "ring-white/10 group-hover:ring-[#527AFF] group-hover:placeholder-[#527AFF]! group-focus-within:ring-[#527AFF] group-focus-within:placeholder-[#527AFF]! group-focus-within:ring-2!"
+                                }
                             `}
                         />
                         <label 
                             htmlFor="password" 
-                            className="
-                                absolute left-4 origin-left transform text-[#959595] group-hover:text-[#527AFF]
-                                group-focus-within:text-[#527AFF] group-focus-within:-translate-y-6 group-focus-within:-translate-x-2
-                                group-focus-within:text-xs! group-focus-within:bg-[#1C1C1C] group-focus-within:px-1! group-focus-within:font-medium!
+                            className={`
+                                absolute left-4 origin-left transform group-focus-within:-translate-y-6 group-focus-within:-translate-x-2
+                                group-focus-within:text-xs! group-focus-within:bg-[#171717] group-focus-within:px-1! group-focus-within:font-medium!
                                 duration-200 cursor-text not-peer-placeholder-shown:-translate-y-6 not-peer-placeholder-shown:-translate-x-2
-                                not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#1C1C1C]
-                            "
+                                not-peer-placeholder-shown:text-xs! not-peer-placeholder-shown:px-1! not-peer-placeholder-shown:bg-[#171717]
+                                ${fieldErrors.password
+                                    ? "text-red-400 group-hover:text-red-500 group-focus-within:text-red-500"
+                                    : "text-[#959595] group-hover:text-[#527AFF] group-focus-within:text-[#527AFF]"
+                                }
+                            `}
                         >
                             Password
                         </label>
                         <button
                             type="button"
                             onClick={() => setShowPassword((prev) => !prev)}
-                            className="
+                            className={`
                                 absolute right-4 text-[#959595]! group-hover:text-[#527AFF]! hover:text-[#2E5FFF]!
                                 group-focus-within:text-[#527AFF]! cursor-pointer transition-[opacity, colors] duration-200
-                            "
+                                ${fieldErrors.password
+                                    ? "group-hover:text-red-500! hover:text-red-500! group-focus-within:text-red-500!"
+                                    : "group-hover:text-[#527AFF]! hover:text-[#2E5FFF]! group-focus-within:text-[#527AFF]!"
+                                } 
+                            `}
                         >
                             <div className={`transition-transform duration-300 ease-in-out ${showPassword ? "scale-110" : "scale-90"}`}>
                                 {showPassword === true ? (<Eye/>) : (<EyeClosed/>)}
                             </div>
                         </button>
                     </div>
+
+                    <div className="relative flex items-center">
+                        {(error || getFirstError(fieldErrors)) && (
+                            <p 
+                                className="absolute text-red-400 text-[15px]!" 
+                                role="alert"
+                                aria-live="polite"
+                            >
+                                {error || getFirstError(fieldErrors)}
+                            </p>
+                        )}
+                    </div>
+
                     <div className="relative flex items-center justify-center w-full group">
                         <button 
-                            className="h-12 w-full rounded-2xl bg-[#527AFF]! cursor-pointer text-lg! font-bold! hover:bg-[#2E5FFF]!
-                            transition-all duration-200"
+                            type="submit"
+                            className="h-12 w-full rounded-2xl bg-[#527AFF]! cursor-pointer text-lg! font-bold! hover:bg-[#2E5FFF]! transition-all duration-200"
                         >
                             Log in
                         </button>
                     </div>
+                </div>
+                
+                <div className="flex items-center justify-end pr-3! pt-3!">
+                    <span className="text-[#959595] text-[15px]! pr-1!">
+                        Don't have an account?
+                    </span>
+
+                    <button 
+                        type="button"
+                        onClick={() => navigate("/register")}
+                        className="flex text-[#527AFF]! hover:text-[#2E5FFF]! hover:underline transition-colors duration-300 cursor-pointer"
+                    >
+                        <span className="text-[15px]!">Register</span>
+                        <ChevronRight className="size-5.5!"/>
+                    </button>
                 </div>
             </form>
         </div>
