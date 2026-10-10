@@ -64,20 +64,21 @@ export const useMessenger = () => {
     
     const closeAddContact = () => setIsAddContactOpen(false);
 
-    const { markAsRead, handleSendMessage, handleSetReaction, handleDeleteMessageForEveryone, handleDeleteMessageForUser, handlePinMessage, handleUnpinMessage } = useChatHub({
-        currentUser,
-        setChats,
-        selectedChatId,
-        closeReply,
-        replyToMessage
-    });
-
     const { isLoadingMessages, fetchMessages } = useChatMessages({
         setChats,
         currentUserId: currentUser?.id,
         closeReply,
         replyToMessage
     })
+
+    const { markAsRead, handleSendMessage, handleSetReaction, handleDeleteMessageForEveryone, handleDeleteMessageForUser, handlePinMessage, handleUnpinMessage } = useChatHub({
+        currentUser,
+        setChats,
+        selectedChatId,
+        closeReply,
+        replyToMessage,
+        fetchMessages
+    });
 
     const handleAddContact = ({ firstName, lastName, username }) => {
         addContact(firstName, lastName, username);

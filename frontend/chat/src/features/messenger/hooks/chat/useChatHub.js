@@ -1,13 +1,19 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import connection from "../../services/chatHub";
 import { toggleOwnReaction } from "../../utils/toggleOwnReaction";
 import { MESSAGE_STATUS } from "../../constants/messageBubbleStatus";
 import { formatTime } from "@/utils/formatTime";
 import { formatDate } from "@/utils/formatDate";
 
-export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply, replyToMessage }) => {
+export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply, replyToMessage, fetchMessages }) => {
+    const selectedChatIdRef = useRef(selectedChatId);
+
     useEffect(() => {
-        const  startConnection = async () => {
+        selectedChatIdRef.current = selectedChatId;
+    }, [selectedChatId]);
+
+    useEffect(() => {
+        const startConnection = async () => {
             try {
                 if (connection.state === "Disconnected") {
                     await connection.start();
@@ -18,6 +24,31 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply, 
         };
 
         startConnection();
+    }, []);
+
+    useEffect(() => {
+        const handleReconnected = async (connectionId) => {
+            console.log("SignalR reconnected:", connectionId);
+
+            const chatId = selectedChatIdRef.current;
+
+            if (!chatId)
+                return;
+
+            try {
+                await connection.invoke("JoinChat", chatId);
+
+                await fetchMessages(chatId)
+            } catch (error) {
+                console.error("Failed to rejoin chat:", error);
+            }
+        };
+
+        connection.onreconnected(handleReconnected);
+
+        return () => {
+            connection.off("reconnected", handleReconnected);
+        };
     }, []);
     
     useEffect(() => {
@@ -232,7 +263,7 @@ export const useChatHub = ({ currentUser, setChats, selectedChatId, closeReply, 
 
                 const currentPinned = chat.pinnedMessages || [];
 
-                const isAlreadyPinned = currentPinned.some(pm => pm.messageId === pinnedMessage.MessageId)
+                const isAlreadyPinned = currentPinned.some(pm => pm.messageId === pinnedMessage.messageId)
                 if (isAlreadyPinned)
                     return chat;
 
