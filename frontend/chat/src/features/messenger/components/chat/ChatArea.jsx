@@ -5,7 +5,7 @@ import { MessageList } from "./MessageList";
 import { MessageInput } from "./chatFooter/MessageInput";
 
 export const ChatArea = ({ selectedChat, onSendMessage, isMobile, onBack, isLoadingMessages}) => {
-    const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
+    const [readTrackingChatId, setReadTrackingChatId] = useState(null);
 
     const headerRef = useRef(null);
     const footerRef = useRef(null);
@@ -37,8 +37,6 @@ export const ChatArea = ({ selectedChat, onSendMessage, isMobile, onBack, isLoad
     }, [selectedChat, selectedChat?.pinnedMessages?.length]);
 
     useLayoutEffect(() => {
-        setIsMessagesLoaded(false);
-
         if (!selectedChat || isLoadingMessages) 
             return;
 
@@ -47,7 +45,8 @@ export const ChatArea = ({ selectedChat, onSendMessage, isMobile, onBack, isLoad
             return;
 
         container.scrollTop = container.scrollHeight;
-        setIsMessagesLoaded(true);
+
+        setReadTrackingChatId(selectedChat.id);
     }, [selectedChat?.id, isLoadingMessages]);
 
     if(!selectedChat) {
@@ -86,8 +85,13 @@ export const ChatArea = ({ selectedChat, onSendMessage, isMobile, onBack, isLoad
                         }} 
                         className="w-full min-h-full flex flex-col transition-all duration-75 ease-out"
                     >
-                        {!isLoadingMessages && isMessagesLoaded && selectedChat && (
-                            <MessageList messages={selectedChat.messages} chat={selectedChat} scrollContainerRef={messagesScrollRef} />
+                        {!isLoadingMessages && selectedChat && (
+                            <MessageList 
+                                messages={selectedChat.messages} 
+                                chat={selectedChat} 
+                                scrollContainerRef={messagesScrollRef} 
+                                isReadTrackingEnabled={readTrackingChatId === selectedChat.id && !isLoadingMessages}
+                            />
                         )}
                     </div>
                 </div>

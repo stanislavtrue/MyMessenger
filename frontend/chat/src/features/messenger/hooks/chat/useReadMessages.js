@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react"
 
-export const useReadMessages = (messages, chatId, messagesContainerRef, onMarkAsRead) => {
+export const useReadMessages = (messages, chatId, messagesContainerRef, onMarkAsRead, isReadTrackingEnabled) => {
     const lastReadRef = useRef({
-        index: -1,
         messageId: null
     });
         
@@ -14,11 +13,15 @@ export const useReadMessages = (messages, chatId, messagesContainerRef, onMarkAs
 
     useEffect(() => {
         lastReadRef.current = {
-            index: -1,
             messageId: null
         };
     }, [chatId]);
 
+    useEffect(() => {
+        if (!isReadTrackingEnabled || !chatId || !messages.length)
+            return;
+    }, [messages, chatId, messagesContainerRef, isReadTrackingEnabled]);
+    
     useEffect(() => {
         if (!chatId || !messages.length) return;
 
@@ -26,39 +29,38 @@ export const useReadMessages = (messages, chatId, messagesContainerRef, onMarkAs
             (entries) => {
                 const visibleMessages = entries
                     .filter(entry => entry.isIntersecting)
-                    .filter(entry => entry.target.getAttribute("data-is-own") !== "true");
-
-                const visibleWithIndexes = visibleMessages
+                    .filter(entry => entry.target.getAttribute("data-is-own") !== "true")
                     .map(entry => {
                         const messageId = entry.target.getAttribute("data-message-id");
 
                         return {
                             messageId,
-                            index: messages.findIndex(message => message.id === messageId)
+                            index: messages.findIndex(message => String(message.id) === messageId)
                         };
-                    });
+                    })
+                    .filter(message => message.index !== -1);
 
-                if (!visibleWithIndexes.length)
+                if (!visibleMessages.length)
                     return;
                 
-                const lastVisibleMessage = visibleWithIndexes
-                    .reduce((last, current) => {
-                        if (current.index > last.index) 
-                            return current;
+                const lastVisibleMessage = visibleMessages
+                    .reduce((last, current) => current.index > last.index  
+                        ? current
+                        : last
+                    );
 
-                        else return last;
-                    });
+                const previousReadIndex = lastReadRef.current.messageId
+                    ? messages.findIndex(message => String(message.id) === String(lastReadRef.current.messageId))
+                    : -1;
 
-                if (lastVisibleMessage.index > lastReadRef.current.index) {
-                    lastReadRef.current = {
-                        index: lastVisibleMessage.index,
-                        messageId: lastVisibleMessage.messageId
-                    };
+                if (lastVisibleMessage.index <= previousReadIndex) 
+                    return;
 
-                    onMarkAsReadRef.current(chatId, lastVisibleMessage.messageId);
-                }
+                lastReadRef.current = {
+                    messageId: lastVisibleMessage.messageId
+                };
 
-                console.log(lastReadRef.current.index);
+                onMarkAsReadRef.current(chatId, lastVisibleMessage.messageId);
             },
             {
                 threshold: 0.5,

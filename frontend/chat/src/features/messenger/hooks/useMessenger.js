@@ -10,6 +10,7 @@ import { useChatHub } from "./chat/useChatHub";
 import { useChatMessages } from "./chat/useChatMessages";
 import { useAuthUser } from "./useAuthUser";
 import { useChats } from "./chat/useChats";
+import { useAutoScroll } from "./chat/useAutoScroll";
 
 export const useMessenger = () => {
     // --- Chat state --------------------------------------------------------------------------
@@ -50,6 +51,8 @@ export const useMessenger = () => {
     const { highlightMsgId, setHighlightMsgId, triggerHighlight } = useHighlightMessage();
 
     const { contextMenu, setContextMenu, showMenu, closeMenu } = useContextMenu();
+
+    const { bottomRef, scrollToBottom } = useAutoScroll();
 
     const chatSearch = useChatSearch(selectedChat, setIsChatSearchFocused);
 
@@ -135,6 +138,8 @@ export const useMessenger = () => {
         isLoadingMessages,
         isLoadingOlderMessages,
         hasMoreMessages,
+        bottomRef,
+        scrollToBottom,
         markAsRead,
         handleSendMessage,
         handlePinMessage,

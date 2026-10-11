@@ -8,12 +8,13 @@ import { ContextMenuWrapper } from "../common/ContextMenuWrapper";
 import { MessageItem } from "./MessageItem";
 import { DeleteMessageModal } from "../modals/DeleteMessageModal";
 
-export const MessageList = ({ messages, chat, scrollContainerRef }) => {
+export const MessageList = ({ messages, chat, scrollContainerRef, isReadTrackingEnabled }) => {
     const messengerContext = useMessengerContext();
     const { 
         contextMenu, showMenu, closeMenu, openReply, chatSearchText, filteredSearchMessages, 
         currentSearchIndex, highlightMsgId, triggerHighlight, markAsRead, selectedChatId,
-        handleDeleteMessageForEveryone, handleDeleteMessageForUser, fetchOlderMessages, isLoadingOlderMessages, hasMoreMessages
+        handleDeleteMessageForEveryone, handleDeleteMessageForUser, fetchOlderMessages, 
+        isLoadingOlderMessages, hasMoreMessages, bottomRef, scrollToBottom
     } = messengerContext;
 
     const scrollAnchorRef = useRef(null);
@@ -88,10 +89,9 @@ export const MessageList = ({ messages, chat, scrollContainerRef }) => {
     const [deletingMessage, setDeletingMessage] = useState(null);
 
     useMessageSearchNavigation(chatSearchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
-    const { bottomRef, scrollToBottom } = useAutoScroll();
     const messagesContainerRef = useRef();
 
-    useReadMessages(messages, selectedChatId, messagesContainerRef, markAsRead);
+    useReadMessages(messages, selectedChatId, messagesContainerRef, markAsRead, isReadTrackingEnabled);
 
     const handleQuickReply = (message) => {
         openReply(message);

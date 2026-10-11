@@ -14,7 +14,7 @@ export const ChatAvatar = ({ user, isSelected }) => {
                 transition-all duration-300
                 ${isSelected 
                     ? "bg-white border-[#056996]!"
-                    : "bg-[#0AC630] border-[#1C1C1C]!"
+                    : "bg-[#0AC630] border-[#171717]!"
                 }
                 ${user.isOnline
                     ? "opacity-100 scale-100"

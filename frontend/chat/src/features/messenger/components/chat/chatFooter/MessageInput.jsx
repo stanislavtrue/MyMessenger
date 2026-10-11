@@ -15,7 +15,7 @@ export const MessageInput = ({ onSendMessage }) => {
 
     const { 
         replyToMessage, replyPreview, closeReply, selectedChatId, 
-        isEmojiPickerOpen, setIsEmojiPickerOpen
+        isEmojiPickerOpen, setIsEmojiPickerOpen, scrollToBottom
     } = useMessengerContext();
 
     const { handleMouseEnter, handleMouseLeave } = useEmojiPickerHover(isEmojiPickerOpen, setIsEmojiPickerOpen);
@@ -60,6 +60,10 @@ export const MessageInput = ({ onSendMessage }) => {
         onSendMessage(text);
         setMessage("");
         inputRef.current?.focus();
+
+        setTimeout(() => {
+            scrollToBottom();
+        }, 50);
     };
 
     const handleEmojiClick = (emojiData) => {
