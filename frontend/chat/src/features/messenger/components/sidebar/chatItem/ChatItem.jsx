@@ -12,8 +12,10 @@ export const ChatItem = ({ chat, selectedChatId, setSelectedChatId, isContextAct
         createRipple(e);
 
         setTimeout(() => {
-            setSelectedChatId(chat.id);
-        }, 80);
+            if (selectedChatId !== chat.id) {
+                setSelectedChatId(chat.id);
+            }
+        }, 0);
     };
 
     const handleContextMenu = (e) => {

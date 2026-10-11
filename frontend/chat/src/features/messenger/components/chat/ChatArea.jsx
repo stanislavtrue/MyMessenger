@@ -4,9 +4,12 @@ import { PinnedMessageBar } from "./chatHeader/PinnedMessageBar";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./chatFooter/MessageInput";
 
-export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, onBack}) => {
+export const ChatArea = ({ selectedChat, onSendMessage, isMobile, onBack, isLoadingMessages}) => {
+    const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
+
     const headerRef = useRef(null);
     const footerRef = useRef(null);
+    const messagesScrollRef = useRef(null);
 
     const [padding, setPadding] = useState({
         top: 0,
@@ -33,6 +36,20 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
         return () => observer.disconnect();
     }, [selectedChat, selectedChat?.pinnedMessages?.length]);
 
+    useLayoutEffect(() => {
+        setIsMessagesLoaded(false);
+
+        if (!selectedChat || isLoadingMessages) 
+            return;
+
+        const container = messagesScrollRef.current;
+        if (!container)
+            return;
+
+        container.scrollTop = container.scrollHeight;
+        setIsMessagesLoaded(true);
+    }, [selectedChat?.id, isLoadingMessages]);
+
     if(!selectedChat) {
         return (
             <div className="flex-1 h-screen flex justify-center items-center" />
@@ -44,7 +61,10 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
             <div className="relative flex-1 flex flex-col w-full h-full overflow-hidden">
                 <div className="absolute top-0 inset-x-0 z-30 pointer-events-none">
                     <div className="max-w-180 mx-auto! w-full">
-                        <div ref={headerRef} className="bg-linear-to-t from-[#111111]/0 to-[#111111] pointer-events-auto">
+                        <div 
+                            ref={headerRef} 
+                            className="bg-linear-to-t from-[#111111]/0 to-[#111111] pointer-events-auto"
+                        >
                             <div className="pt-6! mx-auto! transition-all duration-75 ease-out">
                                 <ChatHeader chat={selectedChat} isMobile={isMobile} onBack={onBack} />
                             </div>
@@ -55,14 +75,28 @@ export const ChatArea = ({ selectedChat, onSendMessage, sidebarWidth, isMobile, 
                     </div>
                 </div>
                 
-                <div className="w-full h-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#282836] scrollbar-track-transparent">
-                    <div style={{ paddingTop: padding.top, paddingBottom: padding.bottom }} className="w-full min-h-full flex flex-col transition-all duration-75 ease-out">
-                        <MessageList messages={selectedChat.messages} chat={selectedChat} />
+                <div 
+                    ref={messagesScrollRef}               
+                    className="w-full h-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#282836] scrollbar-track-transparent"
+                >
+                    <div 
+                        style={{ 
+                            paddingTop: padding.top, 
+                            paddingBottom: padding.bottom 
+                        }} 
+                        className="w-full min-h-full flex flex-col transition-all duration-75 ease-out"
+                    >
+                        {!isLoadingMessages && isMessagesLoaded && selectedChat && (
+                            <MessageList messages={selectedChat.messages} chat={selectedChat} scrollContainerRef={messagesScrollRef} />
+                        )}
                     </div>
                 </div>
                 
                 <div className="absolute bottom-0 inset-x-0 z-30 pointer-events-none">
-                    <div ref={footerRef} className="max-w-180 mx-auto! transition-all duration-75 ease-out">
+                    <div 
+                        ref={footerRef} 
+                        className="max-w-180 mx-auto! transition-all duration-75 ease-out"
+                    >
                         <div className="pb-6! bg-linear-to-b from-[#111111]/0 to-[#111111] rounded-3xl pointer-events-auto">
                             <MessageInput onSendMessage={onSendMessage}/>
                         </div>

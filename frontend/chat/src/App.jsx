@@ -5,7 +5,7 @@ import { Sidebar } from "./features/messenger/components/sidebar/Sidebar";
 import { MessengerSceleton } from "./features/messenger/components/MessengerSceleton";
 
 export const MessengerContent = () => {
-    const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage, toast, isLoadingUser } = useMessengerContext();
+    const { chats, selectedChat, selectedChatId, sidebarWidth, windowWidth, setSidebarWidth, setSelectedChatId, handleSendMessage, toast, isLoadingUser, isLoadingMessages } = useMessengerContext();
 
     const isMobile = windowWidth < 768;
 
@@ -63,6 +63,7 @@ export const MessengerContent = () => {
                     sidebarWidth={sidebarWidth}
                     isMobile={isMobile}
                     onBack={() => setSelectedChatId(null)}
+                    isLoadingMessages={isLoadingMessages}
                 />
             )}
         </div>

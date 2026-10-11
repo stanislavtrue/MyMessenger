@@ -28,14 +28,14 @@ public class MessagesController : ControllerBase
 
     [Authorize]
     [HttpGet("{chatId}")]
-    public async Task<IActionResult> Messages(Guid chatId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Messages(Guid chatId, [FromQuery] Guid? beforeMessageId, [FromQuery] int limit = 30, CancellationToken cancellationToken = default)
     {
         var userId = GetUserId();
 
         if (!await _chatRoomService.HasAccess(chatId, userId))
             throw new ChatAccessDeniedException();
 
-        var response = await _messagesService.GetByChatId(userId, chatId, cancellationToken);
+        var response = await _messagesService.GetByChatId(userId, chatId, beforeMessageId, limit, cancellationToken);
 
         return Ok(response);
     }

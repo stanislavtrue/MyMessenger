@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MESSAGE_CONTEXT_MENU } from "../../constants/messageMenuItems";
 import { useMessengerContext } from "../../context/MessengerContext";
 import { useAutoScroll } from "../../hooks/chat/useAutoScroll";
@@ -8,18 +8,87 @@ import { ContextMenuWrapper } from "../common/ContextMenuWrapper";
 import { MessageItem } from "./MessageItem";
 import { DeleteMessageModal } from "../modals/DeleteMessageModal";
 
-export const MessageList = ({ messages, chat }) => {
+export const MessageList = ({ messages, chat, scrollContainerRef }) => {
     const messengerContext = useMessengerContext();
     const { 
         contextMenu, showMenu, closeMenu, openReply, chatSearchText, filteredSearchMessages, 
         currentSearchIndex, highlightMsgId, triggerHighlight, markAsRead, selectedChatId,
-        handleDeleteMessageForEveryone, handleDeleteMessageForUser
+        handleDeleteMessageForEveryone, handleDeleteMessageForUser, fetchOlderMessages, isLoadingOlderMessages, hasMoreMessages
     } = messengerContext;
+
+    const scrollAnchorRef = useRef(null);
+    const previousMessagesRef = useRef(messages);
+    const loadingOlderRef = useRef(false);
+
+    const isInitialMount = useRef(true);
+
+    useLayoutEffect(() => {
+        const container = scrollContainerRef?.current;
+        const anchor = scrollAnchorRef?.current;
+
+        if (container && anchor && anchor.chatId === chat.id) {
+            container.scrollTop = anchor.scrollTop + (container.scrollHeight - anchor.scrollHeight);
+            scrollAnchorRef.current = null;
+        }
+
+        previousMessagesRef.current = messages;
+        isInitialMount.current = false;
+    }, [messages, chat.id, scrollContainerRef]);
+
+    const handleScroll = useCallback(async () => {
+        const container = scrollContainerRef?.current;
+
+        if (isInitialMount.current || loadingOlderRef.current || isLoadingOlderMessages || !container || container.scrollTop > 10) 
+            return;
+
+        const page = hasMoreMessages?.[chat.id];
+        if (!page?.hasMore || !page?.nextCursor)
+            return;
+
+        loadingOlderRef.current = true;
+
+        scrollAnchorRef.current = {
+            chatId: chat.id,
+            scrollTop: container.scrollTop,
+            scrollHeight: container.scrollHeight
+        };
+
+        try {
+            await fetchOlderMessages(chat.id);
+        } catch (error) {
+            scrollAnchorRef.current = null;
+            console.error("Error loading older messages: ", error);
+        } finally {
+            loadingOlderRef.current = false;
+        }
+    }, [scrollContainerRef, hasMoreMessages, fetchOlderMessages, chat.id, isLoadingOlderMessages]);
+
+    useEffect(() => {
+        const container = scrollContainerRef?.current;
+        if (!container) 
+            return;
+
+        container.addEventListener("scroll", handleScroll, { passive: true });
+        
+        return () => {
+            container.removeEventListener("scroll", handleScroll);
+        };
+    }, [scrollContainerRef, handleScroll]);
+
+    useEffect(() => {
+        isInitialMount.current = true;
+
+        const timer = setTimeout(() => {
+            scrollToBottom("auto");
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, [chat.id]);
 
     const [deletingMessage, setDeletingMessage] = useState(null);
 
     useMessageSearchNavigation(chatSearchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
-    const bottomRef = useAutoScroll([messages.length]);
+    const { bottomRef, scrollToBottom } = useAutoScroll();
     const messagesContainerRef = useRef();
 
     useReadMessages(messages, selectedChatId, messagesContainerRef, markAsRead);
@@ -95,18 +164,26 @@ export const MessageList = ({ messages, chat }) => {
                         isPinned: pinnedMessageIds.has(message.id)
                     }
 
+                    const animationDelay = `${Math.min(visibleMessages.length - 1 - index, 20) * 0.015}s`;
+
                     return (
-                        <MessageItem 
+                        <div 
                             key={message.id || index}
-                            message={enrichedMessage}
-                            isFirstMessage={isFirstMessage}
-                            isLastMessage={isLastMessage}
-                            isHighlighted={isHighlighted}
-                            showDivider={showDivider}
-                            showMenu={showMenu}
-                            handleQuickReply={handleQuickReply}
-                            spacingClass={spacingClass}
-                        />
+                            className={`${visibleMessages.length - 1 - index < 30 ? "animate-message-scale-up" : ""}`}
+                            style={{ animationDelay }}
+                        >
+                            <MessageItem 
+                                key={message.id || index}
+                                message={enrichedMessage}
+                                isFirstMessage={isFirstMessage}
+                                isLastMessage={isLastMessage}
+                                isHighlighted={isHighlighted}
+                                showDivider={showDivider}
+                                showMenu={showMenu}
+                                handleQuickReply={handleQuickReply}
+                                spacingClass={spacingClass}
+                            />
+                        </div>
                     );
                 })}
             

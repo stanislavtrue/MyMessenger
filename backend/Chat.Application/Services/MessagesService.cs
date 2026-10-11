@@ -80,9 +80,11 @@ public class MessagesService
         return await _messagesRepository.GetById(messageId);
     }
 
-    public async Task<List<MessageDto>> GetByChatId(Guid currentUserId, Guid chatId, CancellationToken cancellationToken)
+    public async Task<MessagePageDto> GetByChatId(Guid currentUserId, Guid chatId, Guid? beforeMessageId, int pageSize, CancellationToken cancellationToken)
     {
-        var messages = await _messagesRepository.GetByChatId(chatId, currentUserId, cancellationToken);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var (messages, hasMore) = await _messagesRepository.GetPageByChatId(chatId, currentUserId, beforeMessageId, pageSize, cancellationToken);
 
         var messageIds = messages.Select(m => m.Id).ToList();
 
@@ -111,7 +113,7 @@ public class MessagesService
                 recipientLastReadMessageSentAt = await _messagesRepository.GetSentAtById(recipientLastReadMessageId.Value);
         }
 
-        return messages.Select(m =>
+        var items = messages.Select(m =>
         {
             var messageReactions = reactionsByMessage.GetValueOrDefault(m.Id) ?? new List<MessageReaction>();
 
@@ -143,6 +145,12 @@ public class MessagesService
                 replyToMessageDto
             );
         }).ToList();
+
+        var nextCursor = hasMore 
+            ? messages.FirstOrDefault()?.Id 
+            : null;
+
+        return new MessagePageDto(items, hasMore, nextCursor);
     }
 
     public async Task<Dictionary<Guid, LastMessageDto>> GetLastMessagesByUserIds(Guid chatId, List<Guid> userIds, CancellationToken cancellationToken = default)

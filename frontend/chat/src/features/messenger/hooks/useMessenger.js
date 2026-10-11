@@ -64,7 +64,7 @@ export const useMessenger = () => {
     
     const closeAddContact = () => setIsAddContactOpen(false);
 
-    const { isLoadingMessages, fetchMessages } = useChatMessages({
+    const { isLoadingMessages, isLoadingOlderMessages, hasMoreMessages, fetchMessages, fetchOlderMessages } = useChatMessages({
         setChats,
         currentUserId: currentUser?.id,
         closeReply,
@@ -133,12 +133,15 @@ export const useMessenger = () => {
 
         // Chat messages
         isLoadingMessages,
+        isLoadingOlderMessages,
+        hasMoreMessages,
         markAsRead,
         handleSendMessage,
         handlePinMessage,
         handleUnpinMessage,
         handleDeleteMessageForEveryone,
         handleDeleteMessageForUser,
+        fetchOlderMessages,
 
         // Reactions
         handleSetReaction,

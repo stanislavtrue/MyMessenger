@@ -1,13 +1,11 @@
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 
-export const useAutoScroll = (dependecies) => {
+export const useAutoScroll = () => {
     const bottomRef = useRef(null);
 
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({
-            behavior: "smooth"
-        });
-    }, dependecies);
-    
-    return bottomRef;
+    const scrollToBottom = useCallback((behavior = "smooth") => {
+        bottomRef.current?.scrollIntoView({ behavior });
+    }, []);
+
+    return { bottomRef, scrollToBottom };
 };

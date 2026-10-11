@@ -30,6 +30,57 @@ public class MessagesRepository : IMessagesRepository
         await _context.Messages.AddAsync(messageEntity);
     }
 
+    public async Task<(List<Message> Messages, bool HasMore)> GetPageByChatId(Guid chatId, Guid currentUserId, Guid? beforeMessageId, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Messages
+            .AsNoTracking()
+            .Where(m => m.ChatId == chatId)
+            .Where(m => !_context.UserDeletedMessages
+                .Any(udm => udm.MessageId == m.Id && udm.UserId == currentUserId));
+
+        if (beforeMessageId.HasValue)
+        {
+            var cursor = await _context.Messages
+                .AsNoTracking()
+                .Where(m => m.Id == beforeMessageId.Value && m.ChatId == chatId)
+                .Select(m => new { m.Id, m.SentAt })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (cursor is null)
+                throw new MessageNotFoundException();
+
+            query = query.Where(m =>
+                m.SentAt < cursor.SentAt ||
+                (m.SentAt == cursor.SentAt && 
+                m.Id.CompareTo(cursor.Id) < 0));
+        }
+
+        var entities = await query
+            .OrderByDescending(m => m.SentAt)
+            .ThenByDescending(m => m.Id)
+            .Take(pageSize + 1)
+            .ToListAsync(cancellationToken);
+
+        var hasMore = entities.Count > pageSize;
+
+        if (hasMore)
+            entities.RemoveAt(entities.Count - 1);
+
+        entities.Reverse();
+
+        var messages = entities.Select(m => Message.Restore(
+            m.Id,
+            m.ChatId,
+            m.SenderId,
+            m.Text,
+            m.SentAt,
+            m.DeletedAt,
+            m.ReplyToMessageId
+        )).ToList();
+
+        return (messages, hasMore);
+    }
+
     public async Task<List<Message>> GetByChatId(Guid chatId, Guid currentUserId, CancellationToken cancellationToken = default)
     {
         var messageEntities = await _context.Messages

@@ -318,3 +318,19 @@ aside.EmojiPickerReact {
 .reaction-set {
     animation: reactionSet 0.5s ease-in-out forwards;
 }
+
+@keyframes messageScaleUp {
+    from {
+        transform: scale(0.8);
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-message-scale-up {
+    animation: messageScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+}
+

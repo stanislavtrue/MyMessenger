@@ -5,6 +5,7 @@ namespace Chat.Application.Interfaces;
 public interface IMessagesRepository
 {
     Task Add(Message message);
+    Task<(List<Message> Messages, bool HasMore)> GetPageByChatId(Guid chatId, Guid currentUserId, Guid? beforeMessageId, int pageSize, CancellationToken cancellationToken = default);
     Task<List<Message>> GetByChatId(Guid chatId, Guid currentUserId, CancellationToken cancellationToken = default);
     Task<Dictionary<Guid, ReplyMessageDto>> GetReplyPreviews(List<Guid> replyToIds, Guid currentUserId, CancellationToken cancellationToken = default);
     Task<Message> GetById(Guid messageId);
