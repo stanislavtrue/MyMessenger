@@ -212,6 +212,7 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
                                 key={message.id || index}
                                 data-message-id={message.id}
                                 data-message-date={message.date}
+                                data-is-own={message.isOwnMessage ? "true" : "false"}
                                 className={`${visibleMessages.length - 1 - index < 30 ? "animate-message-scale-up" : ""}`}
                                 style={{ animationDelay }}
                             >

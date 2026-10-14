@@ -8,12 +8,8 @@ export const MessageItem = memo(({ message, isFirstMessage, isLastMessage, isHig
     return (
         <div 
             id={`msg-${message.id}`}
-            data-message-id={message.id}
-            data-is-own={message.isOwnMessage}
             className="w-full flex flex-col"
         >
-            
-
             {!isDeleted && (
                 <div 
                     onDoubleClick={() => handleQuickReply(message)} 

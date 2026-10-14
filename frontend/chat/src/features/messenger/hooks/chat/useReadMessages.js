@@ -18,12 +18,8 @@ export const useReadMessages = (messages, chatId, messagesContainerRef, onMarkAs
     }, [chatId]);
 
     useEffect(() => {
-        if (!isReadTrackingEnabled || !chatId || !messages.length)
+        if (!isReadTrackingEnabled || !chatId || !messages.length || !messagesContainerRef.current) 
             return;
-    }, [messages, chatId, messagesContainerRef, isReadTrackingEnabled]);
-    
-    useEffect(() => {
-        if (!chatId || !messages.length) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -73,5 +69,5 @@ export const useReadMessages = (messages, chatId, messagesContainerRef, onMarkAs
         return () => {
             observer.disconnect();
         };
-    }, [messages, chatId, messagesContainerRef]); 
+    }, [messages, chatId, messagesContainerRef, isReadTrackingEnabled]); 
 };
