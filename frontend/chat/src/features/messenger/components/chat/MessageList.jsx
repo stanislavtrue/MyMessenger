@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MESSAGE_CONTEXT_MENU } from "../../constants/messageMenuItems";
 import { useMessengerContext } from "../../context/MessengerContext";
-import { useAutoScroll } from "../../hooks/chat/useAutoScroll";
 import { useMessageSearchNavigation } from "../../hooks/chat/useMessageSearchNavigation";
 import { useReadMessages } from "../../hooks/chat/useReadMessages";
 import { ContextMenuWrapper } from "../common/ContextMenuWrapper";
 import { MessageItem } from "./MessageItem";
 import { DeleteMessageModal } from "../modals/DeleteMessageModal";
+import { formatDividerDate } from "../../utils/formatDividerDate";
 
 export const MessageList = ({ messages, chat, scrollContainerRef, isReadTrackingEnabled }) => {
     const messengerContext = useMessengerContext();
@@ -23,12 +23,45 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
 
     const isInitialMount = useRef(true);
 
+    const saveScrollAnchor = useCallback(() => {
+        const container = scrollContainerRef?.current;
+        if (!container)
+            return;
+
+        const containerTop = container.getBoundingClientRect().top;
+        const messageElements = container.querySelectorAll("[data-message-id]");
+
+        for (const element of messageElements) {
+            const rect = element.getBoundingClientRect();
+
+            if (rect.bottom > containerTop) {
+                scrollAnchorRef.current = {
+                    chatId: chat.id,
+                    messageId: element.dataset.messageId,
+                    offset: rect.top - containerTop,
+                };
+
+                return;
+            }
+        }
+    }, [scrollContainerRef, chat.id]);
+
     useLayoutEffect(() => {
         const container = scrollContainerRef?.current;
         const anchor = scrollAnchorRef?.current;
 
         if (container && anchor && anchor.chatId === chat.id) {
-            container.scrollTop = anchor.scrollTop + (container.scrollHeight - anchor.scrollHeight);
+            const element = Array
+                .from(container.querySelectorAll("[data-message-id]"))
+                .find(el => el.dataset.messageId === String(anchor.messageId));
+
+            if (element) {
+                const containerTop = container.getBoundingClientRect().top;
+                const newOffset = element.getBoundingClientRect().top - containerTop;
+
+                container.scrollTop += newOffset - anchor.offset;
+            }
+
             scrollAnchorRef.current = null;
         }
 
@@ -47,12 +80,7 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
             return;
 
         loadingOlderRef.current = true;
-
-        scrollAnchorRef.current = {
-            chatId: chat.id,
-            scrollTop: container.scrollTop,
-            scrollHeight: container.scrollHeight
-        };
+        saveScrollAnchor();
 
         try {
             await fetchOlderMessages(chat.id);
@@ -62,7 +90,7 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
         } finally {
             loadingOlderRef.current = false;
         }
-    }, [scrollContainerRef, hasMoreMessages, fetchOlderMessages, chat.id, isLoadingOlderMessages]);
+    }, [scrollContainerRef, hasMoreMessages, fetchOlderMessages, chat.id, isLoadingOlderMessages, saveScrollAnchor]);
 
     useEffect(() => {
         const container = scrollContainerRef?.current;
@@ -132,10 +160,11 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
                 {visibleMessages.map((message, index) => {
                     const previousMessage = visibleMessages[index - 1];
                     const nextMessage = visibleMessages[index + 1];
+                    const hasMoreOlderMessages = hasMoreMessages?.[chat.id]?.hasMore ?? false;
 
                     const showDivider = 
-                        !previousMessage || 
-                        previousMessage.date !== message.date;
+                        (!previousMessage && !hasMoreOlderMessages) || 
+                        (previousMessage && previousMessage.date !== message.date);
 
                     const isFirstMessage = 
                         !previousMessage ||
@@ -167,26 +196,41 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
                     const animationDelay = `${Math.min(visibleMessages.length - 1 - index, 20) * 0.015}s`;
 
                     return (
-                        <div 
-                            key={message.id || index}
-                            className={`${visibleMessages.length - 1 - index < 30 ? "animate-message-scale-up" : ""}`}
-                            style={{ animationDelay }}
-                        >
-                            <MessageItem 
+                        <React.Fragment key={message.id || index}>
+                            {showDivider && (
+                                <div 
+                                    key={`divider-${message.date}`}
+                                    className="flex justify-center my-4! select-none pointer-events-none"
+                                >
+                                    <div className="px-3! py-1! flex items-center justify-center bg-[#00C8FF]/15 text-sm! text-white font-semibold! rounded-2xl">
+                                        {formatDividerDate(message.date)}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <div
                                 key={message.id || index}
-                                message={enrichedMessage}
-                                isFirstMessage={isFirstMessage}
-                                isLastMessage={isLastMessage}
-                                isHighlighted={isHighlighted}
-                                showDivider={showDivider}
-                                showMenu={showMenu}
-                                handleQuickReply={handleQuickReply}
-                                spacingClass={spacingClass}
-                            />
-                        </div>
+                                data-message-id={message.id}
+                                data-message-date={message.date}
+                                className={`${visibleMessages.length - 1 - index < 30 ? "animate-message-scale-up" : ""}`}
+                                style={{ animationDelay }}
+                            >
+                                <MessageItem 
+                                    key={message.id || index}
+                                    message={enrichedMessage}
+                                    isFirstMessage={isFirstMessage}
+                                    isLastMessage={isLastMessage}
+                                    isHighlighted={isHighlighted}
+                                    showDivider={showDivider}
+                                    showMenu={showMenu}
+                                    handleQuickReply={handleQuickReply}
+                                    spacingClass={spacingClass}
+                                />
+                            </div>
+                        </React.Fragment>
                     );
                 })}
-            
+                
                 <div ref={bottomRef} />
 
             </div>

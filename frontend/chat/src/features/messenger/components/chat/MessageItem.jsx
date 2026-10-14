@@ -12,13 +12,7 @@ export const MessageItem = memo(({ message, isFirstMessage, isLastMessage, isHig
             data-is-own={message.isOwnMessage}
             className="w-full flex flex-col"
         >
-            {showDivider && (
-                <div className="flex justify-center my-4! select-none pointer-events-none">
-                    <div className="px-2! py-1! bg-[#006FC3]/40 text-sm! font-semibold! rounded-2xl">
-                        {formatDividerDate(message.date)}
-                    </div>
-                </div>
-            )}
+            
 
             {!isDeleted && (
                 <div 

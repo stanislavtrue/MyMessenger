@@ -22,5 +22,5 @@ export const formatDividerDate = (dateString) => {
     if (isSameDay(messageDate, today)) return "Today";
     if (isSameDay(messageDate, yesterday)) return "Yesterday";
 
-    return messageDate.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+    return messageDate.toLocaleDateString("en-US", { day: "numeric", month: "long" });
 }
