@@ -7,6 +7,7 @@ import { ContextMenuWrapper } from "../common/ContextMenuWrapper";
 import { MessageItem } from "./MessageItem";
 import { DeleteMessageModal } from "../modals/DeleteMessageModal";
 import { formatDividerDate } from "../../utils/formatDividerDate";
+import { useMessagePagination } from "../../hooks/chat/useMessagePagination";
 
 export const MessageList = ({ messages, chat, scrollContainerRef, isReadTrackingEnabled }) => {
     const messengerContext = useMessengerContext();
@@ -17,114 +18,20 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
         isLoadingOlderMessages, hasMoreMessages, bottomRef, scrollToBottom
     } = messengerContext;
 
-    const scrollAnchorRef = useRef(null);
-    const previousMessagesRef = useRef(messages);
-    const loadingOlderRef = useRef(false);
-
-    const isInitialMount = useRef(true);
-
-    const saveScrollAnchor = useCallback(() => {
-        const container = scrollContainerRef?.current;
-        if (!container)
-            return;
-
-        const containerTop = container.getBoundingClientRect().top;
-        const messageElements = container.querySelectorAll("[data-message-id]");
-
-        for (const element of messageElements) {
-            const rect = element.getBoundingClientRect();
-
-            if (rect.bottom > containerTop) {
-                scrollAnchorRef.current = {
-                    chatId: chat.id,
-                    messageId: element.dataset.messageId,
-                    offset: rect.top - containerTop,
-                };
-
-                return;
-            }
-        }
-    }, [scrollContainerRef, chat.id]);
-
-    useLayoutEffect(() => {
-        const container = scrollContainerRef?.current;
-        const anchor = scrollAnchorRef?.current;
-
-        if (container && anchor && anchor.chatId === chat.id) {
-            const element = Array
-                .from(container.querySelectorAll("[data-message-id]"))
-                .find(el => el.dataset.messageId === String(anchor.messageId));
-
-            if (element) {
-                const containerTop = container.getBoundingClientRect().top;
-                const newOffset = element.getBoundingClientRect().top - containerTop;
-
-                container.scrollTop += newOffset - anchor.offset;
-            }
-
-            scrollAnchorRef.current = null;
-        }
-
-        previousMessagesRef.current = messages;
-        isInitialMount.current = false;
-    }, [messages, chat.id, scrollContainerRef]);
-
-    const handleScroll = useCallback(async () => {
-        const container = scrollContainerRef?.current;
-
-        if (isInitialMount.current || loadingOlderRef.current || isLoadingOlderMessages || !container || container.scrollTop > 10) 
-            return;
-
-        const page = hasMoreMessages?.[chat.id];
-        if (!page?.hasMore || !page?.nextCursor)
-            return;
-
-        loadingOlderRef.current = true;
-        saveScrollAnchor();
-
-        try {
-            await fetchOlderMessages(chat.id);
-        } catch (error) {
-            scrollAnchorRef.current = null;
-            console.error("Error loading older messages: ", error);
-        } finally {
-            loadingOlderRef.current = false;
-        }
-    }, [scrollContainerRef, hasMoreMessages, fetchOlderMessages, chat.id, isLoadingOlderMessages, saveScrollAnchor]);
-
-    useEffect(() => {
-        const container = scrollContainerRef?.current;
-        if (!container) 
-            return;
-
-        container.addEventListener("scroll", handleScroll, { passive: true });
-        
-        return () => {
-            container.removeEventListener("scroll", handleScroll);
-        };
-    }, [scrollContainerRef, handleScroll]);
-
-    useEffect(() => {
-        isInitialMount.current = true;
-
-        const timer = setTimeout(() => {
-            scrollToBottom("auto");
-        }, 0);
-
-        return () => clearTimeout(timer);
-    }, [chat.id]);
-
     const [deletingMessage, setDeletingMessage] = useState(null);
 
-    useMessageSearchNavigation(chatSearchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
     const messagesContainerRef = useRef();
+
+    useMessagePagination(scrollContainerRef, chat.id, isLoadingOlderMessages, hasMoreMessages, fetchOlderMessages, messages, scrollToBottom);
+
+    useMessageSearchNavigation(chatSearchText, filteredSearchMessages, currentSearchIndex, triggerHighlight);
 
     useReadMessages(messages, selectedChatId, messagesContainerRef, markAsRead, isReadTrackingEnabled);
 
-    const handleQuickReply = (message) => {
+    const handleQuickReply = useCallback((message) => {
         openReply(message);
         document.getElementById("message-input")?.focus();
-    };
+    }, [openReply]);
 
     const handleConfirmDelete = async (forEveryone) => {
         if (!deletingMessage)
@@ -152,6 +59,8 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
     const visibleMessages = useMemo(() => {
         return messages.filter(msg => !msg.isDeleted);
     }, [messages]);
+
+    const hasMoreOlderMessages = hasMoreMessages?.[chat.id]?.hasMore ?? false;
     
     return (
         <div className="relative flex flex-col w-full flex-1">
@@ -160,7 +69,6 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
                 {visibleMessages.map((message, index) => {
                     const previousMessage = visibleMessages[index - 1];
                     const nextMessage = visibleMessages[index + 1];
-                    const hasMoreOlderMessages = hasMoreMessages?.[chat.id]?.hasMore ?? false;
 
                     const showDivider = 
                         (!previousMessage && !hasMoreOlderMessages) || 
@@ -198,10 +106,7 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
                     return (
                         <React.Fragment key={message.id || index}>
                             {showDivider && (
-                                <div 
-                                    key={`divider-${message.date}`}
-                                    className="flex justify-center my-4! select-none pointer-events-none"
-                                >
+                                <div className="flex justify-center my-4! select-none pointer-events-none">
                                     <div className="px-3! py-1! flex items-center justify-center bg-[#00C8FF]/15 text-sm! text-white font-semibold! rounded-2xl">
                                         {formatDividerDate(message.date)}
                                     </div>
@@ -209,7 +114,6 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
                             )}
                             
                             <div
-                                key={message.id || index}
                                 data-message-id={message.id}
                                 data-message-date={message.date}
                                 data-is-own={message.isOwnMessage ? "true" : "false"}
@@ -217,7 +121,6 @@ export const MessageList = ({ messages, chat, scrollContainerRef, isReadTracking
                                 style={{ animationDelay }}
                             >
                                 <MessageItem 
-                                    key={message.id || index}
                                     message={enrichedMessage}
                                     isFirstMessage={isFirstMessage}
                                     isLastMessage={isLastMessage}

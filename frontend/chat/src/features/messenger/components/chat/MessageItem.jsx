@@ -1,8 +1,7 @@
 import { memo } from "react";
-import { formatDividerDate } from "../../utils/formatDividerDate";
 import { MessageBubble } from "./messageBubble/MessageBubble";
 
-export const MessageItem = memo(({ message, isFirstMessage, isLastMessage, isHighlighted, showDivider, showMenu, handleQuickReply, spacingClass }) => {
+export const MessageItem = memo(function MessageItem({ message, isFirstMessage, isLastMessage, isHighlighted, showMenu, handleQuickReply, spacingClass }) {
     const isDeleted = message.isDeleted;
 
     return (
@@ -34,13 +33,5 @@ export const MessageItem = memo(({ message, isFirstMessage, isLastMessage, isHig
                 </div>
             )}
         </div>
-    );
-}, (prevProps, nextProps) => {
-    return (
-        prevProps.message === nextProps.message &&
-        prevProps.isHighlighted === nextProps.isHighlighted &&
-        prevProps.isFirstMessage === nextProps.isFirstMessage &&
-        prevProps.isLastMessage === nextProps.isLastMessage &&
-        prevProps.showDivider === nextProps.showDivider
     );
 });
